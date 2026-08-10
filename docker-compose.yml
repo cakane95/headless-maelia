@@ -13,7 +13,6 @@ services:
 
   gama-headless:
     image: gamaplatform/gama:2025.06.4
-    container_name: maelia.headless
     ports:
       - "6868:6868"
     volumes:
