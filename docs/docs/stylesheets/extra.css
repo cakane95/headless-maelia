@@ -1,0 +1,244 @@
+/* =====================================================================
+   Plateforme MAELIA — Charte graphique de la documentation
+   Alignée sur le Design System du frontend (maelia-front/src/index.css) :
+   - Primaire « eau / teal »  : primary-600 #0E7C86 (action #0E7C86 / hover #115E67)
+   - Neutres « slate »
+   - Typographie : Inter (texte) + JetBrains Mono (code)
+   ===================================================================== */
+
+:root {
+  /* Palette teal MAELIA */
+  --maelia-primary-50:  #ECFEFF;
+  --maelia-primary-100: #CFFAFE;
+  --maelia-primary-200: #A5F0F5;
+  --maelia-primary-300: #67E0E8;
+  --maelia-primary-400: #2DC4D1;
+  --maelia-primary-500: #0E9CA8;
+  --maelia-primary-600: #0E7C86;
+  --maelia-primary-700: #115E67;
+  --maelia-primary-800: #134E55;
+  --maelia-primary-900: #134048;
+
+  /* Neutres slate */
+  --maelia-neutral-50:  #F8FAFC;
+  --maelia-neutral-100: #F1F5F9;
+  --maelia-neutral-200: #E2E8F0;
+  --maelia-neutral-300: #CBD5E1;
+  --maelia-neutral-500: #64748B;
+  --maelia-neutral-700: #334155;
+  --maelia-neutral-800: #1E293B;
+  --maelia-neutral-900: #0F172A;
+
+  /* Sémantiques */
+  --maelia-success: #16A34A;
+  --maelia-warning: #D97706;
+  --maelia-danger:  #DC2626;
+  --maelia-info:    #2563EB;
+
+  /* Rayons de la charte */
+  --md-code-radius: 10px;
+}
+
+/* ---- Branchement sur les variables Material (mode clair « custom ») ---- */
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color:         var(--maelia-primary-600);
+  --md-primary-fg-color--light:  var(--maelia-primary-500);
+  --md-primary-fg-color--dark:   var(--maelia-primary-700);
+  --md-primary-bg-color:         #ffffff;
+  --md-primary-bg-color--light:  rgba(255, 255, 255, 0.7);
+}
+
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color:          var(--maelia-primary-500);
+  --md-accent-fg-color--transparent: rgba(14, 156, 168, 0.1);
+  --md-accent-bg-color:          #ffffff;
+  --md-accent-bg-color--light:   rgba(255, 255, 255, 0.7);
+}
+
+/* ---- Mode clair : fond neutre slate, liens teal ---- */
+[data-md-color-scheme="default"] {
+  --md-default-bg-color:          #ffffff;
+  --md-typeset-a-color:           var(--maelia-primary-600);
+  --md-footer-bg-color:           var(--maelia-neutral-900);
+  --md-footer-bg-color--dark:     var(--maelia-primary-900);
+}
+
+/* ---- Mode sombre : profondeur teal/slate ---- */
+[data-md-color-scheme="slate"] {
+  --md-hue: 205;
+  --md-default-bg-color:          #0B1220;
+  --md-default-fg-color:          #E2E8F0;
+  --md-typeset-a-color:           var(--maelia-primary-300);
+  --md-primary-fg-color:          var(--maelia-primary-700);
+  --md-accent-fg-color:           var(--maelia-primary-400);
+  --md-code-bg-color:             #111a2b;
+}
+
+/* ---- Typographie ---- */
+body, input {
+  font-feature-settings: "kern", "liga";
+}
+
+.md-typeset {
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset h1 {
+  font-weight: 700;
+}
+
+/* Barre supérieure : dégradé « eau » de la charte */
+.md-header {
+  background: linear-gradient(
+    120deg,
+    var(--maelia-primary-700) 0%,
+    var(--maelia-primary-600) 55%,
+    var(--maelia-primary-500) 100%
+  );
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.md-tabs {
+  background: transparent;
+}
+
+/* ---- Code : radius et police de la charte ---- */
+.md-typeset code,
+.md-typeset pre > code {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  border-radius: 6px;
+}
+
+.md-typeset pre > code {
+  border-radius: var(--md-code-radius);
+}
+
+.md-typeset :not(pre) > code {
+  background-color: var(--maelia-primary-50);
+  color: var(--maelia-primary-700);
+  padding: 0.1em 0.4em;
+}
+
+[data-md-color-scheme="slate"] .md-typeset :not(pre) > code {
+  background-color: rgba(14, 156, 168, 0.15);
+  color: var(--maelia-primary-200);
+}
+
+/* ---- Boutons / navigation active ---- */
+.md-nav__link--active,
+.md-nav__link:focus,
+.md-nav__link:hover {
+  color: var(--md-typeset-a-color);
+}
+
+/* ---- Tableaux : allure « cards » de la charte ---- */
+.md-typeset table:not([class]) {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  border: 1px solid var(--maelia-neutral-200);
+  font-size: 0.72rem;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) {
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--maelia-primary-600);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  background-color: var(--maelia-primary-800);
+}
+
+/* ---- Admonitions : couleurs sémantiques de la charte ---- */
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 10px;
+  border-left-width: 4px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.md-typeset .admonition.note,
+.md-typeset .admonition.info {
+  border-color: var(--maelia-info);
+}
+
+.md-typeset .admonition.tip,
+.md-typeset .admonition.success {
+  border-color: var(--maelia-success);
+}
+
+.md-typeset .admonition.warning {
+  border-color: var(--maelia-warning);
+}
+
+.md-typeset .admonition.danger,
+.md-typeset .admonition.failure {
+  border-color: var(--maelia-danger);
+}
+
+/* ---- Cartes de la page d'accueil (grid cards) ---- */
+.md-typeset .grid.cards > ul > li {
+  border-radius: 14px;
+  border: 1px solid var(--maelia-neutral-200);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+  border-color: var(--maelia-primary-300);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .grid.cards > ul > li {
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+/* ---- Bannière d'accueil ---- */
+.maelia-hero {
+  background: linear-gradient(135deg, var(--maelia-primary-700), var(--maelia-primary-500));
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  margin: 0 0 2rem;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+}
+
+.maelia-hero h1 {
+  color: #ffffff !important;
+  margin: 0 0 0.4rem;
+  font-size: 2rem;
+}
+
+.maelia-hero p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  max-width: 60ch;
+}
+
+/* ---- Puces / badges d'état ---- */
+.maelia-badge {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.maelia-badge--ok    { background: rgba(22,163,74,0.12);  color: var(--maelia-success); }
+.maelia-badge--wip   { background: rgba(217,119,6,0.12);  color: var(--maelia-warning); }
+.maelia-badge--todo  { background: rgba(100,116,139,0.14); color: var(--maelia-neutral-500); }

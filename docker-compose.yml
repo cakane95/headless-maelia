@@ -1,0 +1,12 @@
+services:
+
+  docs:
+    # Documentation de la plateforme (mkdocs-material). Le dossier ./docs contient
+    # mkdocs.yml + docs/ (contenu Markdown) + docs/stylesheets/extra.css (charte graphique).
+    image: squidfunk/mkdocs-material:9.7.0
+    working_dir: /docs
+    command: ["serve", "--dev-addr=0.0.0.0:8080"]
+    volumes:
+      - ./docs:/docs
+    ports:
+      - "8082:8080"

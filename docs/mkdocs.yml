@@ -1,0 +1,97 @@
+site_name: Plateforme MAELIA
+site_description: >-
+  Documentation de la plateforme web de gestion de projets de simulation MAELIA
+  (eau / agriculture / normes) sur moteur GAMA.
+site_author: LHackSRT · UMMISCO
+copyright: © LHackSRT · UMMISCO — Plateforme MAELIA
+docs_dir: docs
+
+theme:
+  name: material
+  language: fr
+  # Le logo/favicon sont repris de la charte du frontend (icône « eau »).
+  icon:
+    logo: material/water
+    repo: fontawesome/brands/git-alt
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    # Mode clair — teal MAELIA (primary-600)
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Passer en mode sombre
+    # Mode sombre
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Passer en mode clair
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - def_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.keys
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+nav:
+  - Accueil: index.md
+  - Démarrage:
+      - Installation & démarrage: guides/installation.md
+      - Guide d'utilisation: guides/utilisation.md
+  - Architecture:
+      - Vue d'ensemble: architecture/index.md
+      - Backend: architecture/backend.md
+      - Frontend: architecture/frontend.md
+      - Modèle de domaine — Données d'entrée: architecture/modele-domaine-donnees-entree.md
+  - Référence:
+      - API REST: reference/api.md
+      - Charte graphique: reference/charte-graphique.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/git-alt
+      link: "#"
+      name: Dépôt Git
