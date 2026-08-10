@@ -1,0 +1,17 @@
+annee;date;parcelle;exploitation;culture;situation;masse_C[kg/ha];masse_N[kg/ha];ratio_CN;nom_produit;type_residu;type_pool;Kres;Hres;CNbio;Yres
+2019;258;19_001;SSM1-0002;mil;incorpore;638.0;7.001165119436588;91.1276893368489;racines post recolte;residus racinaires;labile;0.0;0.0;0.0;0.0
+2019;258;19_001;SSM1-0002;mil;surface;91.42222222222223;1.003232089911603;91.12768933684892;aerien post recolte;residus aeriens;labile;0.0;0.0;0.0;0.0
+2019;258;119_001;SSM1-0010;mil;incorpore;638.0;7.035780539757079;90.67934913473408;racines post recolte;residus racinaires;labile;0.0;0.0;0.0;0.0
+2019;258;119_001;SSM1-0010;mil;surface;91.42222222222223;1.0081923072295584;90.6793491347341;aerien post recolte;residus aeriens;labile;0.0;0.0;0.0;0.0
+2019;258;219_001;SSM1-0019;mil;incorpore;638.0;6.87308671196636;92.82583309900814;racines post recolte;residus racinaires;labile;0.0;0.0;0.0;0.0
+2019;258;219_001;SSM1-0019;mil;surface;91.42222222222223;0.9848790920595475;92.82583309900814;aerien post recolte;residus aeriens;labile;0.0;0.0;0.0;0.0
+2019;258;319_001;SSM1-0009;mil;incorpore;638.0;7.035780539757079;90.67934913473408;racines post recolte;residus racinaires;labile;0.0;0.0;0.0;0.0
+2019;258;319_001;SSM1-0009;mil;surface;91.42222222222223;1.0081923072295584;90.6793491347341;aerien post recolte;residus aeriens;labile;0.0;0.0;0.0;0.0
+2019;258;419_001;SSM1-0013;mil;incorpore;638.0;7.049688306134763;90.50045509739788;racines post recolte;residus racinaires;labile;0.0;0.0;0.0;0.0
+2019;258;419_001;SSM1-0013;mil;surface;91.42222222222223;1.010185220879081;90.50045509739789;aerien post recolte;residus aeriens;labile;0.0;0.0;0.0;0.0
+2019;258;519_001;SSM1-0032;mil;incorpore;638.0;7.049688306134763;90.50045509739788;racines post recolte;residus racinaires;labile;0.0;0.0;0.0;0.0
+2019;258;519_001;SSM1-0032;mil;surface;91.42222222222223;1.010185220879081;90.50045509739789;aerien post recolte;residus aeriens;labile;0.0;0.0;0.0;0.0
+2019;258;619_001;SSM1-0037;mil;incorpore;638.0;7.035780539757079;90.67934913473408;racines post recolte;residus racinaires;labile;0.0;0.0;0.0;0.0
+2019;258;619_001;SSM1-0037;mil;surface;91.42222222222223;1.0081923072295584;90.6793491347341;aerien post recolte;residus aeriens;labile;0.0;0.0;0.0;0.0
+2019;258;719_001;SSM1-0043;mil;incorpore;638.0;7.0467969635738905;90.53758797052507;racines post recolte;residus racinaires;labile;0.0;0.0;0.0;0.0
+2019;258;719_001;SSM1-0043;mil;surface;91.42222222222223;1.009770905891431;90.53758797052507;aerien post recolte;residus aeriens;labile;0.0;0.0;0.0;0.0

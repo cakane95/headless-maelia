@@ -1,0 +1,43 @@
+version GAMA	2025.6.4
+version MAELIA	MAELIA_1.4.29_GAMA_2025-06
+
+PARAMETRES GENERAUX
+executerSurCluster	false
+nomDecoupageZonePourLectureFichiers	includes_sasseme
+anneeDebutSimulation	2018
+nbAnneesSimulation	2
+executerModeleSurUneZH	false
+executerUnSeulAgriculteur	false
+executerUnSeulAgriculteur	false
+executerUneSeuleParcelle	true
+	nomParcelleAffichee	19_001
+nomScenarioClimatique	
+utiliserMemeDonnesMeteoPartout	false
+associerIlotMeteoZH	false
+verboseMode	true
+
+MODULE HYDROLOGIQUE
+executerModeleHydrographique	false
+
+MODULE AGRICOLE
+executerModeleAgricole	true
+	nomChoixAssolement	Donnees
+	anneeDeReferenceRPG	2014
+	nomChoixModeleCroissancePlante	AqYieldNC
+	activerITKalternatif	false
+	nomFichierReglesDeDecision	reglesDeDecisions.csv
+	avecIlotsHorsZone	false
+	avecContrainteDeMainOeuvre	false
+	isIrrigationSimulee	true
+		nomChoixModeleIrrigation	Simple
+	listScenarioPrix	['SC1']
+	scenarioDePrixPrincipal	SC1
+	prefixeCouvertIntermediaire	ci-
+
+MODULE NORMATIF
+executerModeleNormatif	false
+
+WARNINGS
+- désactivation exécution sur une seule ZH car exécution sur une seule exploitation ou une seule parcelle sélectionnée
+- fichier des communes inexistant: ../../includes/includes_sasseme/modeleCommun/communes/communes-trimUG.shp
+- répertoire inexistant: ../../includes/includes_sasseme/modeleAgricole/marcheAgricole/

@@ -1,0 +1,41 @@
+version GAMA	2025.6.4
+version MAELIA	MAELIA_1.4.29_GAMA_2025-06
+
+PARAMETRES GENERAUX
+executerSurCluster	false
+nomDecoupageZonePourLectureFichiers	
+anneeDebutSimulation	2018
+nbAnneesSimulation	4
+executerModeleSurUneZH	false
+executerUnSeulAgriculteur	false
+executerUnSeulAgriculteur	false
+executerUneSeuleParcelle	false
+nomScenarioClimatique	
+utiliserMemeDonnesMeteoPartout	false
+associerIlotMeteoZH	false
+verboseMode	true
+
+MODULE HYDROLOGIQUE
+executerModeleHydrographique	false
+
+MODULE AGRICOLE
+executerModeleAgricole	true
+	nomChoixAssolement	Donnees
+	anneeDeReferenceRPG	2014
+	nomChoixModeleCroissancePlante	AqYieldNC
+	activerITKalternatif	false
+	nomFichierReglesDeDecision	reglesDeDecisions.csv
+	avecIlotsHorsZone	false
+	avecContrainteDeMainOeuvre	false
+	isIrrigationSimulee	true
+		nomChoixModeleIrrigation	Simple
+	listScenarioPrix	['SC1']
+	scenarioDePrixPrincipal	SC1
+	prefixeCouvertIntermediaire	ci-
+
+MODULE NORMATIF
+executerModeleNormatif	false
+
+WARNINGS
+- fichier des communes inexistant: /workspace/maelia/projects/c1e3bd26-2137-4df5-b4a9-e9e06bcd404b/includes//modeleCommun/communes/communes-trimUG.shp
+- répertoire inexistant: /workspace/maelia/projects/c1e3bd26-2137-4df5-b4a9-e9e06bcd404b/includes//modeleAgricole/marcheAgricole/

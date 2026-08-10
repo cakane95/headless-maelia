@@ -1,0 +1,9 @@
+annee;jourDebut;jourFin;parcelle;couvert;itk;N_lixivie[kgN/ha];N_volatilise_NH3[kgN/ha];N_mineralise_net_SOM[kgN/ha];N_mineralise_net_residus[kgN/ha];N_acquis_couvert[kgN/ha];N_mineral_debut[kgN/ha];N_mineral_fin[kgN/ha];emissions_N2O_directes[kgN/ha];emissions_N2[kgN/ha];N_fixe_legumineuses[kgN/ha];satisfactionAzote_culture[%];satisfactionAzote_ci[%];delta_Corg[kgC/ha];emissions_N2O_denit[kgN-N2O/ha];emissions_N2O_nit[kgN-N2O/ha];emissions_N2O_indirectes_volat[kgN-N2O/ha];emissions_N2O_indirectes_lixiv[kgN-N2O/ha]
+2018;213;365;19_001;solnu;;34.24;0.0;21.93;0.0;0.0;35.0;22.66;0.04;0.0;0;0;0;-304.19;0.02;0.01;0.0;34.24
+2018;213;365;119_001;solnu;;33.81;0.0;21.62;0.0;0.0;35.0;22.78;0.04;0.0;0;0;0;-295.0;0.03;0.01;0.0;33.81
+2018;213;365;219_001;solnu;;31.86;0.0;24.28;0.0;0.0;35.0;27.37;0.05;0.0;0;0;0;-326.81;0.04;0.01;0.0;31.86
+2018;213;365;319_001;solnu;;33.81;0.0;21.62;0.0;0.0;35.0;22.78;0.04;0.0;0;0;0;-295.0;0.03;0.01;0.0;33.81
+2018;213;365;419_001;solnu;;34.09;0.0;24.32;0.0;0.0;35.0;25.19;0.05;0.0;0;0;0;-318.44;0.03;0.01;0.0;34.09
+2018;213;365;519_001;solnu;;34.09;0.0;24.32;0.0;0.0;35.0;25.19;0.05;0.0;0;0;0;-318.44;0.03;0.01;0.0;34.09
+2018;213;365;619_001;solnu;;33.81;0.0;21.62;0.0;0.0;35.0;22.78;0.04;0.0;0;0;0;-295.0;0.03;0.01;0.0;33.81
+2018;213;365;719_001;solnu;;33.96;0.0;21.39;0.0;0.0;35.0;22.39;0.04;0.0;0;0;0;-292.79;0.03;0.01;0.0;33.96

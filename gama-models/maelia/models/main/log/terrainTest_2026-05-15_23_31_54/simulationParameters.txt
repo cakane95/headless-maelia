@@ -1,0 +1,92 @@
+version GAMA	2025.6.4
+version MAELIA	MAELIA_1.4.29_GAMA_2025-06
+
+PARAMETRES GENERAUX
+executerSurCluster	false
+nomDecoupageZonePourLectureFichiers	terrainTest
+anneeDebutSimulation	2019
+nbAnneesSimulation	3
+executerModeleSurUneZH	false
+executerUnSeulAgriculteur	false
+executerUnSeulAgriculteur	false
+executerUneSeuleParcelle	false
+nomScenarioClimatique	rcp8.5
+utiliserMemeDonnesMeteoPartout	false
+associerIlotMeteoZH	false
+verboseMode	false
+
+MODULE HYDROLOGIQUE
+executerModeleHydrographique	false
+
+MODULE AGRICOLE
+executerModeleAgricole	true
+	nomChoixAssolement	Donnees
+	anneeDeReferenceRPG	2014
+	nomChoixModeleCroissancePlante	AqYieldNC
+	activerITKalternatif	false
+	nomFichierReglesDeDecision	reglesDeDecisions.csv
+	avecIlotsHorsZone	false
+	avecContrainteDeMainOeuvre	true
+	isIrrigationSimulee	true
+		nomChoixModeleIrrigation	Simple
+	listScenarioPrix	['']
+	scenarioDePrixPrincipal	
+	prefixeCouvertIntermediaire	ci
+
+MODULE NORMATIF
+executerModeleNormatif	false
+
+WARNINGS
+- fichier des communes inexistant: ../../includes/terrainTest/modeleCommun/communes/communes-trimUG.shp
+- espèce orgeVert
+		statut CI rotation: false
+		statut CI AqYieldNC: true
+- espèce TriticaleVert
+		statut CI rotation: false
+		statut CI AqYieldNC: true
+- Pas de stratégie de ferti disponible pour l'ITK gel_tous_tous_NA
+- Pas de stratégie de ferti disponible pour l'ITK ciVesce_tousSols_nonirr_noferti
+- ITK orgeH_tousSols_nonirr_mineral incohérence entre dates semis/récolte et booléen isCultureHiver du fichier ITK
+		semisAnneeNrecolteAnneeNplusUn=true car dernier jour récolte=217 et premier jour semis=253
+		alors que isCultureHiver=false
+		juste pour info car le booléen isCultureHiver du fichier ITK n'est plus utilisé
+- ITK orgeH_tousSols_nonirr_organique incohérence entre dates semis/récolte et booléen isCultureHiver du fichier ITK
+		semisAnneeNrecolteAnneeNplusUn=true car dernier jour récolte=217 et premier jour semis=253
+		alors que isCultureHiver=false
+		juste pour info car le booléen isCultureHiver du fichier ITK n'est plus utilisé
+- ITK orgeH_tousSols_irr_organique incohérence entre dates semis/récolte et booléen isCultureHiver du fichier ITK
+		semisAnneeNrecolteAnneeNplusUn=true car dernier jour récolte=217 et premier jour semis=253
+		alors que isCultureHiver=false
+		juste pour info car le booléen isCultureHiver du fichier ITK n'est plus utilisé
+- ITK orgeH_tousSols_irr_mineral incohérence entre dates semis/récolte et booléen isCultureHiver du fichier ITK
+		semisAnneeNrecolteAnneeNplusUn=true car dernier jour récolte=217 et premier jour semis=253
+		alors que isCultureHiver=false
+		juste pour info car le booléen isCultureHiver du fichier ITK n'est plus utilisé
+- Pas de stratégie de ferti disponible pour l'ITK gel_tous_tous_NA
+- Pas de stratégie de ferti disponible pour l'ITK ciVesce_tousSols_nonirr_noferti
+- Pas de stratégie de ferti disponible pour l'ITK luzernePreLuzerne_t2050_aveyron
+- Pas de stratégie de ferti disponible pour l'ITK luzernePreAutre_t2050_aveyron
+- Pas de stratégie de ferti disponible pour l'ITK ciRGI_accalmie
+- Pas de stratégie de ferti disponible pour l'ITK cilolMul_accalmie
+- ITK cilolMul_accalmie incohérence entre dates semis/récolte et booléen isCultureHiver du fichier ITK
+		semisAnneeNrecolteAnneeNplusUn=true car dernier jour récolte=124 et premier jour semis=176
+		alors que isCultureHiver=false
+		juste pour info car le booléen isCultureHiver du fichier ITK n'est plus utilisé
+- Pas de stratégie de ferti disponible pour l'ITK dacGlo_t2050_aveyron_fauche
+- Pas de stratégie de ferti disponible pour l'ITK dacGlo_t2050_aveyron_pature
+- Pas de stratégie de ferti disponible pour l'ITK dacGlo_t2050_aveyron_faucheETpature
+- Pas de stratégie de ferti disponible pour l'ITK feverole_t2050_aveyron
+- Pas de stratégie de ferti disponible pour l'ITK lolPer_precFeverole_fauche_accalmie
+- Pas de stratégie de ferti disponible pour l'ITK lolPer_precPrairie_fauche_accalmie
+- Pas de stratégie de ferti disponible pour l'ITK lolPer_precPrairie_pature_accalmie
+- Pas de stratégie de ferti disponible pour l'ITK lolPer_precPrairie_pature_accalmie
+- Pas de stratégie de ferti disponible pour l'ITK lolPer_precPrairie_fauchepature_accalmie
+- Pas de stratégie de ferti disponible pour l'ITK lolPer_precPrairie_fauchepature_accalmie
+- Pas de stratégie de ferti disponible pour l'ITK poish_t2050_aveyron
+- Pas de stratégie de ferti disponible pour l'ITK poip_t2050_aveyron
+- Pas de stratégie de ferti disponible pour l'ITK trifPra_t2050_aveyron
+- ITK trifPra_t2050_aveyron incohérence entre dates semis/récolte et booléen isCultureHiver du fichier ITK
+		semisAnneeNrecolteAnneeNplusUn=true car dernier jour récolte=200 et premier jour semis=244
+		alors que isCultureHiver=false
+		juste pour info car le booléen isCultureHiver du fichier ITK n'est plus utilisé
+- répertoire inexistant: ../../includes/terrainTest/modeleAgricole/marcheAgricole/

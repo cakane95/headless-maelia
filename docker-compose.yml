@@ -10,3 +10,12 @@ services:
       - ./docs:/docs
     ports:
       - "8082:8080"
+
+  gama-headless:
+    image: gamaplatform/gama:2025.06.4
+    container_name: maelia.headless
+    ports:
+      - "6868:6868"
+    volumes:
+      - ./gama-models:/usr/lib/gama/workspace/gama-models
+    command: -socket 6868
