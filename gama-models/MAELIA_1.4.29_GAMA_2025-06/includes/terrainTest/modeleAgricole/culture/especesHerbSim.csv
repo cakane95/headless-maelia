@@ -1,0 +1,38 @@
+Espece;alfalfa;trifPra;trifoliumRepens;lolPer;lolMul;cilolMul;dacGlo;festucaArundinacea;typeA;typeB;typeC;typeD;typeb;Commentaires
+nomSequenceEspeceHerbSim;alfalfa;trifPra;triRep;lolPer;lolMul;cilolMul;dacGlo;festArun;typeA;typeB;typeC;typeD;typeb;
+couleur_r;231;230;230;230;230;230;230;230;230;230;230;230;230;
+couleur_g;241;241;241;241;241;241;241;241;241;241;241;241;241;
+couleur_b;225;225;225;225;225;225;225;225;225;225;225;225;225;
+biomass_above_ground_reinit_winter_species;700;700;700;700;700;700;700;700;700;700;700;700;700;
+LeafAngle;0.7;0.7;0.7;0.5;0.5;0.5;0.5;0.5;0.5;0.5;0.5;0.5;0.6;Dans Duru et al.. 2009 => 0.73 poru tous les groupes (> au 0.6 du modèle initial parce que les prairies permanentes ont des feuillages plus horizontaux que les prairies semées pures) mais dans Duru et al., 2010 mets 0,5 à tous les groupes fonctionnels. 0,5 = csv d'origine
+LeafAreaIndexRate;1;1;1;1;1;1;1;1;1;0.9;0.8;0.8;0.9;Duru et al., 2010
+LeafLifeSpanMin;650;500;650;500;500;500;600;800;500;600;800;1000;600;PFT selon Duru et al.. 2009
+LeafLifeSpanMax;650;750;650;750;750;750;900;1200;750;900;1200;1500;900;Pour les légumineuses. fichier csv d'origine
+RegrowthKSward;0.95;0.95;0.95;1.2;1.2;1.2;1;1.1;1.2;1.1;1;0.95;0.95;PFT A. B. C selon Cros et al.. 2003. D = extrapolation. légumineuses = fichier csv d'origine (ou tout était à 0.95 pour toutes les espèces)
+hauteurPourKc1;38.4;38.4;33.48;69.7;77.12;77.12;89.12;99.94;43.48;77.66;72.47;76.79;66.46;
+croissanceRacineCult;13;13;13;13;13;13;13;13;13;13;13;13;13;
+VegetativePotentialRadiationUseEfficiencyRate;1;1;0.8;1;1;1;1;1;1;0.94;0.89;0.84;0.94;PFT selon Duru et al.. 2009. Luzerne selon Kaithi et Lemaire. trifolium = csv d'origine
+ThermalTimeAtFlowering;1200;917;1053;1600;1600;1600;1600;1600;1200;1400;1600;1800;1400;PFT et non legume Duru et al., 2010 // Legume = csv d'origine
+ThermalTimeAtStemElongation;80;80;80;900;900;900;900;900;500;700;900;1200;700;Duru et al., 2010
+PotentialOrganicMatterDigestibility;753.4;840;816;840;840;840;820;705;840;800;760;720;800;PFT et non legume Duru et al., 2010 // Legume = csv d'origine
+YieldCorrectionCoefficient;1;0.95;0.85;0.9;1;1;1;1;0.9;1;0.8;0.85;0.85;
+casCroissanceSenescence;alfalfa;trifoliumPratense;trifoliumRepens;autre;autre;autre;autre;autre;autre;autre;autre;autre;autre;
+isLEG;true;true;true;false;false;false;false;false;false;false;false;false;false;
+C_aer;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;
+C_rac;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;
+coeffRacBM;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;
+coeffRacN;0.26;0.26;0.26;0.26;0.26;0.26;0.26;0.26;0.26;0.26;0.26;0.26;0.26;
+paramDilMaxA;7.5;7.1;7.1;5.5;5.5;5.5;5.6;5.5;5.5;5.5;5.6;5.6;5.5;"Luzerne = param STICS ; adil = 5, adil max = 5,5, bdil = 0,32; bdilmax=0,38
+Grass (STICS) = adil = 4,8, adilmax = ??: bdil = bdil max = 0,32"
+paramDilMaxB;0.35;0.35;0.35;0.32;0.32;0.32;0.44;0.32;0.32;0.32;0.44;0.44;0.32;Lemaire et al., 1985 proposent des adil et bdil par coupe : 55 - 0,36 / 48 - 0,31/ 46 -0,33 / 47 - 0,29
+paramDilMinA;5.5;5.5;5.5;4.8;4.8;4.8;4.8;4.8;4.8;4.8;4.8;4.8;4.8;"Lemaire et Denoix, 1987 = a et b pour fétuque elevée selon niveau de fertilisation (max à N = 150 : 5,56; 0,44 ) et courbe de référence non limitante au printemps 4,79 et 0,32 qui est la même pour fétuque et dactyle"
+paramDilMinB;0.25;0.25;0.25;0.32;0.32;0.32;0.32;0.32;0.32;0.32;0.32;0.32;0.32;
+CN_LostLeafHarvest;12;16;14;14;14;14;13;17;14;13;17;17;13;
+profMaxRacines;200;120;120;120;120;120;120;120;120;120;120;120;120;
+BM_rac_max;6750;6000;6000;4500;4500;4500;6000;7000;4500;6000;7000;8000;6000;
+v95_croissance_rac;915;730;730;900;900;900;850;730;900;850;730;730;850;A partir de données expérimentales pour la luzerne, biblio pour les graminées
+CN_rac;19.7;20;28;30;30;30;30;30;30;30;30;30;30;A partir de données expérimentales pour la luzerne, biblio pour les graminées
+cn_senescent_root;25;26;35;38;38;38;38;38;38;38;38;38;38;Valeur calculée à partir du C/N des racines vivantes en considérant 21% de pertes de N à la sénescence
+cn_sheath;23;23;23;23;23;23;23;23;23;23;23;23;23;Valeur par défaut, certainement à ajuster par culture
+cn_senescent_leaf;16;20;18;26;26;26;24;33;26;24;33;33;24;
+thermal_time_at_germination_species;80;80;80;80;80;80;80;80;80;80;80;80;80;

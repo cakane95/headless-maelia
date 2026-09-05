@@ -1,0 +1,28 @@
+Crop rotation;Herbicide timing;Mineral nitrogen;Dicot diversity
+Low;Both or pre-emergence;Low;Low
+Low;Both or pre-emergence;Medium;Low
+Low;Both or pre-emergence;High;Low
+Low;Post-emergence;Low;Low
+Low;Post-emergence;Medium;Medium
+Low;Post-emergence;High;Medium
+Low;No herbicide;Low;Low
+Low;No herbicide;Medium;Medium
+Low;No herbicide;High;High
+Medium;Both or pre-emergence;Low;Low
+Medium;Both or pre-emergence;Medium;Low
+Medium;Both or pre-emergence;High;Medium
+Medium;Post-emergence;Low;Low
+Medium;Post-emergence;Medium;Medium
+Medium;Post-emergence;High;High
+Medium;No herbicide;Low;Medium
+Medium;No herbicide;Medium;High
+Medium;No herbicide;High;High
+High;Both or pre-emergence;Low;Low
+High;Both or pre-emergence;Medium;Medium
+High;Both or pre-emergence;High;Medium
+High;Post-emergence;Low;Medium
+High;Post-emergence;Medium;Medium
+High;Post-emergence;High;High
+High;No herbicide;Low;Medium
+High;No herbicide;Medium;High
+High;No herbicide;High;High

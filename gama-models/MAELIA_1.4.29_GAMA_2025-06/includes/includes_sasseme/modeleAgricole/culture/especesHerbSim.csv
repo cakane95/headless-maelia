@@ -1,0 +1,28 @@
+Espece;alfalfa;dactylisGlomerata;festucaArundinacea;loliumMultiforum;loliumPerenne;trifoliumPratense;trifoliumRepens;typeA;typeb;typeB;typeC;typeD
+nomSequenceEspeceHerbSim;alfalfa;dacGlo;festArun;lolMul;loliumPerenne;trifPra;triRep;typeA;typeb;typeB;typeC;typeD
+couleur_r;230;230;230;230;230;230;230;230;230;230;230;230
+couleur_g;241;241;241;241;241;241;241;241;241;241;241;241
+couleur_b;225;225;225;225;225;225;225;225;225;225;225;225
+LeafAngle;0.7;0.5;0.5;0.5;0.5;0.7;0.7;0.6;0.6;0.6;0.6;0.6
+LeafAreaIndexRate;1;1;1;1;1;1;1;1;0.9;0.9;0.8;0.7
+LeafLifeSpanMin;650;600;700;500;500;500;650;550;600;600;800;1000
+LeafLifeSpanMax;650;850;950;750;750;750;650;800;900;900;1200;1500
+RegrowthKSward;0.95;0.95;0.95;0.95;0.95;0.95;0.95;0.9;0.95;0.95;0.95;0.95
+hauteurPourKc1;38.4;89.12;99.94;77.12;69.7;38.4;33.48;43.48;66.46;77.66;72.47;76.79
+croissanceRacineCult;13;13;13;NA;13;NA;NA;13;NA;NA;NA;NA
+VegetativePotentialRadiationUseEfficiencyRate;1.4;1;1;1;1;1;0.8;1;0.94;0.94;0.89;0.84
+ThermalTimeAtFlowering;1200;1600;1600;1600;1600;917;1053;900;1400;1400;1600;1800
+ThermalTimeAtStemElongation;;900;900;900;900;;;500;700;700;900;1200
+PotentialOrganicMatterDigestibility;753.4;820;705;840;840;840;816;840;800;800;760;720
+YieldCorrectionCoefficient;1;1;1;1;0.9;0.95;0.85;0.9;0.85;1;0.8;0.85
+casCroissanceSenescence;alfalfa;autre;autre;autre;autre;trifoliumPratense;trifoliumRepens;autre;autre;autre;autre;autre
+isLEG;true;false;false;false;false;true;true;false;false;false;false;false
+C_aer;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44;0.44
+C_rac;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4;0.4
+coeffRacBM;0.4;0.4;0.4;A completer;0.4;A completer;A completer;A completer;A completer;A completer;A completer;A completer
+coeffRacN;0.26;0.26;0.26;A completer;0.26;A completer;A completer;A completer;A completer;A completer;A completer;A completer
+paramDilMaxA;7.1;7.1;7.1;A completer;7.1;A completer;A completer;A completer;A completer;A completer;A completer;A completer
+paramDilMaxB;0.35;0.35;0.35;A completer;0.35;A completer;A completer;A completer;A completer;A completer;A completer;A completer
+paramDilMinA;5.1;5.1;5.1;A completer;5.1;A completer;A completer;A completer;A completer;A completer;A completer;A completer
+paramDilMinB;0.33;0.33;0.33;A completer;0.33;A completer;A completer;A completer;A completer;A completer;A completer;A completer
+CN_LostLeafHarvest;6;6;6;A completer;6;A completer;A completer;A completer;A completer;A completer;A completer;A completer
