@@ -1,4 +1,230 @@
+# docker-compose.yml — Plateforme headless-MAELIA (backend Python)
+#
+# Démarrage :  docker compose up -d --build
+# Logs       :  docker compose logs -f api worker gama-headless
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# INVARIANT DE CHEMINS (le point le plus important de ce fichier)
+#
+# `api`, `worker` et `gama-headless` montent TOUS ./gama-models sur EXACTEMENT
+# le même chemin : /usr/lib/gama/workspace/gama-models
+#
+# Conséquence : un chemin calculé par Python est directement utilisable comme
+# argument `model` / `cheminRacineMaelia` envoyé à GAMA, sans aucune traduction.
+# C'est ce que faisait l'ancienne version avec /workspace ; on garde le principe
+# mais on le place SOUS le workspace de l'image officielle, hors du répertoire
+# courant du script gama-headless.sh (cf. section « workspaces » du rapport).
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: headless-maelia
+
+x-gama-paths: &gama-paths
+  # Racine partagée avec gama-headless (chemin identique dans les 3 conteneurs).
+  GAMA_MODELS_ROOT: /usr/lib/gama/workspace/gama-models
+  MAELIA_PROJECT_DIR: /usr/lib/gama/workspace/gama-models/MAELIA_1.4.29_GAMA_2025-06
+  # Le launcher dérive cheminModeleVersDonnees / cheminSorties de cheminRacineMaelia :
+  # le slash final est significatif côté GAML.
+  MAELIA_ROOT_PATH: /usr/lib/gama/workspace/gama-models/MAELIA_1.4.29_GAMA_2025-06/
+  MAELIA_MODEL_PATH: /usr/lib/gama/workspace/gama-models/MAELIA_1.4.29_GAMA_2025-06/models/main/launcherBase.gaml
+  MAELIA_EXPERIMENT_NAME: simulationBase
+  # Sorties : le modèle écrit sous <racine>/models/main/log/<zone>_<nomSimulation>_<horodatage>/
+  MAELIA_OUTPUT_ROOT: /usr/lib/gama/workspace/gama-models/MAELIA_1.4.29_GAMA_2025-06/models/main/log
+  GAMA_HOST: gama-headless
+  GAMA_PORT: "6868"
+  # Filet de sécurité : un run MAELIA de 3 ans dure des dizaines de minutes.
+  GAMA_COMMAND_TIMEOUT: "300"
+  GAMA_RUN_TIMEOUT: "10800"
+
+x-backend-env: &backend-env
+  <<: *gama-paths
+  DATABASE_URL: postgresql+asyncpg://maelia:maelia@db:5432/maelia
+  REDIS_URL: redis://redis:6379/0
+  MINIO_ENDPOINT: minio:9000
+  MINIO_ACCESS_KEY: maelia
+  MINIO_SECRET_KEY: maelia12345
+  MINIO_BUCKET: maelia
+  MINIO_SECURE: "false"
+  LOG_LEVEL: INFO
+
 services:
+
+  # ───────────────────────── Moteur de simulation ─────────────────────────
+  #
+  # NE PAS MODIFIER (demande explicite). Bloc repris à l'identique.
+  #
+  # Image officielle : WORKDIR = /opt/gama-platform/headless, ENTRYPOINT =
+  # gama-headless.sh. Le script crée son workspace Eclipse dans son répertoire
+  # courant, donc DANS le conteneur (éphémère) — c'est précisément pour cela
+  # que les modèles sont montés ailleurs, sous /usr/lib/gama/workspace/.
+  gama-headless:
+    image: gamaplatform/gama:2025.06.4
+    ports:
+      - "6868:6868"
+    volumes:
+      - ./gama-models:/usr/lib/gama/workspace/gama-models
+    command: -socket 6868
+
+  # ───────────────────────────── Infrastructure ────────────────────────────
+
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: maelia
+      POSTGRES_USER: maelia
+      POSTGRES_PASSWORD: maelia
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U maelia -d maelia"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    # Double rôle : file de tâches ARQ (runs) + pub/sub temps réel worker → api.
+    # Remplace RabbitMQ + STOMP de l'ancienne version Java (un composant en moins).
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    # Stockage objet : shapefiles uploadés + artefacts de sortie archivés.
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: maelia
+      MINIO_ROOT_PASSWORD: maelia12345
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-init:
+    # Crée le bucket au démarrage puis sort (évite de le faire au boot de l'API).
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 maelia maelia12345 &&
+      mc mb --ignore-existing local/maelia &&
+      echo 'bucket maelia prêt'
+      "
+    restart: "no"
+
+  # ────────────────────────────── Backend Python ───────────────────────────
+
+  api:
+    # FastAPI + Uvicorn. Expose le REST et le WebSocket temps réel (/ws/runs/{id}),
+    # alimenté par le pub/sub Redis publié par le worker.
+    build:
+      context: ./headless-maelia-server
+      dockerfile: Dockerfile
+      target: dev                              # `prod` pour l'image durcie non-root
+    image: maelia/backend:local
+    # `pull_policy: build` : sans ça, Compose voit un tag local absent du registre
+    # et tente un `docker pull maelia/backend:local` → « pull access denied /
+    # repository does not exist » au tout premier démarrage sur une machine neuve.
+    # C'est LA panne de premier lancement de l'ancienne plateforme.
+    pull_policy: build
+    # `--ws wsproto` est obligatoire : websockets 10.4 est présent dans l'image
+    # (épinglé par gama-client) et l'auto-détection d'uvicorn le choisirait, alors
+    # qu'uvicorn 0.52 attend l'API de websockets>=13. Voir headless-maelia-server/pyproject.toml.
+    # --timeout-graceful-shutdown : filet de securite. Un WebSocket de suivi de run
+    # laisse ouvert dans un onglet retardait l'arret d'uvicorn (donc le --reload).
+    command:
+      ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000",
+       "--ws", "wsproto", "--reload", "--timeout-graceful-shutdown", "5"]
+    environment:
+      <<: *backend-env
+      APP_ROLE: api
+      CORS_ORIGINS: "http://localhost:5173,http://localhost:8081"
+    volumes:
+      - ./headless-maelia-server:/app          # hot-reload en dev
+      # Même chemin que gama-headless : l'API matérialise les includes et relit
+      # les sorties écrites par GAMA.
+      - ./gama-models:/usr/lib/gama/workspace/gama-models
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  worker:
+    # Même image, rôle différent : consomme la file ARQ, tient la connexion
+    # WebSocket GAMA ouverte pendant toute la durée du run (si le socket se
+    # ferme, GAMA détruit la simulation), publie l'avancement sur Redis,
+    # puis ingère les sorties.
+    build:
+      context: ./headless-maelia-server
+      dockerfile: Dockerfile
+      target: dev
+    image: maelia/backend:local
+    pull_policy: build
+    command: ["arq", "app.worker.settings.WorkerSettings"]
+    environment:
+      <<: *backend-env
+      APP_ROLE: worker
+      # 2 runs concurrents : un run bloqué n'empêche pas d'en lancer un autre.
+      # Nombre de simulations menées de front par ce worker. Chaque run tient une
+      # session GAMA ouverte et une copie des includes ; la vraie limite est la
+      # memoire de gama-headless (cf. README).
+      WORKER_MAX_JOBS: "3"
+    volumes:
+      - ./headless-maelia-server:/app
+      - ./gama-models:/usr/lib/gama/workspace/gama-models
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      gama-headless:
+        condition: service_started
+
+  # ──────────────────────────────── Frontend ───────────────────────────────
+
+  frontend:
+    build:
+      context: ./headless-maelia-front
+      dockerfile: Dockerfile
+      target: dev                              # `prod` = build statique servi par nginx
+    image: maelia/frontend:local
+    pull_policy: build
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_WS_URL: ws://localhost:8000
+    volumes:
+      - ./headless-maelia-front:/app
+      - /app/node_modules
+    depends_on:
+      - api
+
+  # ────────────────────────────── Documentation ────────────────────────────
 
   docs:
     # Documentation de la plateforme (mkdocs-material). Le dossier ./docs contient
@@ -11,10 +237,7 @@ services:
     ports:
       - "8082:8080"
 
-  gama-headless:
-    image: gamaplatform/gama:2025.06.4
-    ports:
-      - "6868:6868"
-    volumes:
-      - ./gama-models:/usr/lib/gama/workspace/gama-models
-    command: -socket 6868
+volumes:
+  db-data:
+  redis-data:
+  minio-data:

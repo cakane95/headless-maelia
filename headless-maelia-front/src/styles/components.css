@@ -1,0 +1,320 @@
+/* Composants partagés : une section par composant de components/. */
+
+/* ── Card ──────────────────────────────────────────────────────────── */
+.card {
+  margin-bottom: var(--space-5);
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.card h3 {
+  margin: 0 0 var(--space-4);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ── Tableaux ──────────────────────────────────────────────────────── */
+/* Une table de données déborde sur petit écran : elle défile dans son propre
+   conteneur plutôt que d'élargir la page. */
+.card table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+th {
+  padding: 0 var(--space-3) var(--space-2) 0;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+td {
+  padding: var(--space-3) var(--space-3) var(--space-3) 0;
+  border-top: 1px solid var(--border);
+}
+
+tr.clickable {
+  cursor: pointer;
+  transition: background var(--transition);
+}
+tr.clickable:hover td {
+  background: var(--surface-muted);
+}
+
+.cell--name { width: 160px; }
+.cell--status { width: 96px; }
+.cell--label { width: 128px; color: var(--text-muted); }
+
+/* ── StatusBadge ───────────────────────────────────────────────────── */
+/* Le libellé est toujours présent : le statut n'est jamais porté par la
+   seule couleur (WCAG AA). La pastille ne fait que renforcer. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--neutral-soft);
+  color: var(--text-muted);
+}
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.badge.up,
+.badge.FINISHED {
+  background: var(--success-soft);
+  color: var(--success);
+}
+.badge.down,
+.badge.FAILED {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.badge.RUNNING {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+/* Une exécution en cours respire : le point pulse, sauf motion réduite. */
+.badge.RUNNING::before {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  50% { opacity: 0.35; }
+}
+
+/* ── Boutons ───────────────────────────────────────────────────────── */
+button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  font: inherit;
+  font-weight: 550;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: var(--shadow-sm);
+}
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+button.ghost {
+  color: var(--text);
+  background: transparent;
+  border-color: var(--border-strong);
+}
+button.ghost:hover:not(:disabled) {
+  background: var(--surface-muted);
+}
+
+/* ── Formulaires ───────────────────────────────────────────────────── */
+label {
+  display: block;
+  margin-bottom: var(--space-4);
+  max-width: 380px;
+}
+label span {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+input,
+select {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+input:hover,
+select:hover {
+  border-color: var(--neutral-400);
+}
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* ── ConsoleView ───────────────────────────────────────────────────── */
+.console {
+  height: clamp(220px, 40vh, 420px);
+  padding: var(--space-4);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--console-text);
+  background: var(--console-bg);
+  border-radius: var(--radius-sm);
+}
+.console .platform {
+  color: var(--console-accent);
+  font-weight: 500;
+}
+
+/* ── StatGroup ─────────────────────────────────────────────────────── */
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-5);
+}
+.stat b {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: 1.3rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.stat span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Placeholder ───────────────────────────────────────────────────── */
+.todo {
+  margin: 0;
+  padding-left: var(--space-5);
+  line-height: 2;
+  color: var(--text-muted);
+}
+
+/* ── Utilitaires de texte ──────────────────────────────────────────── */
+.muted { color: var(--text-muted); }
+.muted--first { margin-top: 0; }
+.error {
+  padding: var(--space-3) var(--space-4);
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: var(--radius-sm);
+}
+.error--last { margin-bottom: 0; }
+.empty {
+  padding: var(--space-7) 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* ── ThemeToggle ───────────────────────────────────────────────────── */
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.theme-toggle:hover:not(:disabled) {
+  color: var(--accent-text);
+  background: var(--surface-muted);
+  box-shadow: none;
+}
+
+/* ── ProgressBar ───────────────────────────────────────────────────────── */
+.progress {
+  position: relative;
+  height: 20px;
+  min-width: 120px;
+  overflow: hidden;
+  background: var(--surface-muted);
+  border-radius: var(--radius-pill);
+}
+.progress__fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--transition);
+}
+.progress__label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Statuts des fichiers d'entrée : mêmes teintes que les runs. */
+.badge.VALID { background: var(--success-soft); color: var(--success); }
+.badge.INVALID { background: var(--danger-soft); color: var(--danger); }
+.badge.DRAFT { background: var(--warning-soft); color: var(--warning); }
+
+/* Aide sous un champ de formulaire. */
+.hint {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Liste de modules dans l'écran Données. */
+.module-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border);
+}
+.module-row__name { flex: 1; font-weight: 550; }
+.module-row__count { color: var(--text-muted); font-size: 0.8rem; }
+
+/* ── Onglets d'un projet ───────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+.tabs a {
+  padding: var(--space-2) var(--space-4);
+  color: var(--text-muted);
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--transition), border-color var(--transition);
+}
+.tabs a:hover { color: var(--text); }
+.tabs a.active {
+  color: var(--accent-text);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}

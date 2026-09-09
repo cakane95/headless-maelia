@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Plateforme de simulation MAELIA sur GAMA headless" />
+    <title>headless-MAELIA</title>
+
+    <!-- Typographie de la charte : Inter (texte) + JetBrains Mono (code).
+         `display=swap` : le texte reste lisible pendant le chargement. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Pose le theme AVANT le premier rendu : sans ce script, un utilisateur en
+         mode sombre verrait un flash clair au chargement. Duplique volontairement
+         la logique de hooks/useTheme.js, qui prend ensuite le relais. -->
+    <script>
+      (function () {
+        try {
+          var pref = localStorage.getItem("maelia-theme") || "system";
+          var sombre =
+            pref === "dark" ||
+            (pref === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.dataset.theme = sombre ? "dark" : "light";
+        } catch (e) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

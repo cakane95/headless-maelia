@@ -1,0 +1,1520 @@
+[
+  {
+    "name": "executerSurCluster",
+    "label": "executerSurCluster",
+    "group": "Chemins",
+    "type": "BOOL",
+    "default": false,
+    "system": true,
+    "editable": false
+  },
+  {
+    "name": "cheminRacineMaelia",
+    "label": "cheminRacineMaelia",
+    "group": "Chemins",
+    "type": "EXPRESSION",
+    "default": "mapCheminRacineMaeliaSelonClusterOuPas[executerSurCluster]",
+    "system": true,
+    "editable": false
+  },
+  {
+    "name": "cheminModeleVersDonnees",
+    "label": "cheminModeleVersDonnees",
+    "group": "Chemins",
+    "type": "EXPRESSION",
+    "default": "cheminRacineMaelia + \"includes/\"",
+    "system": true,
+    "editable": false
+  },
+  {
+    "name": "cheminRelatifDuDossierDeSortieDeSimulation",
+    "label": "cheminSorties",
+    "group": "Chemins",
+    "type": "EXPRESSION",
+    "default": "cheminRacineMaelia + \"models/main/log\"",
+    "system": true,
+    "editable": false
+  },
+  {
+    "name": "anneeDebutSimulation",
+    "label": "anneeDebutSimulation",
+    "group": "Général",
+    "type": "INT",
+    "default": 2019,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nbAnneesSimulation",
+    "label": "nbAnneesSimulation",
+    "group": "Général",
+    "type": "INT",
+    "default": 3,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomSimulation",
+    "label": "nomSimulation",
+    "group": "Général",
+    "type": "STRING",
+    "default": "",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomDecoupageZonePourLectureFichiers",
+    "label": "nomDecoupageZonePourLectureFichiers",
+    "group": "Général",
+    "type": "STRING",
+    "default": "terrainTest",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerModeleSurUneZH",
+    "label": "simulationSurZH",
+    "group": "Général",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "listNomsZHsDecoupageZone",
+    "label": "idZHASimuler",
+    "group": "Général",
+    "type": "LIST",
+    "default": [
+      ""
+    ],
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerUnSeulAgriculteur",
+    "label": "simulationSurExploitation",
+    "group": "Général",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "idExploitationAexecuter",
+    "label": "idExploitationASimuler",
+    "group": "Général",
+    "type": "STRING",
+    "default": "mineral_beauce_29",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerSurEnsembleExploit",
+    "label": "simulationSurEnsembleExploitations",
+    "group": "Général",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "listIdExploitationAexecuter",
+    "label": "idExploitationsASimuler",
+    "group": "Général",
+    "type": "LIST",
+    "default": [
+      "expl_13",
+      "expl_15"
+    ],
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerUneSeuleParcelle",
+    "label": "simulationSurParcelle",
+    "group": "Général",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomParcelleAffichee",
+    "label": "idParcelleASimuler",
+    "group": "Général",
+    "type": "STRING",
+    "default": "beauce_48_1",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomScenarioClimatique",
+    "label": "nomScenarioClimatique",
+    "group": "Général",
+    "type": "STRING",
+    "default": "rcp8.5",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "utiliserMemeDonnesMeteoPartout",
+    "label": "utiliserMemeMeteoPartout",
+    "group": "Général",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "idPointMeteoUnique",
+    "label": "idPointMeteoUnique",
+    "group": "Général",
+    "type": "STRING",
+    "default": "3994",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "idSimulationAPI",
+    "label": "idSimulationAPI",
+    "group": "Général",
+    "type": "STRING",
+    "default": "",
+    "system": true,
+    "editable": false
+  },
+  {
+    "name": "verboseMode",
+    "label": "modeVerbeux",
+    "group": "Général",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerModeleHydrographique",
+    "label": "executerModeleHydrographique",
+    "group": "Modèle hydrographique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomChoixModeleHydrographique",
+    "label": "nomChoixModeleHydrographique",
+    "group": "Modèle hydrographique",
+    "type": "STRING",
+    "default": "SWAT",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "coefficientSurfaceRuissellementLag",
+    "label": "surLag: coefficientSurfaceRuissellementLag",
+    "group": "Modèle hydrographique",
+    "type": "FLOAT",
+    "default": 4.0,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "retardEntreSortiSolEtEntreeAquifereGlobal",
+    "label": "deltaGw: retardEntreSortiSolEtEntreeAquifereGlobal",
+    "group": "Modèle hydrographique",
+    "type": "FLOAT",
+    "default": 31.0,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "coefPercolationVersAquifereProfondGlobal",
+    "label": "betaDeep: coefPercolationVersAquifereProfondGlobal",
+    "group": "Modèle hydrographique",
+    "type": "FLOAT",
+    "default": 1.0,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "coefficientManningTerrain",
+    "label": "nTerrain: coefficientManningTerrain",
+    "group": "Modèle hydrographique",
+    "type": "FLOAT",
+    "default": 0.12,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "isPrelevementEtRejetSimules",
+    "label": "isPrelevementEtRejetSimules",
+    "group": "Modèle hydrographique",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "affecterEqIrrSiInexistant",
+    "label": "affecterEqIrrSiInexistant",
+    "group": "Modèle hydrographique",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomPtRefAffichee",
+    "label": "nomPtRefAffichee",
+    "group": "Modèle hydrographique",
+    "type": "STRING",
+    "default": "O5882510",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "listNomsZHsDebitComplement",
+    "label": "listNomsZHsDebitComplement",
+    "group": "Modèle hydrographique",
+    "type": "LIST",
+    "default": [
+      "549"
+    ],
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "listeExutoiresZoneMaelia",
+    "label": "listeExutoiresZoneMaelia",
+    "group": "Modèle hydrographique",
+    "type": "LIST",
+    "default": [
+      "110",
+      "208"
+    ],
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "ID_RESSOURCES_INFINIES",
+    "label": "ID_RESSOURCES_INFINIES",
+    "group": "Modèle hydrographique",
+    "type": "LIST",
+    "default": [
+      "SURF_EAU0000000025689668"
+    ],
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerModeleAgricole",
+    "label": "executerModeleAgricole",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomChoixAssolement",
+    "label": "nomChoixAssolement",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "Donnees",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "anneeDeReferenceRPG",
+    "label": "anneeDeReferenceRPG",
+    "group": "Modèle agricole",
+    "type": "INT",
+    "default": 2014,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "activerITKalternatif",
+    "label": "activerITKAlternatif",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "forcerSemisCI",
+    "label": "forcerSemisCI",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "avecContrainteDeMainOeuvre",
+    "label": "avecContrainteDeMainOeuvre",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "plusieursTravauxDuSolParITK",
+    "label": "plusieursTravauxDuSolParITK",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "plusieursFertilisationsParITK",
+    "label": "plusieursFertilisationsParITK",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "plusieursTraitementsPhytoParITK",
+    "label": "plusieursTraitementsPhytoParITK",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "adaptationFertilisation",
+    "label": "Adaptation de la fertilisation",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "corpenProfondeurTemporelle",
+    "label": "Profondeur temporelle du bilan CORPEN",
+    "group": "Modèle agricole",
+    "type": "INT",
+    "default": 3,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "gestionStocksEngrais",
+    "label": "Niveau scalaire de gestion des stocks d engrais",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "territoire",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "avecIlotsHorsZone",
+    "label": "avecIlotsHorsZone",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomChoixModeleCroissancePlante",
+    "label": "nomChoixModeleCroissancePlante",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "AqYieldNC",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomChoixModeleCroissancePrairie",
+    "label": "nomChoixModeleCroissancePrairie",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "HerbSimNC",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "denit_fTemp_option",
+    "label": "Choix fonction temp dénit",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "Stics",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "isIrrigationSimulee",
+    "label": "isIrrigationSimulee",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nomChoixModeleIrrigation",
+    "label": "nomChoixModeleIrrigation",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "Simple",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "listScenarioPrix",
+    "label": "liste des scénarios de prix de vente des cultures",
+    "group": "Modèle agricole",
+    "type": "LIST",
+    "default": [
+      ""
+    ],
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "scenarioDePrixPrincipal",
+    "label": "nom du scenario de prix principal",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "PREFIXE_CI",
+    "label": "préfixe culture couvert intermédiaire",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "ci",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "remplacerItkManquants",
+    "label": "remplacement ITK manquants",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "associerIlotMeteoZH",
+    "label": "associerIlotMeteoZH",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "option_Finert_calc",
+    "label": "fraction SOM inerte fonction du %MO",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "avecStressClimatique",
+    "label": "Gel et échaudage",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerParcelleVirtuelle",
+    "label": "executerParcelleVirtuelle",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "rotationForceeParcelle",
+    "label": "rotationForceeParcelle",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "colza-precPauvre_CP-precRiche_feverole_CP-precRiche",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "gestionPaillesForceeParcelle",
+    "label": "gestionPaillesForceeParcelle",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "idSdcForce",
+    "label": "[PARAM] idSdcForce",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "all",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "typeDeSolForceParcelle",
+    "label": "[PARAM] typeDeSolForceParcelle",
+    "group": "Modèle agricole",
+    "type": "STRING",
+    "default": "luvisols plateaux inferieurs",
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "surfaceHectareForceParcelle",
+    "label": "[PARAM] surfaceHectareForceParcelle",
+    "group": "Modèle agricole",
+    "type": "FLOAT",
+    "default": 10.0,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerModeleElevage",
+    "label": "executerModeleElevage",
+    "group": "Modèle agricole",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerModeleNormatif",
+    "label": "executerModeleNormatif",
+    "group": "Modèle normatif",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerBarrage",
+    "label": "executerBarrage",
+    "group": "Modèle normatif",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "accelerationTourEauSiRestriction",
+    "label": "accelerationTourEauSiRestriction",
+    "group": "Modèle normatif",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "executerEcritureFichiers",
+    "label": "executerEcritureFichiers",
+    "group": "Sorties",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "nb_decimales_sorties",
+    "label": "nb décimales sorties",
+    "group": "Sorties",
+    "type": "INT",
+    "default": 2,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "sorties_eau",
+    "label": "sorties eau",
+    "group": "Sorties",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "sorties_azote",
+    "label": "sorties azote",
+    "group": "Sorties",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "sorties_carboneGES",
+    "label": "sorties carbone et GES",
+    "group": "Sorties",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "sorties_retenues",
+    "label": "sorties retenues",
+    "group": "Sorties",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "sorties_barrages",
+    "label": "sorties barrages",
+    "group": "Sorties",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "listAgriASuivre",
+    "label": "listAgriASuivre",
+    "group": "Sorties",
+    "type": "LIST",
+    "default": [
+      "344877",
+      "345341",
+      "346156",
+      "346838",
+      "345630",
+      "345225",
+      "346823",
+      "347327",
+      "345857",
+      "344736",
+      "343392",
+      "345120",
+      "344376",
+      "344467",
+      "343607",
+      "344483",
+      "345756",
+      "344630",
+      "345039",
+      "344464",
+      "345772",
+      "345459",
+      "346630",
+      "343768",
+      "343023",
+      "347505",
+      "343772",
+      "343677",
+      "344156",
+      "345099",
+      "347320",
+      "345234",
+      "342842",
+      "347130",
+      "190567",
+      "345215",
+      "346058",
+      "346472",
+      "346646",
+      "347312",
+      "343329",
+      "343505",
+      "343770",
+      "346680",
+      "343729",
+      "342973",
+      "343409",
+      "346530",
+      "345611",
+      "343321",
+      "344675",
+      "346673",
+      "343610",
+      "344226",
+      "345593",
+      "343078",
+      "344442",
+      "345259",
+      "345343",
+      "344095",
+      "343658",
+      "343086",
+      "347174",
+      "347533",
+      "347180",
+      "345041",
+      "344491",
+      "346591",
+      "346048",
+      "190428",
+      "346878",
+      "345509",
+      "343805",
+      "343020",
+      "346374",
+      "346136",
+      "343700",
+      "345530",
+      "343968",
+      "343910",
+      "343180",
+      "345363",
+      "345314",
+      "346991",
+      "343243",
+      "343251",
+      "344590",
+      "344399",
+      "344329",
+      "343200",
+      "346195",
+      "345121",
+      "344061",
+      "345539",
+      "345355",
+      "344611",
+      "344517",
+      "342987",
+      "344342",
+      "346790",
+      "345851",
+      "344532",
+      "346040",
+      "345458",
+      "346867",
+      "346683",
+      "346239",
+      "346222",
+      "346879",
+      "347183",
+      "343774",
+      "343500",
+      "346055",
+      "343057",
+      "347498",
+      "345586",
+      "345206",
+      "345937",
+      "343193",
+      "346872",
+      "346318",
+      "345297",
+      "346763",
+      "347472",
+      "347248",
+      "347617",
+      "346504",
+      "343149",
+      "344938",
+      "347019",
+      "345284",
+      "346783",
+      "343638",
+      "343368",
+      "345952",
+      "346440",
+      "344201",
+      "347155",
+      "344023",
+      "345211",
+      "347441",
+      "344963",
+      "345592",
+      "347120",
+      "347249",
+      "346881",
+      "347325",
+      "346387",
+      "345720",
+      "345262",
+      "346199",
+      "345283",
+      "345351",
+      "346215",
+      "343966",
+      "345652",
+      "345714",
+      "346045",
+      "346619",
+      "346919",
+      "347507",
+      "346276",
+      "346807",
+      "346252",
+      "343137"
+    ],
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "listParcellesASuivre",
+    "label": "listParcellesASuivre",
+    "group": "Sorties",
+    "type": "LIST",
+    "default": [
+      "082-5653275_00",
+      "082-5661385_00",
+      "082-5658658_03"
+    ],
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Assolement_SDC",
+    "label": "Sortie Assolement_SDC",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Assolement_itk",
+    "label": "Sortie Assolement_itk",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Assolement_espece",
+    "label": "Sortie Assolement_espece",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "ECO_espece",
+    "label": "Sortie ECO_espece",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "ECO_itk",
+    "label": "Sortie ECO_itk",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "ECO_exploitationType",
+    "label": "Sortie ECO_exploitationType",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "ECO_exploitationDetail",
+    "label": "Sortie ECO_exploitationDetail",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "ECO_SDCRef",
+    "label": "Sortie ECO_SDCRef",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "ECO_coutIrrigationIlot",
+    "label": "Sortie ECO_coutIrrigationIlot",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "variablesAqYieldSurParcellesSpecifiees",
+    "label": "Sortie AqYield parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "variablesAqYieldSurParcellesSpecifiees_light",
+    "label": "Sortie AqYield parcelles light",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "listParcellesPourSortiesAqYield",
+    "label": "Liste parcelles sorties AqYield",
+    "group": "Sorties — assolement",
+    "type": "LIST",
+    "default": [
+      "082-5650603_00"
+    ],
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "aqYield_eva_trmax_trr_ITK_ZH",
+    "label": "Sortie eva, trmax, trreelle ITK ZH",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "debug_fusion_AqYieldNC",
+    "label": "debug_fusion_AqYieldNC",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "sortiesAqYieldNC",
+    "label": "Sorties AqYield NC",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_lixi_typeExploitation",
+    "label": "Sortie N_lixi_typeExploitation",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_total_eqC02_typeExploitation",
+    "label": "Sortie N_total_eqC02_typeExploitation",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_Cstock_Parcelles",
+    "label": "Sortie N_Cstock_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "engrais_utilises_territoire",
+    "label": "Sortie engrais_utilises_territoire",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "engrais_utilises_exploitation",
+    "label": "Sortie engrais_utilises_exploitation",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "eqCO2_emissions_NC_Parcelles",
+    "label": "Sortie eqCO2_emissions_NC_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_N2O_Parcelles",
+    "label": "Sortie N_N2O_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_NH3_Parcelles",
+    "label": "Sortie N_NH3_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_Nmin_som_res_Parcelles",
+    "label": "Sortie N_Nmin_som_res_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_Nmin_total_Parcelles",
+    "label": "Sortie N_Nmin_total",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_QNfix_Parcelles",
+    "label": "Sortie N_QNfix_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "tpsWFerti_Parcelles",
+    "label": "Sortie tpsWFerti_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "prixFerti_Parcelles",
+    "label": "Sortie prixFerti_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "recolteParcelles",
+    "label": "Sortie recolteParcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "eqCO2_synthesis_Parcelles",
+    "label": "Sortie eqCO2_synthesis_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_GES_Parcelles",
+    "label": "Sortie N_GES_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "N_lixi_Parcelles",
+    "label": "Sortie N_lixi_Parcelles",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "suivi_journalier_1parc_HerbSimNC",
+    "label": "Sortie journalière HerbSimNC",
+    "group": "Sorties — assolement",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "suivi_ajout_pools_residus",
+    "label": "Sortie Ajout_Pools_Residus",
+    "group": "Bilan nc",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "DrainIlot",
+    "label": "Sortie DrainIlot",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "DrainIlot_mois",
+    "label": "Sortie DrainIlot mensuel",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "DrainIlot_quinzaine",
+    "label": "Sortie DrainIlot bimensuel",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "DrainIlotDetail",
+    "label": "Sortie DrainIlotDetail",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "DrainIlotDetail_mois",
+    "label": "Sortie DrainIlotDetail mensuel",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "DrainIlotDetail_quinzaine",
+    "label": "Sortie DrainIlotDetail bimensuel",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "IrrigationParAgri",
+    "label": "Irrigation par Agri",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "travailParAgri_Irrigation",
+    "label": "Travail Irrigation par agri",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "DetailsGroupeIrrigation",
+    "label": "Travail Irrigation",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "irrigationDebug",
+    "label": "Irrigation debug",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "IrrigationParcelle",
+    "label": "Irrigation par parcelle",
+    "group": "Sorties — bilan hydrique",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "RDT_itk",
+    "label": "Sortie RDT_itk",
+    "group": "Sorties — économie",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "RDT_sol_itk",
+    "label": "Sortie RDT_sol_itk",
+    "group": "Sorties — économie",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "RDT_espece",
+    "label": "Sortie RDT_espece",
+    "group": "Sorties — économie",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "RDT_parcelle_espece",
+    "label": "Sortie RDT_parcelle_espece",
+    "group": "Sorties — économie",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "sorties_iBio",
+    "label": "Sortie i-Bio",
+    "group": "Sorties — biodiversité",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "DebistSTH",
+    "label": "Sortie debit aux points STH selectione",
+    "group": "Sorties — hydrologie",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Debit",
+    "label": "Sortie debit pour tous les points STH",
+    "group": "Sorties — hydrologie",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Prelevements",
+    "label": "Sortie Prelevements Territoire",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "PrelevementsZH",
+    "label": "Sortie Prelevements par ZH",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "PrelevementsZA",
+    "label": "Sortie Prelevements par ZA",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Prelevements_sol_itk",
+    "label": "Sortie Prelevements par Sol x ITK",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Prelevements_sol_espece",
+    "label": "Sortie Prelevements par Sol x Espece",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Prelevements_espece",
+    "label": "Sortie Prelevements par Espece",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Prelevements_za_espece",
+    "label": "Sortie Prelevements par ZA x Espece",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Prelevements_za_sol_espece",
+    "label": "Sortie Prelevements par ZA x Sol x Espece",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Prelevements_decoupage_itk",
+    "label": "Sortie Prelevements par ITK x Decoupage ilot",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Prelevements_decoupage_typePPA",
+    "label": "Sortie Prelevements par ITK x Decoupage PPA",
+    "group": "Sorties — prélèvements",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "Restrictions",
+    "label": "Sortie Niveau de restriction par ZA",
+    "group": "Sorties — normatif",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "GestionnaireDeBarrage",
+    "label": "Sortie GestionnaireDeBarrage",
+    "group": "Sorties — normatif",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "debugSortie1parcelleAqYield",
+    "label": "Sortie debugSortie1parcelleAqYield",
+    "group": "Sorties — opérations techniques",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "suiviOT",
+    "label": "Suivi de la realisation des operations techniques",
+    "group": "Sorties — opérations techniques",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "suiviOTParParcelle",
+    "label": "Suivi détaillé des OT par parcelle",
+    "group": "Sorties — opérations techniques",
+    "type": "BOOL",
+    "default": true,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "suiviOTParParcelleTemps",
+    "label": "Suivi detaille des OT par parcelle avec duree",
+    "group": "Sorties — opérations techniques",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "suiviOTParParcelle_humidite",
+    "label": "Suivi des OT semis, irrigation, récolte + humidité",
+    "group": "Sorties — opérations techniques",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  },
+  {
+    "name": "listOTASuivreEnSortie",
+    "label": "liste des OT a suivre en sortie",
+    "group": "Sorties — opérations techniques",
+    "type": "EXPRESSION",
+    "default": "listOT",
+    "system": false,
+    "editable": false
+  },
+  {
+    "name": "plan_epandage_actif",
+    "label": "Plan épandage",
+    "group": "Sorties — opérations techniques",
+    "type": "BOOL",
+    "default": false,
+    "system": false,
+    "editable": true
+  }
+]

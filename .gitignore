@@ -1,0 +1,41 @@
+# ── Sorties de simulation GAMA ────────────────────────────────────────────
+# Le launcher MAELIA écrit ses résultats DANS l'arborescence du modèle
+# (cheminRelatifDuDossierDeSortieDeSimulation = cheminRacineMaelia + "models/main/log").
+gama-models/**/models/main/log/
+# Copies de travail des includes, une par run (cf. app/core/includes.py).
+gama-models/**/includes/.runs/
+
+# ── Workspaces Eclipse créés par gama-headless ────────────────────────────
+# Ne devraient jamais apparaître ici (le WORKDIR de l'image officielle est
+# interne au conteneur), mais un lancement de GAMA desktop sur ce dossier
+# les produirait. Cf. section « workspace » du README.
+.workspace*/
+.metadata/
+.gama_application_workspace
+.built_in_models_*
+
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ── Node ──────────────────────────────────────────────────────────────────
+node_modules/
+dist/
+.vite/
+
+# ── Documentation générée ─────────────────────────────────────────────────
+docs/site/
+
+# ── Environnement local ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Divers ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

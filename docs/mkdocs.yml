@@ -78,17 +78,15 @@ markdown_extensions:
 
 nav:
   - Accueil: index.md
-  - Démarrage:
-      - Installation & démarrage: guides/installation.md
-      - Guide d'utilisation: guides/utilisation.md
   - Architecture:
-      - Vue d'ensemble: architecture/index.md
       - Backend: architecture/backend.md
+      - Backend — bonnes pratiques: architecture/backend-bonnes-pratiques.md
+      - Backend — les domaines: architecture/backend-domaines.md
       - Frontend: architecture/frontend.md
+      - Frontend — bonnes pratiques: architecture/frontend-bonnes-pratiques.md
       - Modèle de domaine — Données d'entrée: architecture/modele-domaine-donnees-entree.md
   - Référence:
-      - API REST: reference/api.md
-      - Charte graphique: reference/charte-graphique.md
+      - Données, sorties et paramètres MAELIA: reference/donnees-et-parametres.md
 
 extra:
   social:

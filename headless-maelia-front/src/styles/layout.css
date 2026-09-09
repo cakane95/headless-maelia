@@ -1,0 +1,217 @@
+/* Chrome applicatif : bandeau, barre latérale (tiroir sous 1024 px), contenu. */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Bandeau ───────────────────────────────────────────────────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  height: var(--topbar-height);
+  padding: 0 var(--space-5);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.topbar .brand {
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  /* Le tiroir occupe le coin gauche en mobilité. */
+  padding-left: 0;
+}
+.topbar .brand span {
+  color: var(--accent);
+}
+
+/* Bascule entre les deux espaces. */
+.spaces {
+  display: flex;
+  gap: var(--space-1);
+  margin-left: auto;
+  margin-right: var(--space-2);
+  padding: var(--space-1);
+  background: var(--surface-muted);
+  border-radius: var(--radius-pill);
+}
+.spaces a {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-weight: 550;
+  color: var(--text-muted);
+  transition: color var(--transition), background var(--transition);
+}
+.spaces a:hover {
+  color: var(--text);
+}
+.spaces a.active {
+  background: var(--surface);
+  color: var(--accent-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Barre latérale ────────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  padding: var(--space-5) var(--space-3);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+
+  /* La navigation reste en place quand le contenu defile : elle se colle sous
+     le bandeau et defile independamment si elle devient plus haute que l'ecran. */
+  position: sticky;
+  top: var(--topbar-height);
+  align-self: flex-start;
+  height: calc(100vh - var(--topbar-height));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sidebar__group + .sidebar__group {
+  margin-top: var(--space-5);
+}
+
+.sidebar h2 {
+  margin: 0 0 var(--space-2) var(--space-3);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar nav a {
+  position: relative;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  transition: background var(--transition), color var(--transition);
+}
+.sidebar nav a:hover {
+  background: var(--surface-muted);
+}
+.sidebar nav a.active {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 550;
+}
+/* Repère latéral : l'état actif ne repose pas sur la seule couleur. */
+.sidebar nav a.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+/* ── Contenu ───────────────────────────────────────────────────────── */
+.content {
+  flex: 1;
+  min-width: 0;
+  max-width: var(--content-max);
+  padding: var(--space-6);
+}
+
+.content h1 {
+  margin: 0 0 var(--space-1);
+  font-size: 1.5rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.content .lede {
+  margin: 0 0 var(--space-6);
+  max-width: 68ch;
+  color: var(--text-muted);
+}
+
+/* ── Tiroir (sous 1024 px) ─────────────────────────────────────────── */
+.drawer-toggle {
+  display: none;
+  padding: var(--space-2) var(--space-3);
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+@media (max-width: 1024px) {
+  .drawer-toggle {
+    position: fixed;
+    top: calc((var(--topbar-height) - 34px) / 2);
+    left: var(--space-4);
+    z-index: 50;
+    display: block;
+  }
+
+  .topbar .brand {
+    padding-left: var(--space-7);
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: auto;
+    align-self: auto;
+    z-index: 45;
+    width: min(280px, 82vw);
+    padding-top: var(--space-6);
+    transform: translateX(-100%);
+    transition: transform var(--transition);
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar--open {
+    transform: translateX(0);
+  }
+
+  .content {
+    padding: var(--space-5) var(--space-4);
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    gap: var(--space-3);
+    padding: 0 var(--space-3);
+  }
+  .spaces a {
+    padding: var(--space-2) var(--space-3);
+  }
+  .content h1 {
+    font-size: 1.25rem;
+  }
+}
