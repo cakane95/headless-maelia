@@ -1,0 +1,92 @@
+/* =====================================================================
+   Tableaux : listes de données et grille d'édition.
+   ===================================================================== */
+
+/* ── Tableaux ──────────────────────────────────────────────────────── */
+/* Une table occupe toute la largeur de sa carte : ses colonnes se répartissent
+   la place disponible au lieu de se tasser à gauche. Le débordement est géré
+   par la carte, qui défile — mettre `display: block` sur la table elle-même la
+   ramènerait à la largeur de son contenu. */
+.card table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+th {
+  padding: 0 var(--space-3) var(--space-2) 0;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+td {
+  padding: var(--space-3) var(--space-3) var(--space-3) 0;
+  border-top: 1px solid var(--border);
+}
+
+tr.clickable {
+  cursor: pointer;
+  transition: background var(--transition);
+}
+tr.clickable:hover td {
+  background: var(--surface-muted);
+}
+/* Ligne consultée : le détail affiché dessous s'y rattache visuellement. */
+tr.selected td {
+  background: var(--surface-muted);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.cell--name { width: 160px; }
+.cell--status { width: 96px; }
+.cell--label { width: 128px; color: var(--text-muted); }
+
+/* ── Grille d'édition ──────────────────────────────────────────────────── */
+/* Un fichier MAELIA peut avoir des centaines de colonnes : la grille défile
+   dans son conteneur, elle n'élargit jamais la page. */
+.grid-scroll {
+  max-height: 60vh;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.grid-scroll table { white-space: nowrap; }
+.grid-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-muted);
+}
+.grid-scroll td { padding: 0 var(--space-1); }
+
+.cell-input {
+  width: 100%;
+  min-width: 90px;
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.8rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+}
+.cell-input:hover { border-color: var(--border); }
+.cell-input[data-focused] {
+  background: var(--surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+/* Lien présenté comme une action principale. */
+.button-link {
+  display: inline-block;
+  padding: var(--space-2) var(--space-5);
+  font-weight: 550;
+  color: #fff;
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+}
+.button-link:hover { background: var(--accent-hover); }

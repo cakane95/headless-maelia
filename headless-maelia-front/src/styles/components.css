@@ -1,8 +1,11 @@
-/* Composants partagés : une section par composant de components/. */
+/* =====================================================================
+   Chrome interactif : cartes, boutons, formulaires, modale.
+   ===================================================================== */
 
 /* ── Card ──────────────────────────────────────────────────────────── */
 .card {
   margin-bottom: var(--space-5);
+  overflow-x: auto;
   padding: var(--space-5);
   background: var(--surface);
   border: 1px solid var(--border);
@@ -14,88 +17,6 @@
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-}
-
-/* ── Tableaux ──────────────────────────────────────────────────────── */
-/* Une table de données déborde sur petit écran : elle défile dans son propre
-   conteneur plutôt que d'élargir la page. */
-.card table {
-  display: block;
-  overflow-x: auto;
-  width: 100%;
-  border-collapse: collapse;
-  white-space: nowrap;
-}
-
-th {
-  padding: 0 var(--space-3) var(--space-2) 0;
-  text-align: left;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-}
-
-td {
-  padding: var(--space-3) var(--space-3) var(--space-3) 0;
-  border-top: 1px solid var(--border);
-}
-
-tr.clickable {
-  cursor: pointer;
-  transition: background var(--transition);
-}
-tr.clickable:hover td {
-  background: var(--surface-muted);
-}
-
-.cell--name { width: 160px; }
-.cell--status { width: 96px; }
-.cell--label { width: 128px; color: var(--text-muted); }
-
-/* ── StatusBadge ───────────────────────────────────────────────────── */
-/* Le libellé est toujours présent : le statut n'est jamais porté par la
-   seule couleur (WCAG AA). La pastille ne fait que renforcer. */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  background: var(--neutral-soft);
-  color: var(--text-muted);
-}
-.badge::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.badge.up,
-.badge.FINISHED {
-  background: var(--success-soft);
-  color: var(--success);
-}
-.badge.down,
-.badge.FAILED {
-  background: var(--danger-soft);
-  color: var(--danger);
-}
-.badge.RUNNING {
-  background: var(--warning-soft);
-  color: var(--warning);
-}
-/* Une exécution en cours respire : le point pulse, sauf motion réduite. */
-.badge.RUNNING::before {
-  animation: pulse 1.6s ease-in-out infinite;
-}
-@keyframes pulse {
-  50% { opacity: 0.35; }
 }
 
 /* ── Boutons ───────────────────────────────────────────────────────── */
@@ -169,65 +90,24 @@ select:focus {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
-/* ── ConsoleView ───────────────────────────────────────────────────── */
-.console {
-  height: clamp(220px, 40vh, 420px);
-  padding: var(--space-4);
-  overflow-y: auto;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--console-text);
-  background: var(--console-bg);
-  border-radius: var(--radius-sm);
+/* Interrupteur de configuration : libellé à droite, aligné sur la case. */
+.switch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: none;
+  margin-bottom: var(--space-2);
+  cursor: pointer;
 }
-.console .platform {
-  color: var(--console-accent);
-  font-weight: 500;
-}
-
-/* ── StatGroup ─────────────────────────────────────────────────────── */
-.row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: var(--space-5);
-}
-.stat b {
-  display: block;
-  margin-bottom: var(--space-1);
-  font-size: 1.3rem;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-}
-.stat span {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-/* ── Placeholder ───────────────────────────────────────────────────── */
-.todo {
+.switch input {
+  width: auto;
   margin: 0;
-  padding-left: var(--space-5);
-  line-height: 2;
-  color: var(--text-muted);
+  accent-color: var(--accent);
 }
-
-/* ── Utilitaires de texte ──────────────────────────────────────────── */
-.muted { color: var(--text-muted); }
-.muted--first { margin-top: 0; }
-.error {
-  padding: var(--space-3) var(--space-4);
-  color: var(--danger);
-  background: var(--danger-soft);
-  border-radius: var(--radius-sm);
-}
-.error--last { margin-bottom: 0; }
-.empty {
-  padding: var(--space-7) 0;
-  text-align: center;
-  color: var(--text-muted);
+.switch span {
+  margin: 0;
+  color: var(--text);
+  font-weight: 400;
 }
 
 /* ── ThemeToggle ───────────────────────────────────────────────────── */
@@ -249,72 +129,65 @@ select:focus {
   box-shadow: none;
 }
 
-/* ── ProgressBar ───────────────────────────────────────────────────────── */
-.progress {
-  position: relative;
-  height: 20px;
-  min-width: 120px;
-  overflow: hidden;
-  background: var(--surface-muted);
-  border-radius: var(--radius-pill);
-}
-.progress__fill {
-  height: 100%;
-  background: var(--accent);
-  transition: width var(--transition);
-}
-.progress__label {
-  position: absolute;
+/* ── Modale ────────────────────────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
   inset: 0;
+  z-index: 60;
   display: grid;
   place-items: center;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text);
+  padding: var(--space-4);
+  background: rgba(15, 23, 42, 0.45);
 }
-
-/* Statuts des fichiers d'entrée : mêmes teintes que les runs. */
-.badge.VALID { background: var(--success-soft); color: var(--success); }
-.badge.INVALID { background: var(--danger-soft); color: var(--danger); }
-.badge.DRAFT { background: var(--warning-soft); color: var(--warning); }
-
-/* Aide sous un champ de formulaire. */
-.hint {
-  display: block;
-  margin-top: var(--space-1);
-  font-size: 0.75rem;
-  color: var(--text-muted);
+.modal {
+  width: min(560px, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
-
-/* Liste de modules dans l'écran Données. */
-.module-row {
+.modal:focus { outline: none; }
+.modal__head {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-3) 0;
-  border-top: 1px solid var(--border);
-}
-.module-row__name { flex: 1; font-weight: 550; }
-.module-row__count { color: var(--text-muted); font-size: 0.8rem; }
-
-/* ── Onglets d'un projet ───────────────────────────────────────────────── */
-.tabs {
-  display: flex;
-  gap: var(--space-1);
-  margin-bottom: var(--space-5);
+  padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--border);
 }
-.tabs a {
-  padding: var(--space-2) var(--space-4);
-  color: var(--text-muted);
-  font-weight: 500;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: color var(--transition), border-color var(--transition);
+.modal__head h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
 }
-.tabs a:hover { color: var(--text); }
-.tabs a.active {
-  color: var(--accent-text);
-  border-bottom-color: var(--accent);
-  font-weight: 600;
+.modal__head button {
+  padding: 0 var(--space-3);
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+.modal__body { padding: var(--space-5); }
+
+/* En-tête d'écran avec une action à droite. */
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+/* Retour à la liste des projets, au-dessus des rubriques. */
+.sidebar__back {
+  display: block;
+  margin-bottom: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+}
+.sidebar__back:hover {
+  background: var(--surface-muted);
+  color: var(--text);
 }

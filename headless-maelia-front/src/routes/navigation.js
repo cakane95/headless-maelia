@@ -20,12 +20,20 @@ export const adminNav = [
   },
 ];
 
-export const simulationNav = [
-  {
-    title: "Simulation",
-    links: [
-      { to: "/simulation", label: "Mes projets", end: true },
-      { to: "/simulation/resultats", label: "Résultats" },
-    ],
-  },
-];
+/** Rubriques d'un projet. Elles transportent son identifiant : chaque projet a
+ *  ses propres données, scénarios et résultats. */
+export function projectNav(projectId, projectName) {
+  const base = `/simulation/projets/${projectId}`;
+  return [
+    {
+      title: projectName || "Projet",
+      links: [
+        { to: `${base}/initialisation`, label: "Initialisation" },
+        { to: `${base}/donnees`, label: "Données d'entrée" },
+        { to: `${base}/scenarios`, label: "Scénarios" },
+        { to: `${base}/simulations`, label: "Simulations" },
+        { to: `${base}/resultats`, label: "Résultats" },
+      ],
+    },
+  ];
+}

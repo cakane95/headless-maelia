@@ -12,10 +12,13 @@ validated and what GAMA reads.
 """
 
 import uuid
-from dataclasses import replace
+from collections.abc import Sequence
+from dataclasses import dataclass, replace
+from enum import StrEnum
 
 from app.contexts.catalog.domain.models import DataSpec, FileKind
 from app.contexts.catalog.domain.ports import CatalogRepository
+from app.contexts.catalog.domain.services import resolve_spec
 from app.contexts.dataset.application.materialize import OverlayFile
 from app.contexts.dataset.domain import codec
 from app.contexts.dataset.domain.models import (
@@ -33,12 +36,14 @@ from app.contexts.dataset.domain.ports import (
     RecordProjection,
 )
 from app.contexts.dataset.domain.services import (
+    SHAPEFILE_EXTENSIONS,
     blocking,
     check_shapefile_set,
+    instance_key_for,
     normalise_upload_name,
     validate,
 )
-from app.shared.errors import ConflictError, NotFoundError, ValidationError
+from app.shared.errors import ConflictError, DomainError, NotFoundError, ValidationError
 
 
 async def _spec(catalog: CatalogRepository, data_spec_id: str) -> DataSpec:
@@ -394,3 +399,137 @@ async def _dataset(datasets: DatasetRepository, dataset_id: uuid.UUID) -> Datase
 
 def file_kind_is_binary(spec: DataSpec) -> bool:
     return spec.kind in {FileKind.SHAPEFILE, FileKind.IMAGE}
+
+
+class ImportOutcome(StrEnum):
+    IMPORTED = "IMPORTED"    # version created and valid
+    INVALID = "INVALID"      # version created, validation found problems
+    IGNORED = "IGNORED"      # no catalog entry matches this file name
+    ERROR = "ERROR"          # refused (incomplete shapefile, unreadable file...)
+
+
+@dataclass(frozen=True, slots=True)
+class ImportEntry:
+    file_names: tuple[str, ...]
+    outcome: ImportOutcome
+    data_spec_id: str | None = None
+    instance_key: str | None = None
+    dataset_id: uuid.UUID | None = None
+    version_number: int | None = None
+    issues: int = 0
+    message: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ImportReport:
+    entries: tuple[ImportEntry, ...]
+
+    @property
+    def analysed(self) -> int:
+        return len(self.entries)
+
+    @property
+    def imported(self) -> int:
+        return sum(1 for e in self.entries if e.outcome is ImportOutcome.IMPORTED)
+
+    @property
+    def invalid(self) -> int:
+        return sum(1 for e in self.entries if e.outcome is ImportOutcome.INVALID)
+
+    @property
+    def ignored(self) -> int:
+        return sum(1 for e in self.entries if e.outcome is ImportOutcome.IGNORED)
+
+    @property
+    def errors(self) -> int:
+        return sum(1 for e in self.entries if e.outcome is ImportOutcome.ERROR)
+
+
+def group_archive(members: dict[str, bytes], specs: Sequence[DataSpec]) -> list[dict]:
+    """Group archive members into upload units, one per target dataset.
+
+    Two rules do the work:
+      - a shapefile travels as a set, so its sidecars are grouped by base name;
+      - the path inside the archive is ignored, only the file name matters —
+        users zip their folder the way they please.
+    """
+    groups: dict[tuple[str, str | None], dict] = {}
+    unmatched: list[dict] = []
+
+    for path, payload in sorted(members.items()):
+        file_name = path.replace("\\", "/").rsplit("/", 1)[-1]
+        if not file_name or file_name.startswith("."):
+            continue
+
+        spec = resolve_spec(specs, file_name)
+        if spec is None and file_name.lower().endswith(SHAPEFILE_EXTENSIONS):
+            # A sidecar carries no spec of its own: it follows its .shp.
+            stem = file_name.rsplit(".", 1)[0]
+            spec = resolve_spec(specs, f"{stem}.shp")
+
+        if spec is None:
+            unmatched.append({"files": {file_name: payload}, "spec": None, "instance": None})
+            continue
+
+        instance = instance_key_for(spec, file_name)
+        key = (spec.id, instance)
+        group = groups.setdefault(key, {"files": {}, "spec": spec, "instance": instance})
+        group["files"][file_name] = payload
+
+    return [*groups.values(), *unmatched]
+
+
+async def import_archive(
+    datasets: DatasetRepository,
+    catalog: CatalogRepository,
+    blobs: BlobStore,
+    projection: RecordProjection,
+    project_id: uuid.UUID,
+    members: dict[str, bytes],
+    label: str | None = None,
+    author: str | None = None,
+) -> ImportReport:
+    """Initialise a project from an archive of input files.
+
+    Each group becomes one version. A failing group never aborts the others: the
+    point of a bulk import is to get as far as possible and report the rest.
+    """
+    specs = await catalog.list_all()
+    entries: list[ImportEntry] = []
+
+    for group in group_archive(members, specs):
+        names = tuple(sorted(group["files"]))
+        spec: DataSpec | None = group["spec"]
+
+        if spec is None:
+            entries.append(ImportEntry(names, ImportOutcome.IGNORED,
+                                       message="aucun type de fichier ne correspond à ce nom"))
+            continue
+
+        try:
+            dataset, version, issues = await upload_version(
+                datasets, catalog, blobs, projection,
+                project_id=project_id,
+                data_spec_id=spec.id,
+                files=group["files"],
+                instance_key=group["instance"],
+                label=label,
+                author=author,
+            )
+        except DomainError as exc:
+            entries.append(ImportEntry(names, ImportOutcome.ERROR, data_spec_id=spec.id,
+                                       instance_key=group["instance"], message=str(exc)))
+            continue
+
+        entries.append(ImportEntry(
+            file_names=names,
+            outcome=ImportOutcome.IMPORTED if version.status is VersionStatus.VALID
+            else ImportOutcome.INVALID,
+            data_spec_id=spec.id,
+            instance_key=group["instance"],
+            dataset_id=dataset.id,
+            version_number=version.number,
+            issues=len(issues),
+        ))
+
+    return ImportReport(entries=tuple(entries))

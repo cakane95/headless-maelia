@@ -26,6 +26,7 @@ flowchart TB
         dataset["<b>dataset</b><br/><small>versions immuables<br/>blobs · brouillon · validation</small>"]
         scenario["<b>scenario</b><br/><small>écarts de paramètres<br/>versions épinglées</small>"]
         run["<b>run</b><br/><small>résolution figée<br/>session GAMA</small>"]
+        result["<b>result</b><br/><small>profil des sorties<br/>séries · comparaison</small>"]
     end
 
     subgraph SOCLE["shared — socle technique, aucun métier"]
@@ -40,6 +41,7 @@ flowchart TB
     dataset -->|"versions"| scenario
     scenario -->|"pins + écarts"| run
     dataset -->|"overlays"| run
+    run -->|"fichiers produits"| result
 
     ADMIN ~~~ SOCLE
 ```
@@ -51,6 +53,7 @@ flowchart TB
 | `dataset` | 10 | 1 932 | `DatasetRepository`, `BlobStore`, `DraftStore`, `RecordProjection` |
 | `scenario` | 7 | 566 | `ScenarioRepository` |
 | `run` | 6 | 754 | — *(pilote GAMA directement)* |
+| `result` | 6 | 630 | `OutputStore` |
 | `shared` + `worker` | 7 | 580 | — |
 
 ---
@@ -450,7 +453,81 @@ Ils priment sur ceux du scénario :
 
 ---
 
-## 8. `shared` — le socle
+## 8. `result` — lire ce que l'exécution a produit
+
+Un run laisse derrière lui un dossier de fichiers, pas des indicateurs. MAELIA y
+écrit des tables larges — une ligne par parcelle et par période, une trentaine de
+colonnes dont la plupart sont numériques. Ce contexte les rend lisibles **sans
+qu'aucun nom de colonne MAELIA n'apparaisse dans le code**.
+
+### Pourquoi rien n'est déclaré à l'avance
+
+Neuf fichiers de sortie, jusqu'à trente colonnes chacun, et la liste grandit avec
+le modèle : un catalogue de sorties saisi à la main serait faux à la première
+montée de version. La forme est donc **lue dans le fichier**, et les graphiques
+s'en déduisent.
+
+```mermaid
+flowchart LR
+    file["fichier de sortie<br/><small>models/main/log/&lt;runId&gt;</small>"]
+    read["read_table<br/><small>délimiteur deviné<br/>encodage replié</small>"]
+    prof["profile<br/><small>rôle de chaque colonne</small>"]
+    sugg["suggest<br/><small>lectures proposées</small>"]
+    query["SeriesQuery<br/><small>x · mesures · répartition · agrégat</small>"]
+    series["SeriesResult<br/><small>points prêts à tracer</small>"]
+
+    file --> read --> prof --> sugg --> query
+    read --> query --> series
+```
+
+### Le rôle d'une colonne, et pourquoi il ne suffit pas de tester les nombres
+
+| Rôle | Reconnu à | Sert à |
+|---|---|---|
+| `TEMPORAL` | son **nom** (`annee`, `jourDebut`, `date`…) | ordonner l'axe |
+| `MEASURE` | ≥ 80 % de valeurs numériques | être agrégée |
+| `DIMENSION` | le reste | filtrer, répartir en séries |
+
+Le test du nom passe **avant** le test numérique : `annee` ne contient que des
+entiers et serait autrement moyennée comme une mesure. Le seuil de 80 % — et non
+100 % — vient du modèle lui-même, qui laisse des cellules vides quand une
+opération ne s'applique pas à la ligne.
+
+L'unité est extraite de l'en-tête (`N_lixivie[kgN/ha]`) : c'est le seul endroit où
+elle est jamais écrite. Elle sert ensuite à un refus utile — **deux mesures ne
+sont proposées sur un même axe que si elles partagent leur unité**, faute de quoi
+l'échelle de l'une écrase l'autre et la lecture est fausse.
+
+### Une requête, tous les graphiques
+
+`SeriesQuery` — axe, mesures, répartition, agrégat, filtres — couvre courbe,
+barres, barres empilées, aire et nuage de points. Le type de tracé est une
+donnée rendue par le front, pas une branche de code au backend : ajouter un type
+de graphique ne touche pas le domaine.
+
+### Comparer des runs
+
+Le même `SeriesQuery` rejoué sur plusieurs runs du projet, superposé. C'est la
+lecture qui donne son sens au gel des versions : sans elle, la reproductibilité
+d'un scénario resterait une propriété invérifiable.
+
+Un run qui n'a pas produit le fichier est **ignoré, pas fatal** — un run en échec
+a toute sa place dans une comparaison.
+
+### API
+
+`GET /runs/{id}/outputs` · `GET /runs/{id}/outputs/{nom}/profile` ·
+`GET /runs/{id}/outputs/{nom}/preview` · `GET /runs/{id}/outputs/{nom}/text` ·
+`GET /runs/{id}/outputs/{nom}/download` · `POST /runs/{id}/outputs/{nom}/series` ·
+`POST /projects/{id}/output-comparison`
+
+!!! warning "Un nom de fichier vient du client"
+    `FileOutputStore` résout le chemin puis vérifie qu'il est bien **sous** le
+    dossier du run. Sans ce contrôle, `../../` sortirait du dossier de sortie.
+
+---
+
+## 9. `shared` — le socle
 
 Aucun métier. `config` (un seul `Settings`), `database` (moteur async + session),
 `errors` (`DomainError` → RFC 7807), `health` (cinq sondes), `models` (point de
@@ -463,15 +540,16 @@ rassemblement pour Alembic).
 
 ---
 
-## 9. État
+## 10. État
 
-**Fait.** Les cinq contextes, 12 tables, 3 migrations, 43 routes, 97 tests (dont
+**Fait.** Les six contextes, 12 tables, 3 migrations, 50 routes, 116 tests (dont
 20 d'aller-retour du codec sur les fichiers réels). Chaîne complète vérifiée :
 deux scénarios épinglant des versions différentes produisent deux exécutions
 concurrentes menées à terme, avec des entrées matérialisées distinctes et le socle
-inchangé.
+inchangé ; leurs sorties se relisent et se comparent sur un même graphique.
 
 **À faire.** Bascule du stockage des runs de Redis vers Postgres — la table
 `simulation_run` existe déjà et c'est le test annoncé de l'architecture : si les
-ports sont corrects, ni le worker ni les routes ne bougeront. Puis le contexte
-`result` (ingestion des sorties), l'écran d'édition en grille, et `iam`.
+ports sont corrects, ni le worker ni les routes ne bougeront. Puis l'ingestion
+des sorties en stockage objet (le port `OutputStore` est déjà là, seul son
+adaptateur changera), et `iam`.

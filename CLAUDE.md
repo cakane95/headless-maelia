@@ -86,6 +86,9 @@ après toute modification de `app/worker/` ou `app/contexts/`.
 - Les **trois états** — chargement, erreur, données — sont toujours gérés.
 - Tout `useEffect` qui ouvre un minuteur ou un socket **nettoie**.
 - **Aucune règle métier dans le front** : la validation fait autorité côté backend.
+- **Un formulaire est dans une modale ou sur sa propre page**, jamais posé au
+  milieu d'un écran de liste : court (quelques champs) → modale ouverte par un
+  bouton ; long (listes, épinglages, grille) → page dédiée avec lien de retour.
 - Un composant n'est promu dans `components/` qu'au **deuxième** usage.
 - Couleurs et espacements via les **variables CSS**, jamais en dur.
 

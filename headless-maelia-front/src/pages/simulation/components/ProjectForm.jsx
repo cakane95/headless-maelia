@@ -6,7 +6,7 @@ import Field from "../../../components/Field";
 import { useAsync } from "../../../hooks/useAsync";
 
 /** Création d'un projet. Le territoire vient du volume partagé, pas d'une saisie. */
-export default function ProjectForm({ onSubmit }) {
+export default function ProjectForm({ onSubmit, onCancel }) {
   const { data: territories, error, loading } = useAsync(projectApi.territories);
   const [name, setName] = useState("");
   const [territory, setTerritory] = useState("");
@@ -49,9 +49,16 @@ export default function ProjectForm({ onSubmit }) {
           <input value={description} onChange={(e) => setDescription(e.target.value)} />
         </Field>
 
-        <button disabled={busy || !name || !selected}>
-          {busy ? "Création…" : "Créer le projet"}
-        </button>
+        <p>
+          <button disabled={busy || !name || !selected}>
+            {busy ? "Création…" : "Créer le projet"}
+          </button>{" "}
+          {onCancel && (
+            <button type="button" className="ghost" onClick={onCancel} disabled={busy}>
+              Annuler
+            </button>
+          )}
+        </p>
         {failure && <p className="error">{failure}</p>}
       </form>
     </AsyncBoundary>

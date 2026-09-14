@@ -1,0 +1,94 @@
+/* =====================================================================
+   Exploration des sorties : lectures proposées, réglages, tracé.
+   Les couleurs des séries sont des jetons (--chart-1..8, tokens.css) :
+   elles suivent le thème comme le reste de l'interface.
+   ===================================================================== */
+
+/* ── Lectures proposées ────────────────────────────────────────────── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.chip {
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+}
+.chip:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-muted);
+  border-color: var(--border-strong);
+}
+.chip--active {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* ── Réglages du graphique ─────────────────────────────────────────── */
+/* Les listes déroulantes tiennent sur une rangée tant que la place le permet,
+   puis passent à la ligne : aucune largeur fixe. */
+.builder {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0 var(--space-5);
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
+}
+
+/* Le choix des mesures occupe toute la largeur : un fichier en compte trente. */
+.builder > *:last-child { grid-column: 1 / -1; }
+
+.checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-1) var(--space-4);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+.check input { width: auto; margin: 0; }
+.check .unit {
+  font-style: normal;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ── Tracé ─────────────────────────────────────────────────────────── */
+.chart {
+  margin-bottom: var(--space-4);
+  /* Recharts mesure son conteneur : sans largeur nulle autorisée, il ne sait
+     pas rétrécir quand la fenêtre se réduit. */
+  min-width: 0;
+}
+.chart .recharts-cartesian-axis-tick text { fill: var(--chart-axis); }
+.chart .recharts-tooltip-wrapper {
+  font-family: var(--font-sans);
+}
+.chart .recharts-default-tooltip {
+  color: var(--text);
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm);
+}
+
+/* Sortie texte : même bloc que la console, sans hauteur imposée. */
+.console--plain {
+  height: auto;
+  max-height: 420px;
+}

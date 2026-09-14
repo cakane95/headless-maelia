@@ -17,3 +17,14 @@ export async function request(path, options = {}) {
 
   return response.json();
 }
+
+/** Envoi multipart : le navigateur pose lui-même le Content-Type avec sa frontière.
+ *  Le fixer à la main casserait l'analyse côté serveur. */
+export async function upload(path, formData) {
+  const response = await fetch(`${API_URL}${path}`, { method: "POST", body: formData });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.detail ? JSON.stringify(body.detail) : `HTTP ${response.status}`);
+  }
+  return response.json();
+}

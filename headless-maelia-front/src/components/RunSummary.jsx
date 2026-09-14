@@ -1,7 +1,7 @@
-import StatGroup from "../../../components/StatGroup";
-import StatusBadge from "../../../components/StatusBadge";
-import { formatDuration } from "../../../utils/format";
-import { runLabel } from "../../../utils/status";
+import StatGroup from "./StatGroup";
+import StatusBadge from "./StatusBadge";
+import { formatDuration } from "../utils/format";
+import { runLabel } from "../utils/status";
 
 /** Chiffres clés d'une exécution. */
 export default function RunSummary({ run }) {

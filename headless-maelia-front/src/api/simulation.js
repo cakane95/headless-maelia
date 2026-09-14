@@ -1,10 +1,12 @@
-import { request } from "./client";
+import { request, upload } from "./client";
 
 const json = (method, body) => ({ method, body: JSON.stringify(body) });
 
 /** Projets, données, scénarios et exécutions — domaine SIMULATION. */
 export const projectApi = {
   list: () => request("/api/v1/projects"),
+  update: (id, payload) => request(`/api/v1/projects/${id}`, json("PUT", payload)),
+  remove: (id) => request(`/api/v1/projects/${id}`, { method: "DELETE" }),
   get: (id) => request(`/api/v1/projects/${id}`),
   create: (payload) => request("/api/v1/projects", json("POST", payload)),
   territories: () => request("/api/v1/territories"),
@@ -15,6 +17,18 @@ export const projectApi = {
 };
 
 export const datasetApi = {
+  importArchive: (projectId, file, label) => {
+    const form = new FormData();
+    form.append("file", file);
+    if (label) form.append("label", label);
+    return upload(`/api/v1/projects/${projectId}/datasets/import-archive`, form);
+  },
+  uploadVersion: (projectId, dataSpecId, files, extra = {}) => {
+    const form = new FormData();
+    for (const file of files) form.append("files", file);
+    for (const [k, v] of Object.entries(extra)) if (v) form.append(k, v);
+    return upload(`/api/v1/projects/${projectId}/datasets/${dataSpecId}/versions`, form);
+  },
   listForProject: (projectId) => request(`/api/v1/projects/${projectId}/datasets`),
   get: (id) => request(`/api/v1/datasets/${id}`),
   records: (id, version) => request(`/api/v1/datasets/${id}/versions/${version}/records`),

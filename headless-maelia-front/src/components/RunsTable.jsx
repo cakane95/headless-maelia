@@ -1,7 +1,7 @@
-import EmptyState from "../../../components/EmptyState";
-import StatusBadge from "../../../components/StatusBadge";
-import { formatDuration } from "../../../utils/format";
-import { runLabel } from "../../../utils/status";
+import EmptyState from "./EmptyState";
+import StatusBadge from "./StatusBadge";
+import { formatDuration } from "../utils/format";
+import { runLabel } from "../utils/status";
 
 /** Historique des exécutions. Purement présentationnel. */
 export default function RunsTable({ runs, onSelect }) {

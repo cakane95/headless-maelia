@@ -18,6 +18,7 @@ from app.contexts.catalog.infrastructure.repository import (
 from app.contexts.catalog.infrastructure.seed import apply_parameter_seed, apply_seed
 from app.contexts.dataset.api import routes as dataset_routes
 from app.contexts.project.api import routes as project_routes
+from app.contexts.result.api import routes as result_routes
 from app.contexts.run.api import routes as run_routes
 from app.contexts.scenario.api import routes as scenario_routes
 from app.contexts.run.infrastructure import gama_probe, redis_store as runs
@@ -68,6 +69,7 @@ install_error_handlers(app)
 app.include_router(catalog_routes.router)
 app.include_router(dataset_routes.router)
 app.include_router(project_routes.router)
+app.include_router(result_routes.router)
 app.include_router(run_routes.router)
 app.include_router(run_routes.project_router)
 app.include_router(scenario_routes.router)

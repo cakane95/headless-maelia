@@ -55,22 +55,26 @@ requêtes dupliquées), la réponse sera TanStack Query, pas un store maison.
 headless-maelia-front/src/
 ├── main.jsx                  # point d'entrée
 ├── App.jsx                   # arbre de routes — la carte du site
-├── index.css                 # variables de thème + styles partagés
-├── api.js                    # SEUL accès réseau de l'application
+├── index.css                 # n'assemble que les modules de styles/
+├── api/                      # SEUL accès réseau — un module par domaine
+│   ├── client.js             # fetch, upload, URLs de base
+│   ├── admin.js  catalog.js  health.js  realtime.js
+│   ├── simulation.js         # projets, datasets, scénarios, runs
+│   └── result.js             # sorties : profil, séries, comparaison
 ├── layouts/
-│   ├── AppShell.jsx          # bandeau + bascule d'espace
+│   ├── AppShell.jsx          # bandeau + bascule d'espace + thème
 │   ├── AdminLayout.jsx       # barre latérale Administration
-│   └── SimulationLayout.jsx  # barre latérale Simulation
+│   ├── SimulationShell.jsx   # liste des projets — sans barre latérale
+│   └── ProjectLayout.jsx     # barre latérale d'UN projet
 ├── pages/
+│   ├── RunDetail.jsx         # suivi d'un run — partagé par les deux espaces
 │   ├── admin/                # un fichier par rubrique
-│   │   ├── Dashboard.jsx
-│   │   ├── Models.jsx
-│   │   ├── TestBench.jsx
-│   │   └── RunDetail.jsx
-│   ├── simulation/
-│   └── Placeholder.jsx       # écran d'attente des rubriques à venir
+│   └── simulation/           # projets, données, scénarios, runs, résultats
 ├── components/               # composants réutilisés par ≥ 2 pages
-└── hooks/                    # logique réutilisable (useRunStream…)
+├── hooks/                    # useAsync, useDraft, useRunStream, useChart…
+├── styles/                   # tokens · base · layout · components
+│                             # tables · feedback · charts
+└── utils/                    # formatage, libellés de statut, séries
 ```
 
 **Règles de placement.**
@@ -81,7 +85,7 @@ headless-maelia-front/src/
 | Un composant utilisé par **au moins deux** pages | `components/` |
 | Un composant utilisé par une seule page | dans le fichier de la page |
 | De la logique réutilisable avec état | `hooks/` |
-| Un appel réseau | `api.js` — **et nulle part ailleurs** |
+| Un appel réseau | `api/` — **et nulle part ailleurs** |
 
 Un composant n'est promu dans `components/` qu'au **deuxième** usage. Anticiper la
 réutilisation produit des composants sur-paramétrés qui ne servent qu'une fois.
@@ -230,6 +234,44 @@ async function submit(event) {
   }
 }
 ```
+
+---
+
+## 6 bis. Le module de graphiques
+
+Les sorties d'une simulation ne sont pas des indicateurs nommés : ce sont des
+tableaux larges, différents d'un fichier à l'autre, et dont les colonnes changent
+avec le modèle. **Aucun graphique n'est donc écrit en dur.**
+
+```
+ProjectResults            écran : runs cochés → fichier choisi
+├── FinishedRuns          cases à cocher = comparaison de scénarios
+├── OutputFiles           fichiers du run, avec leur nature
+├── OutputExplorer        assemble les quatre pièces ci-dessous
+│   ├── ChartSuggestions  lectures proposées par le backend
+│   ├── ChartBuilder      axe · agrégat · répartition · mesures
+│   ├── ChartView         tracé recharts, couleurs du thème
+│   └── OutputPreview     lignes brutes, repliées
+└── OutputText            fichiers non tabulaires
+```
+
+**Ce qui vient du backend.** Le profil des colonnes (rôle, unité, valeurs), les
+lectures proposées, et les points agrégés. Le front ne calcule ni moyenne ni
+somme : il ne saurait pas le faire sur 435 lignes sans les télécharger toutes.
+
+**Ce qui appartient au front.** Le type de tracé, la palette et la superposition
+des runs — `utils/chart.js` fusionne les séries de plusieurs runs en préfixant
+chaque clé par le libellé du run.
+
+!!! tip "Couleurs et thème"
+    Recharts pose ses couleurs en **attributs SVG**, où `var(--chart-1)` ne serait
+    pas résolu. `useChartPalette` lit donc les jetons calculés sur `<html>` et
+    observe `data-theme` : la bascule clair/sombre repeint les courbes sans
+    remonter d'état.
+
+!!! warning "Chargement à la demande"
+    La bibliothèque de graphiques pèse ~400 ko. L'écran de résultats est donc
+    chargé en `lazy()` : le reste de l'application n'en paie pas le prix.
 
 ---
 

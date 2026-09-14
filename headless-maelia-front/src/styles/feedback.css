@@ -1,0 +1,170 @@
+/* =====================================================================
+   Retours à l'utilisateur : statuts, progression, chiffres, console,
+   états vides et utilitaires de texte.
+   ===================================================================== */
+
+/* ── StatusBadge ───────────────────────────────────────────────────── */
+/* Le libellé est toujours présent : le statut n'est jamais porté par la
+   seule couleur (WCAG AA). La pastille ne fait que renforcer. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--neutral-soft);
+  color: var(--text-muted);
+}
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.badge.up,
+.badge.FINISHED {
+  background: var(--success-soft);
+  color: var(--success);
+}
+.badge.down,
+.badge.FAILED {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.badge.RUNNING {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+/* Une exécution en cours respire : le point pulse, sauf motion réduite. */
+.badge.RUNNING::before {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  50% { opacity: 0.35; }
+}
+
+/* ── ProgressBar ───────────────────────────────────────────────────────── */
+.progress {
+  position: relative;
+  height: 20px;
+  min-width: 120px;
+  overflow: hidden;
+  background: var(--surface-muted);
+  border-radius: var(--radius-pill);
+}
+.progress__fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--transition);
+}
+.progress__label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Statuts des fichiers d'entrée : mêmes teintes que les runs. */
+.badge.VALID { background: var(--success-soft); color: var(--success); }
+.badge.INVALID { background: var(--danger-soft); color: var(--danger); }
+.badge.DRAFT { background: var(--warning-soft); color: var(--warning); }
+
+/* Aide sous un champ de formulaire. */
+.hint {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Liste de modules dans l'écran Données. */
+.module-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border);
+}
+.module-row__name { flex: 1; font-weight: 550; }
+.module-row__count { color: var(--text-muted); font-size: 0.8rem; }
+
+/* ── StatGroup ─────────────────────────────────────────────────────── */
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-5);
+}
+.stat b {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: 1.3rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.stat span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Fiche de faits (libellé / valeur en lecture) ──────────────────── */
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-5);
+  margin: 0 0 var(--space-4);
+}
+.facts dt {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.facts dd { margin: 0; }
+
+/* ── ConsoleView ───────────────────────────────────────────────────── */
+.console {
+  height: clamp(220px, 40vh, 420px);
+  padding: var(--space-4);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--console-text);
+  background: var(--console-bg);
+  border-radius: var(--radius-sm);
+}
+.console .platform {
+  color: var(--console-accent);
+  font-weight: 500;
+}
+
+/* ── Placeholder ───────────────────────────────────────────────────── */
+.todo {
+  margin: 0;
+  padding-left: var(--space-5);
+  line-height: 2;
+  color: var(--text-muted);
+}
+
+/* ── Utilitaires de texte ──────────────────────────────────────────── */
+.muted { color: var(--text-muted); }
+.muted--first { margin-top: 0; }
+.error {
+  padding: var(--space-3) var(--space-4);
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: var(--radius-sm);
+}
+.error--last { margin-bottom: 0; }
+.empty {
+  padding: var(--space-7) 0;
+  text-align: center;
+  color: var(--text-muted);
+}

@@ -5,7 +5,7 @@ import Placeholder from "../pages/Placeholder";
 import Dashboard from "../pages/admin/Dashboard";
 import InputCatalog from "../pages/admin/InputCatalog";
 import Models from "../pages/admin/Models";
-import RunDetail from "../pages/admin/RunDetail";
+import RunDetail from "../pages/RunDetail";
 import TestBench from "../pages/admin/TestBench";
 import * as attente from "../pages/admin/placeholders";
 

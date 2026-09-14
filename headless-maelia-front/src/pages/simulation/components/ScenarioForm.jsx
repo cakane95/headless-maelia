@@ -3,11 +3,14 @@ import { useState } from "react";
 import Field from "../../../components/Field";
 import PinEditor from "./PinEditor";
 
-/** Création d'un scénario : écarts de paramètres et versions épinglées. */
-export default function ScenarioForm({ datasets, onSubmit }) {
-  const [name, setName] = useState("");
-  const [years, setYears] = useState(1);
-  const [pins, setPins] = useState({});
+/** Écarts de paramètres et versions épinglées d'un scénario.
+ *
+ *  `scenario` absent : création. Présent : modification de ce scénario.
+ */
+export default function ScenarioForm({ datasets, scenario, onSubmit, onCancel }) {
+  const [name, setName] = useState(scenario?.name ?? "");
+  const [years, setYears] = useState(scenario?.parameter_values?.nbAnneesSimulation ?? 1);
+  const [pins, setPins] = useState(scenario?.dataset_pins ?? {});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
@@ -16,15 +19,13 @@ export default function ScenarioForm({ datasets, onSubmit }) {
     setBusy(true);
     setError(null);
     try {
+      // Seuls les écarts voyagent : un paramètre non fourni garde le défaut du
+      // launcher, ce qui rend le scénario robuste aux montées de version.
       await onSubmit({
         name,
-        // Seuls les écarts voyagent : un paramètre non fourni garde le défaut
-        // du launcher, ce qui rend le scénario robuste aux montées de version.
         parameter_values: { nbAnneesSimulation: Number(years) },
         dataset_pins: pins,
       });
-      setName("");
-      setPins({});
     } catch (err) {
       setError(err.message);
     } finally {
@@ -48,7 +49,14 @@ export default function ScenarioForm({ datasets, onSubmit }) {
       <PinEditor datasets={datasets} pins={pins} onChange={setPins} />
 
       <p>
-        <button disabled={busy || !name}>{busy ? "Création…" : "Créer le scénario"}</button>
+        <button disabled={busy || !name}>
+          {busy ? "Enregistrement…" : scenario ? "Enregistrer" : "Créer le scénario"}
+        </button>{" "}
+        {onCancel && (
+          <button type="button" className="ghost" onClick={onCancel} disabled={busy}>
+            Annuler
+          </button>
+        )}
       </p>
       {error && <p className="error">{error}</p>}
     </form>

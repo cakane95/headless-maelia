@@ -1,15 +1,17 @@
 import { useState } from "react";
 
+import Field from "../../../components/Field";
+
 /** Formulaire de lancement. Ne connaît ni le réseau ni la navigation : il remonte
  *  la demande à la page, qui décide quoi en faire. */
-export default function LaunchForm({ models, onLaunch }) {
+export default function LaunchForm({ models, onLaunch, onCancel }) {
   const [modelId, setModelId] = useState("");
   const [label, setLabel] = useState("");
-  const [annees, setAnnees] = useState(1);
+  const [years, setYears] = useState(1);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
-  const modeleCourant = modelId || models[0]?.id || "";
+  const selected = modelId || models[0]?.id || "";
 
   async function submit(event) {
     event.preventDefault();
@@ -17,10 +19,10 @@ export default function LaunchForm({ models, onLaunch }) {
     setError(null);
     try {
       await onLaunch({
-        model_id: modeleCourant,
+        model_id: selected,
         label: label || undefined,
         // Écart aux valeurs par défaut du launcher, au format gama-server.
-        parameters: [{ type: "int", name: "nbAnneesSimulation", value: Number(annees) }],
+        parameters: [{ type: "int", name: "nbAnneesSimulation", value: Number(years) }],
       });
     } catch (err) {
       setError(err.message);
@@ -31,28 +33,32 @@ export default function LaunchForm({ models, onLaunch }) {
 
   return (
     <form onSubmit={submit}>
-      <label>
-        <span>Modèle</span>
-        <select value={modeleCourant} onChange={(e) => setModelId(e.target.value)}>
+      <Field label="Modèle">
+        <select value={selected} onChange={(e) => setModelId(e.target.value)}>
           {models.map((model) => (
-            <option key={model.id} value={model.id}>
-              {model.name}
-            </option>
+            <option key={model.id} value={model.id}>{model.name}</option>
           ))}
         </select>
-      </label>
+      </Field>
 
-      <label>
-        <span>Libellé (optionnel)</span>
-        <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Run de validation" />
-      </label>
+      <Field label="Libellé (optionnel)">
+        <input value={label} onChange={(e) => setLabel(e.target.value)}
+               placeholder="Run de validation" />
+      </Field>
 
-      <label>
-        <span>Nombre d'années simulées</span>
-        <input type="number" min="1" max="10" value={annees} onChange={(e) => setAnnees(e.target.value)} />
-      </label>
+      <Field label="Nombre d'années simulées">
+        <input type="number" min="1" max="10" value={years}
+               onChange={(e) => setYears(e.target.value)} />
+      </Field>
 
-      <button disabled={busy || !modeleCourant}>{busy ? "Lancement…" : "Lancer"}</button>
+      <p>
+        <button disabled={busy || !selected}>{busy ? "Lancement…" : "Lancer"}</button>{" "}
+        {onCancel && (
+          <button type="button" className="ghost" onClick={onCancel} disabled={busy}>
+            Annuler
+          </button>
+        )}
+      </p>
       {error && <p className="error">{error}</p>}
     </form>
   );

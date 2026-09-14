@@ -203,6 +203,29 @@ Titre, accroche d'une phrase, puis des cartes. Une carte = un sujet. Cette
 régularité est ce qui donne l'impression d'**une seule application** plutôt que
 d'un assemblage d'écrans.
 
+### 10 bis. Créer ou modifier : modale ou page, jamais entre les deux
+
+Un formulaire ne vit jamais posé au milieu d'un écran de consultation. Il a deux
+places légitimes, et le critère est sa taille :
+
+| Formulaire | Où | Exemples |
+|---|---|---|
+| **Court** — quelques champs, aucune liste à parcourir | **modale**, ouverte par un bouton de l'en-tête | création d'un projet, identité d'un projet, lancement d'une simulation |
+| **Long** — listes, tableaux, choix répétés par ligne | **page dédiée**, avec un lien de retour | scénario (épinglage de chaque fichier), édition d'un fichier tabulaire, configuration de modélisation |
+
+L'écran de liste reste alors une liste : un en-tête `page-head` (titre + bouton
+d'action), puis le tableau. C'est ce qui rend « mes projets » ou « mes scénarios »
+lisibles d'un coup d'œil, au lieu de commencer par un formulaire vide.
+
+Conséquences pratiques :
+
+- tout formulaire de modale expose un bouton **Annuler** (`onCancel`) en plus de
+  sa soumission — la croix de la modale ne doit pas être le seul recours ;
+- une page de formulaire s'ouvre sur une route propre (`scenarios/nouveau`,
+  `scenarios/:scenarioId`) : elle est partageable et le retour arrière marche ;
+- le même composant de formulaire sert la création et la modification ; c'est la
+  présence de l'objet existant qui change le libellé du bouton, rien d'autre.
+
 ---
 
 ## Partie III — Responsive & accessibilité

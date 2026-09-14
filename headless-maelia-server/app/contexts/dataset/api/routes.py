@@ -6,6 +6,7 @@ Two ways to create a version, and only two:
 """
 
 import uuid
+import io
 import zipfile
 from datetime import datetime
 from io import BytesIO
@@ -33,6 +34,7 @@ from app.contexts.dataset.infrastructure.repository import (
     SqlRecordProjection,
 )
 from app.shared.database import get_session
+from app.shared.errors import ValidationError
 
 router = APIRouter(prefix="/api/v1", tags=["datasets"])
 
@@ -309,3 +311,80 @@ async def resolve(
     reproducible once newer versions are published.
     """
     return await use_cases.resolve_versions(datasets, project_id, payload.pins)
+
+
+class ImportEntryOut(BaseModel):
+    file_names: list[str]
+    outcome: str
+    data_spec_id: str | None = None
+    instance_key: str | None = None
+    dataset_id: uuid.UUID | None = None
+    version_number: int | None = None
+    issues: int = 0
+    message: str | None = None
+
+
+class ImportReportOut(BaseModel):
+    analysed: int
+    imported: int
+    invalid: int
+    ignored: int
+    errors: int
+    entries: list[ImportEntryOut]
+
+
+@router.post(
+    "/projects/{project_id}/datasets/import-archive",
+    response_model=ImportReportOut,
+    status_code=201,
+)
+async def import_archive(
+    datasets: Datasets,
+    catalog: Catalog,
+    session: Session,
+    project_id: uuid.UUID,
+    file: Annotated[UploadFile, File()],
+    label: Annotated[str | None, Form()] = None,
+) -> ImportReportOut:
+    """Initialise a project from a ZIP of input files.
+
+    Each file is matched to the catalog **by its name**; shapefile sidecars are
+    grouped with their `.shp`. A failing entry never aborts the others — the
+    report says what happened to each one.
+    """
+    payload = await file.read()
+    if not zipfile.is_zipfile(io.BytesIO(payload)):
+        raise ValidationError("le fichier fourni n'est pas une archive ZIP")
+
+    with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+        members = {
+            info.filename: archive.read(info)
+            for info in archive.infolist()
+            if not info.is_dir()
+        }
+
+    if not members:
+        raise ValidationError("archive vide")
+
+    report = await use_cases.import_archive(
+        datasets, catalog, MinioBlobStore(), SqlRecordProjection(session),
+        project_id=project_id, members=members, label=label,
+    )
+    await session.commit()
+
+    return ImportReportOut(
+        analysed=report.analysed,
+        imported=report.imported,
+        invalid=report.invalid,
+        ignored=report.ignored,
+        errors=report.errors,
+        entries=[
+            ImportEntryOut(
+                file_names=list(e.file_names), outcome=e.outcome.value,
+                data_spec_id=e.data_spec_id, instance_key=e.instance_key,
+                dataset_id=e.dataset_id, version_number=e.version_number,
+                issues=e.issues, message=e.message,
+            )
+            for e in report.entries
+        ],
+    )

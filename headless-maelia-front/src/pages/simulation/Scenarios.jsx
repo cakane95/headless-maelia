@@ -1,73 +1,45 @@
-import { useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
-import { datasetApi, scenarioApi } from "../../api";
+import { scenarioApi } from "../../api";
 import AsyncBoundary from "../../components/AsyncBoundary";
 import Card from "../../components/Card";
-import EmptyState from "../../components/EmptyState";
 import PageHeader from "../../components/PageHeader";
-import ProjectTabs from "./components/ProjectTabs";
 import { useAsync } from "../../hooks/useAsync";
-import ScenarioForm from "./components/ScenarioForm";
+import ScenariosTable from "./components/ScenariosTable";
 
-/** Scénarios d'un projet : ce qui rend une exécution différente. */
+/** Scénarios d'un projet : ce qui rend une exécution différente.
+ *
+ *  L'édition a son propre écran : un scénario épingle potentiellement des
+ *  dizaines de fichiers, ce n'est pas un formulaire de modale.
+ */
 export default function Scenarios() {
   const { projectId } = useParams();
-  const [version, setVersion] = useState(0);
-  const datasets = useAsync(() => datasetApi.listForProject(projectId), [projectId]);
-  const scenarios = useAsync(
-    () => scenarioApi.listForProject(projectId), [projectId, version],
+  const navigate = useNavigate();
+  const base = `/simulation/projets/${projectId}/scenarios`;
+  const { data: scenarios, error, loading } = useAsync(
+    () => scenarioApi.listForProject(projectId), [projectId],
   );
-
-  async function create(payload) {
-    await scenarioApi.create(projectId, payload);
-    setVersion((v) => v + 1);
-  }
 
   return (
     <>
-      <ProjectTabs projectId={projectId} />
-      <PageHeader
-        title="Scénarios"
-        lede="Écarts aux valeurs par défaut du modèle, et versions de données épinglées."
-      />
+      <div className="page-head">
+        <div>
+          <PageHeader
+            title="Scénarios"
+            lede="Écarts aux valeurs par défaut du modèle, et versions de données épinglées."
+          />
+        </div>
+        <button type="button" onClick={() => navigate(`${base}/nouveau`)}>
+          Nouveau scénario
+        </button>
+      </div>
 
-      <Card title="Nouveau scénario">
-        <AsyncBoundary error={datasets.error} loading={datasets.loading}>
-          <ScenarioForm datasets={datasets.data ?? []} onSubmit={create} />
-        </AsyncBoundary>
-      </Card>
-
-      <Card title="Scénarios">
-        <AsyncBoundary error={scenarios.error} loading={scenarios.loading}>
-          {scenarios.data?.length === 0 ? (
-            <EmptyState>Aucun scénario pour l'instant.</EmptyState>
-          ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th>Nom</th>
-                  <th>Paramètres modifiés</th>
-                  <th>Versions épinglées</th>
-                </tr>
-              </thead>
-              <tbody>
-                {scenarios.data?.map((scenario) => (
-                  <tr key={scenario.id}>
-                    <td>{scenario.name}</td>
-                    <td className="muted">
-                      {Object.entries(scenario.parameter_values)
-                        .map(([k, v]) => `${k}=${v}`)
-                        .join(", ") || "—"}
-                    </td>
-                    <td className="muted">
-                      {Object.keys(scenario.dataset_pins).length || "aucune"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+      <Card>
+        <AsyncBoundary error={error} loading={loading}>
+          <ScenariosTable
+            scenarios={scenarios ?? []}
+            onSelect={(id) => navigate(`${base}/${id}`)}
+          />
         </AsyncBoundary>
       </Card>
     </>

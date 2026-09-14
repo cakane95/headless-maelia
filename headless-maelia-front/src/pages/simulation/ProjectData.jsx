@@ -4,7 +4,6 @@ import { datasetApi, projectApi } from "../../api";
 import AsyncBoundary from "../../components/AsyncBoundary";
 import Card from "../../components/Card";
 import PageHeader from "../../components/PageHeader";
-import ProjectTabs from "./components/ProjectTabs";
 import ProgressBar from "../../components/ProgressBar";
 import { useAsync } from "../../hooks/useAsync";
 import CompletionByModule from "./components/CompletionByModule";
@@ -23,7 +22,6 @@ export default function ProjectData() {
 
   return (
     <>
-      <ProjectTabs projectId={projectId} />
       <PageHeader
         title="Données d'entrée"
         lede={

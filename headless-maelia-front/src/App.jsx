@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
 import AppShell from "./layouts/AppShell";
@@ -11,17 +12,21 @@ import { simulationRoutes } from "./routes/simulationRoutes";
  *
  * Le détail de chaque espace vit dans routes/ : ce fichier doit rester lisible
  * d'un coup d'œil.
+ *
+ * Le Suspense couvre les écrans chargés à la demande (routes/simulationRoutes).
  */
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<AppShell />}>
-          <Route index element={<Navigate to="/admin" replace />} />
-          {adminRoutes}
-          {simulationRoutes}
-        </Route>
-      </Routes>
+      <Suspense fallback={<p className="muted content">Chargement…</p>}>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route index element={<Navigate to="/admin" replace />} />
+            {adminRoutes}
+            {simulationRoutes}
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

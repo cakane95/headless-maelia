@@ -59,6 +59,21 @@
   --console-text:   var(--neutral-200);
   --console-accent: var(--primary-300);
 
+  /* ── Palette de graphiques ─────────────────────────────────────────
+     Huit teintes distinctes en clair comme en sombre : au-delà, une légende
+     n'est de toute façon plus lisible. La première reprend l'accent, pour
+     qu'un graphique à une seule série reste dans la charte. */
+  --chart-1: #0e7c86;
+  --chart-2: #d97706;
+  --chart-3: #2563eb;
+  --chart-4: #16a34a;
+  --chart-5: #db2777;
+  --chart-6: #7c3aed;
+  --chart-7: #0891b2;
+  --chart-8: #b45309;
+  --chart-grid: var(--border);
+  --chart-axis: var(--text-muted);
+
   /* ── Échelle d'espacement (pas de valeur magique) ──────────────── */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -83,7 +98,6 @@
 
   --sidebar-width: 244px;
   --topbar-height: 56px;
-  --content-max: 1120px;
 
   --transition: 150ms ease;
 
@@ -119,6 +133,17 @@
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
 
   --console-bg: #060b14;
+
+  /* Teintes remontées en luminosité : les mêmes couleurs sur fond sombre
+     perdraient tout contraste. */
+  --chart-1: #2dc4d1;
+  --chart-2: #fbbf24;
+  --chart-3: #60a5fa;
+  --chart-4: #4ade80;
+  --chart-5: #f472b6;
+  --chart-6: #a78bfa;
+  --chart-7: #22d3ee;
+  --chart-8: #fb923c;
 
   color-scheme: dark;
 }

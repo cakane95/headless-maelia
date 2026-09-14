@@ -3,5 +3,6 @@
 export { adminApi } from "./admin";
 export { catalogApi } from "./catalog";
 export { healthApi } from "./health";
+export { resultApi } from "./result";
 export { subscribeRun } from "./realtime";
 export { datasetApi, projectApi, projectRunApi, scenarioApi } from "./simulation";

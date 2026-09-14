@@ -132,7 +132,6 @@
 .content {
   flex: 1;
   min-width: 0;
-  max-width: var(--content-max);
   padding: var(--space-6);
 }
 
