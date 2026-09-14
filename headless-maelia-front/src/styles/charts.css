@@ -4,6 +4,84 @@
    elles suivent le thème comme le reste de l'interface.
    ===================================================================== */
 
+/* ── Barre de contexte : quelles exécutions, quel fichier ──────────── */
+/* Collée sous le bandeau : on change de fichier sans perdre le graphique
+   des yeux, et sans remonter en haut de page. */
+.toolbar {
+  position: sticky;
+  top: var(--topbar-height);
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-4) var(--space-6);
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.toolbar__group {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+.toolbar__group--tight { flex: 0 1 280px; }
+.toolbar__group select { margin: 0; }
+
+.toolbar__label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.toolbar__label em {
+  font-style: normal;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--accent-text);
+}
+.toolbar .chips { margin-bottom: 0; }
+.toolbar__hint {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ── En-tête du graphique : ce qu'il montre, et quoi en faire ──────── */
+.chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.chart-head__summary {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.chart-head__actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* Réserve la place du tracé : un chargement ne doit pas faire sauter la page. */
+.chart-slot {
+  display: flex;
+  align-items: center;
+  min-height: 320px;
+}
+.chart-slot > * { width: 100%; }
+
 /* ── Lectures proposées ────────────────────────────────────────────── */
 .chips {
   display: flex;
@@ -26,6 +104,13 @@
   border-color: var(--border-strong);
 }
 .chip--active {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* Bouton d'action maintenu enfoncé (réglages ouverts). */
+.ghost--on {
   color: var(--accent-text);
   background: var(--accent-soft);
   border-color: var(--accent);

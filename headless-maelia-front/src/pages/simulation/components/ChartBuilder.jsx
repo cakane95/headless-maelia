@@ -1,4 +1,5 @@
 import Field from "../../../components/Field";
+import ChartFilters from "./ChartFilters";
 import MeasurePicker from "./MeasurePicker";
 
 const CHARTS = [
@@ -58,6 +59,12 @@ export default function ChartBuilder({ columns, chart, query, onChart, onQuery }
             .map((c) => <option key={c.name} value={c.name}>{label(c)}</option>)}
         </select>
       </Field>
+
+      <ChartFilters
+        columns={columns}
+        filters={query.filters ?? {}}
+        onChange={(filters) => set({ filters })}
+      />
 
       <MeasurePicker
         measures={measures}

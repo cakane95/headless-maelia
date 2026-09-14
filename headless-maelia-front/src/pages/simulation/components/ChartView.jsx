@@ -37,6 +37,9 @@ export default function ChartView({ type = "LINE", rows, keys, height = 320 }) {
 
   const Container = CONTAINERS[type] ?? LineChart;
   const axis = { stroke: palette.axis, fontSize: 11 };
+  // Un filtre peut réduire la série à un point : sans marqueur, une courbe ne
+  // montrerait alors rien du tout.
+  const dots = rows.length <= 40;
 
   return (
     <div className="chart">
@@ -51,7 +54,7 @@ export default function ChartView({ type = "LINE", rows, keys, height = 320 }) {
             labelFormatter={(value) => `${value}`}
           />
           {keys.length > 1 && <Legend wrapperStyle={{ fontSize: 11 }} />}
-          {keys.map((key, index) => renderSeries(type, key, palette.series[index % 8]))}
+          {keys.map((key, index) => renderSeries(type, key, palette.series[index % 8], dots))}
         </Container>
       </ResponsiveContainer>
     </div>
@@ -65,7 +68,7 @@ function format(value) {
   return Math.abs(value) >= 100 ? value.toFixed(0) : value.toFixed(2);
 }
 
-function renderSeries(type, key, color) {
+function renderSeries(type, key, color, dots) {
   if (type === "BAR" || type === "STACKED_BAR") {
     return (
       <Bar
@@ -78,11 +81,21 @@ function renderSeries(type, key, color) {
   }
   if (type === "AREA") {
     return (
-      <Area key={key} type="monotone" dataKey={key} stroke={color} fill={color} fillOpacity={0.2} />
+      <Area
+        key={key}
+        type="monotone"
+        dataKey={key}
+        stroke={color}
+        fill={color}
+        fillOpacity={0.2}
+        dot={dots}
+      />
     );
   }
   if (type === "SCATTER") {
     return <Scatter key={key} dataKey={key} fill={color} />;
   }
-  return <Line key={key} type="monotone" dataKey={key} stroke={color} dot={false} strokeWidth={2} />;
+  return (
+    <Line key={key} type="monotone" dataKey={key} stroke={color} dot={dots} strokeWidth={2} />
+  );
 }

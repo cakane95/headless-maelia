@@ -244,16 +244,23 @@ tableaux larges, différents d'un fichier à l'autre, et dont les colonnes chang
 avec le modèle. **Aucun graphique n'est donc écrit en dur.**
 
 ```
-ProjectResults            écran : runs cochés → fichier choisi
-├── FinishedRuns          cases à cocher = comparaison de scénarios
-├── OutputFiles           fichiers du run, avec leur nature
-├── OutputExplorer        assemble les quatre pièces ci-dessous
-│   ├── ChartSuggestions  lectures proposées par le backend
-│   ├── ChartBuilder      axe · agrégat · répartition · mesures
-│   ├── ChartView         tracé recharts, couleurs du thème
-│   └── OutputPreview     lignes brutes, repliées
-└── OutputText            fichiers non tabulaires
+ProjectResults              écran : exécutions cochées → fichier choisi
+├── ResultsToolbar          barre collante : chips d'exécutions + fichier
+└── OutputPane              aiguille selon la nature du fichier
+    ├── OutputExplorer      TABLE
+    │   ├── ChartSuggestions  lectures proposées par le backend
+    │   ├── ChartHead         résumé en une phrase + Réglages + Exporter
+    │   ├── ChartView         tracé recharts, couleurs du thème
+    │   ├── ChartBuilder      axe · agrégat · répartition · filtres · mesures
+    │   └── OutputPreview     lignes brutes, repliées
+    ├── OutputText          TEXT
+    └── (téléchargement)    BINARY
 ```
+
+**L'ordre à l'écran est un choix.** Le tracé vient avant ses réglages, et les
+réglages s'ouvrent **sous** lui : on voit l'effet de chaque changement sans
+remonter. La barre de contexte est collée sous le bandeau pour la même raison —
+changer de fichier ne doit pas faire perdre le graphique des yeux.
 
 **Ce qui vient du backend.** Le profil des colonnes (rôle, unité, valeurs), les
 lectures proposées, et les points agrégés. Le front ne calcule ni moyenne ni
