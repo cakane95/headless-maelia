@@ -162,6 +162,9 @@ class ParameterSpec:
     # never says it: `idExploitationAexecuter` expects an identifier that exists
     # in a data file, and only a reading of the model tells which one.
     options_from: str | None = None
+    # Condition d'activite : `executerUnSeulAgriculteur == true`. Un parametre
+    # inactif est sans effet — le fixer ne change rien a la simulation.
+    enabled_if: str | None = None
     origin: str = "SEED"
 
     def accepts(self, value: object) -> bool:

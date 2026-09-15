@@ -69,6 +69,69 @@ OPTION_SOURCES = {
     "scenarioDePrixPrincipal": "agri.marcheAgricole.prixVentes#",
 }
 
+# Dependances entre parametres : un parametre n'a de sens que si un autre est actif.
+#
+# Le launcher les documente lui-meme, par un commentaire « si oui » place entre
+# le booleen qui commande et le parametre commande :
+#
+#     // simulation sur une seule exploitation
+#     parameter '...' var: executerUnSeulAgriculteur <- false;
+#     // si oui id de l'exploitation a simuler
+#     parameter '...' var: idExploitationAexecuter   <- "mineral_beauce_29";
+#
+# On les lit donc au lieu de les recopier. Piege : un commentaire qui dit « si
+# oui » ET « si non » decrit les deux branches du parametre lui-meme, pas une
+# dependance — `associerIlotMeteoZH` en est le cas.
+DEPENDANCE = re.compile(r"\bsi\s+oui\b", re.I)
+AUTODESCRIPTION = re.compile(r"\bsi\s+non\b", re.I)
+
+# Ce que le launcher ne dit pas en toutes lettres. Le bloc « parametrage d'une
+# parcelle virtuelle » commande les cinq parametres qui le suivent, sans
+# commentaire par parametre.
+DEPENDANCES_EXPLICITES = {
+    "rotationForceeParcelle": "executerParcelleVirtuelle == true",
+    "gestionPaillesForceeParcelle": "executerParcelleVirtuelle == true",
+    "idSdcForce": "executerParcelleVirtuelle == true",
+    "typeDeSolForceParcelle": "executerParcelleVirtuelle == true",
+    "surfaceHectareForceParcelle": "executerParcelleVirtuelle == true",
+}
+
+
+def dependances(texte: str) -> dict[str, str]:
+    """Condition d'activite de chaque parametre, lue dans le launcher.
+
+    Retourne `{parametre: "commandant == true"}`. Seul un booleen peut commander
+    : « si oui » n'a de sens que la-dessus.
+    """
+    lignes = texte.splitlines()
+    declaration = {}
+    for index, ligne in enumerate(lignes):
+        trouve = PARAMETER.match(ligne)
+        if trouve:
+            declaration[index] = (trouve.group("name"), trouve.group("default").strip())
+
+    conditions: dict[str, str] = {}
+    precedent = None
+    for index in sorted(declaration):
+        nom, _ = declaration[index]
+
+        commentaires = []
+        curseur = index - 1
+        while curseur >= 0 and lignes[curseur].strip().startswith("//"):
+            commentaires.insert(0, lignes[curseur].strip("/ \t"))
+            curseur -= 1
+        bloc = " ".join(commentaires)
+
+        commande = precedent and precedent[1] in {"true", "false"}
+        if commande and DEPENDANCE.search(bloc) and not AUTODESCRIPTION.search(bloc):
+            conditions[nom] = f"{precedent[0]} == true"
+
+        precedent = declaration[index]
+
+    conditions.update(DEPENDANCES_EXPLICITES)
+    return conditions
+
+
 GROUP_LABELS = {
     "CHEMINS SELON EXECUTION EN LOCAL OU SUR CLUSTER": "Chemins",
     "PARAMETRES GENERAUX": "Général",
@@ -132,6 +195,7 @@ def main() -> int:
         return 1
 
     text = LAUNCHER.read_text(encoding="utf-8", errors="replace")
+    conditions = dependances(text)
     parameters: list[dict] = []
     seen: set[str] = set()
 
@@ -156,6 +220,7 @@ def main() -> int:
             # An EXPRESSION default is not a value we can offer for editing.
             "editable": kind != "EXPRESSION" and name not in SYSTEM_PARAMETERS,
             "options_from": OPTION_SOURCES.get(name),
+            "enabled_if": conditions.get(name),
         })
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)

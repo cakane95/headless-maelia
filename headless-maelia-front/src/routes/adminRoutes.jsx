@@ -6,6 +6,8 @@ import Dashboard from "../pages/admin/Dashboard";
 import DataSpecEdit from "../pages/admin/DataSpecEdit";
 import InputCatalog from "../pages/admin/InputCatalog";
 import Models from "../pages/admin/Models";
+import ParameterCatalog from "../pages/admin/ParameterCatalog";
+import ParameterSpecEdit from "../pages/admin/ParameterSpecEdit";
 import RunDetail from "../pages/RunDetail";
 import TestBench from "../pages/admin/TestBench";
 import * as attente from "../pages/admin/placeholders";
@@ -20,7 +22,8 @@ export const adminRoutes = (
     <Route path="catalogue/entrees" element={<InputCatalog />} />
     <Route path="catalogue/entrees/nouveau" element={<DataSpecEdit />} />
     <Route path="catalogue/entrees/:specId" element={<DataSpecEdit />} />
-    <Route path="catalogue/parametres" element={<Placeholder {...attente.catalogueParametres} />} />
+    <Route path="catalogue/parametres" element={<ParameterCatalog />} />
+    <Route path="catalogue/parametres/:name" element={<ParameterSpecEdit />} />
     <Route path="catalogue/sorties" element={<Placeholder {...attente.catalogueSorties} />} />
   </Route>
 );

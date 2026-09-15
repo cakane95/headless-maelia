@@ -12,17 +12,6 @@ export const catalogueEntrees = {
   ],
 };
 
-export const catalogueParametres = {
-  title: "Paramètres de scénario",
-  lede: "Décrire les paramètres exposés par le launcher GAML.",
-  items: [
-    "CRUD des paramètres : nom GAML, type, défaut, groupe",
-    "Valeurs autorisées et conditions de visibilité",
-    "Paramètres pilotés par le système (non modifiables)",
-    "Reprise des 142 paramètres extraits de launcherBase.gaml",
-  ],
-};
-
 export const catalogueSorties = {
   title: "Catalogue des sorties",
   lede: "Décrire les fichiers et séries produits par le modèle.",

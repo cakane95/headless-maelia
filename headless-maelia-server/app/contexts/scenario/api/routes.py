@@ -8,7 +8,7 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,6 +20,7 @@ from app.contexts.dataset.infrastructure.blob_store import MinioBlobStore
 from app.contexts.dataset.infrastructure.repository import SqlDatasetRepository
 from app.contexts.scenario.application import options as parameter_options
 from app.contexts.scenario.application import use_cases
+from app.contexts.scenario.domain import activation as activation_rules
 from app.contexts.scenario.domain.models import Scenario
 from app.contexts.scenario.domain.services import effective_parameters, grouped
 from app.contexts.scenario.infrastructure.repository import SqlScenarioRepository
@@ -59,6 +60,9 @@ class ParameterSpecOut(BaseModel):
     editable: bool
     # '<data_spec_id>#<champ>' : les valeurs acceptables vivent dans un fichier.
     options_from: str | None = None
+    # '<autre paramètre> == true' : ce paramètre n'a d'effet que si la condition
+    # est vraie. Le front grise, il n'évalue pas.
+    enabled_if: str | None = None
 
 
 class OptionsOut(BaseModel):
@@ -114,8 +118,33 @@ async def list_parameters(parameters: Parameters) -> list[ParameterSpecOut]:
             name=p.name, label=p.label, group=p.group, type=p.type.value,
             default=p.default, allowed_values=list(p.allowed_values),
             system=p.system, editable=p.editable, options_from=p.options_from,
+            enabled_if=p.enabled_if,
         )
         for p in await parameters.list_all()
+    ]
+
+
+class ActivationOut(BaseModel):
+    name: str
+    enabled: bool
+    condition: str | None = None
+    because: str | None = None
+
+
+@router.post("/parameters/activation", response_model=list[ActivationOut])
+async def parameter_activation(
+    parameters: Parameters,
+    values: Annotated[dict[str, Any], Body(default_factory=dict)],
+) -> list[ActivationOut]:
+    """Quels paramètres sont actifs, compte tenu de ces écarts.
+
+    Un paramètre commandé par un autre n'a aucun effet tant que celui-ci est
+    éteint. La règle est évaluée ici — le front l'affiche, il ne la refait pas.
+    """
+    etats = activation_rules.activation(values, await parameters.list_all())
+    return [
+        ActivationOut(name=e.name, enabled=e.enabled, condition=e.condition, because=e.because)
+        for e in etats.values()
     ]
 
 

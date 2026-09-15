@@ -378,6 +378,31 @@ l'écart au lieu de l'enregistrer.
     validation refuse un booléen là où un entier est attendu, et un test le
     verrouille.
 
+### Un paramètre peut en commander un autre
+
+`idExploitationAexecuter` ne veut rien dire tant que `executerUnSeulAgriculteur`
+est faux : la simulation porte alors sur toutes les exploitations et
+l'identifiant est ignoré. `ParameterSpec.enabled_if` porte cette condition, dans
+le même mini-langage que `required_if`.
+
+**Le launcher documente ses propres dépendances**, par un commentaire « si oui »
+placé entre le booléen qui commande et le paramètre commandé. Le générateur les
+lit au lieu de les recopier — avec un piège : un commentaire qui dit « si oui »
+*et* « si non » décrit les deux branches du paramètre lui-même, pas une
+dépendance. Treize paramètres sont conditionnés : huit lus dans le launcher,
+cinq déclarés à la main (le bloc « parcelle virtuelle », que le launcher ne
+commente pas).
+
+`POST /parameters/activation` renvoie, pour des écarts donnés, l'état de chaque
+paramètre et la raison de son extinction. **La condition se lit sur l'état
+complet** — écarts posés sur les défauts — sans quoi un paramètre commandé par un
+booléen vrai par défaut passerait pour éteint.
+
+!!! note "Un écart sur un paramètre éteint n'est pas refusé"
+    On peut préparer une valeur avant d'activer le levier qui la commande. Il est
+    simplement sans effet, et l'écran le dit — plutôt que de chercher pourquoi la
+    simulation ne change pas.
+
 ### Les valeurs acceptables viennent du projet
 
 `GET /projects/{id}/parameters/{nom}/options` lit les identifiants **dans les
@@ -402,7 +427,10 @@ liste vide se lirait comme « aucun choix possible ».
 
 `GET|POST /projects/{id}/scenarios` · `GET|PUT|DELETE /scenarios/{id}` ·
 `GET /scenarios/{id}/gama-parameters` ·
-`GET /projects/{id}/parameters/{nom}/options`
+`GET /projects/{id}/parameters/{nom}/options` ·
+`POST /parameters/activation` ·
+`GET /parameters/{nom}` · `PUT|DELETE /admin/parameters/{nom}` ·
+`POST /admin/parameters/{nom}/restore`
 
 ---
 

@@ -5,7 +5,7 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from app.contexts.catalog.domain.models import DataSpec
+from app.contexts.catalog.domain.models import DataSpec, ParameterSpec
 
 # `required_if` is a deliberately minimal expression: `<param> <op> <literal>`.
 # Arbitrary code is never evaluated — the catalog is data, not script.
@@ -222,5 +222,58 @@ def validate_spec(spec: DataSpec, known_ids: Iterable[str] = ()) -> list[SpecIss
         issues.append(SpecIssue(
             "fields", "deux champs partagent la même position : c'est elle qui les identifie"
         ))
+
+    return issues
+
+
+def validate_parameter(
+    spec: ParameterSpec, known_names: Iterable[str] = ()
+) -> list[SpecIssue]:
+    """Verifie un parametre ecrit a la main, avant qu'il n'entre au catalogue.
+
+    Chaque refus decrit un parametre que la plateforme pourrait stocker mais
+    jamais servir : une valeur par defaut que son propre type refuse, une
+    condition qu'on ne peut pas evaluer, une dependance vers un parametre qui
+    n'existe pas.
+    """
+    issues: list[SpecIssue] = []
+
+    if not spec.label.strip():
+        issues.append(SpecIssue("label", "un libelle est necessaire pour l'afficher"))
+    if not spec.group.strip():
+        issues.append(SpecIssue("group", "la section du launcher est necessaire"))
+
+    if spec.default is not None and not spec.accepts(spec.default):
+        issues.append(SpecIssue(
+            "default",
+            f"la valeur par defaut n'est pas un {spec.type.value.lower()} valide",
+        ))
+
+    if spec.options_from and "#" not in spec.options_from:
+        issues.append(SpecIssue(
+            "options_from", "forme attendue : <identifiant de fichier>#<champ>"
+        ))
+
+    if spec.enabled_if:
+        try:
+            evaluate_condition(spec.enabled_if, {})
+        except InvalidExpression:
+            issues.append(SpecIssue(
+                "enabled_if",
+                "condition illisible : forme attendue « autreParametre == true », "
+                "plusieurs conditions liees par &&",
+            ))
+        else:
+            connus = set(known_names)
+            for partie in spec.enabled_if.split("&&"):
+                commandant = partie.strip().split("==")[0].split("!=")[0].strip()
+                if commandant == spec.name:
+                    issues.append(SpecIssue(
+                        "enabled_if", "un parametre ne peut pas dependre de lui-meme"
+                    ))
+                elif connus and commandant not in connus:
+                    issues.append(SpecIssue(
+                        "enabled_if", f"parametre inconnu du launcher : {commandant}"
+                    ))
 
     return issues

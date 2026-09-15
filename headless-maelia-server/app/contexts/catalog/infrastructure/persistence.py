@@ -99,4 +99,6 @@ class ParameterSpecRow(Base):
     editable: Mapped[bool] = mapped_column(Boolean, default=True)
     # '<data_spec_id>#<field>' : ou lire les valeurs acceptables.
     options_from: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    # '<autre parametre> == true' : condition d'activite.
+    enabled_if: Mapped[str | None] = mapped_column(String(300), nullable=True)
     origin: Mapped[str] = mapped_column(String(10), default="SEED")

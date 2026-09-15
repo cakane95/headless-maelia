@@ -87,6 +87,19 @@
 /* Un écart se voit sans lire : c'est ce qui distingue le scénario du modèle. */
 .param--modified { border-left-color: var(--accent); }
 
+/* Paramètre commandé par un autre, éteint : il reste lisible — on doit pouvoir
+   voir ce qu'il vaudrait — mais il n'est pas modifiable, et la raison est dite. */
+.param--inactive {
+  background: var(--surface-muted);
+  opacity: 0.72;
+}
+.param fieldset {
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+.hint--locked { color: var(--text-muted); font-style: italic; }
+
 .param__head {
   display: flex;
   align-items: baseline;

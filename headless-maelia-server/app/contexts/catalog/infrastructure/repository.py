@@ -157,6 +157,7 @@ def _parameter_to_domain(row: ParameterSpecRow) -> ParameterSpec:
         system=row.system,
         editable=row.editable,
         options_from=row.options_from,
+        enabled_if=row.enabled_if,
         origin=row.origin,
     )
 
@@ -190,6 +191,7 @@ class SqlParameterRepository:
         row.system = spec.system
         row.editable = spec.editable
         row.options_from = spec.options_from
+        row.enabled_if = spec.enabled_if
         row.origin = spec.origin
         await self._session.flush()
         return spec

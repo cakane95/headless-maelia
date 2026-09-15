@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import EmptyState from "../../../components/EmptyState";
+import { useActivation } from "../../../hooks/useActivation";
 import { matches, sameValue } from "../../../utils/parameters";
 import ParameterBar from "./ParameterBar";
 import ParameterGroup from "./ParameterGroup";
@@ -14,6 +15,9 @@ import ParameterGroup from "./ParameterGroup";
 export default function ParameterEditor({ specs, values, onChange }) {
   const [query, setQuery] = useState("");
   const [onlyModified, setOnlyModified] = useState(false);
+  // Un paramètre commandé par un autre reste grisé tant que celui-ci est
+  // éteint : le fixer ne changerait rien à la simulation.
+  const activation = useActivation(values);
 
   // Les paramètres pilotés par la plateforme (chemins, id de run) et les
   // expressions GAML ne sont pas offerts : les fixer n'aurait aucun effet.
@@ -55,6 +59,7 @@ export default function ParameterEditor({ specs, values, onChange }) {
             group={group}
             specs={groupSpecs}
             values={values}
+            activation={activation}
             onSet={set}
             onReset={reset}
             // Une recherche ou un filtre a déjà réduit la liste : on l'ouvre.

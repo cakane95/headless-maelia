@@ -17,10 +17,16 @@ from app.contexts.catalog.domain.models import (
     FieldType,
     FileKind,
     Orientation,
+    ParameterSpec,
+    ParameterType,
 )
-from app.contexts.catalog.infrastructure.repository import SqlCatalogRepository
-from app.contexts.catalog.infrastructure.seed import load_seed
+from app.contexts.catalog.infrastructure.repository import (
+    SqlCatalogRepository,
+    SqlParameterRepository,
+)
+from app.contexts.catalog.infrastructure.seed import load_parameter_seed, load_seed
 from app.shared.database import get_session
+from app.shared.errors import NotFoundError
 
 router = APIRouter(prefix="/api/v1", tags=["input catalog"])
 
@@ -30,6 +36,15 @@ def repository(session: Annotated[AsyncSession, Depends(get_session)]) -> SqlCat
 
 
 Repo = Annotated[SqlCatalogRepository, Depends(repository)]
+
+
+def parameter_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> SqlParameterRepository:
+    return SqlParameterRepository(session)
+
+
+Parameters = Annotated[SqlParameterRepository, Depends(parameter_repository)]
 Session = Annotated[AsyncSession, Depends(get_session)]
 
 
@@ -167,4 +182,76 @@ async def restore(repo: Repo, session: Session, spec_id: str) -> DataSpecOut:
 @router.delete("/admin/dataspecs/{spec_id}", status_code=204)
 async def delete(repo: Repo, session: Session, spec_id: str) -> None:
     await use_cases.delete_spec(repo, spec_id)
+    await session.commit()
+
+
+# ── Paramètres de scénario (administration) ─────────────────────────────────
+
+class ParameterIn(BaseModel):
+    label: str
+    group: str
+    type: ParameterType = ParameterType.STRING
+    default: Any = None
+    allowed_values: list[str] = Field(default_factory=list)
+    editable: bool = True
+    # Où lire les valeurs acceptables : '<identifiant de fichier>#<champ>'.
+    options_from: str | None = None
+    # Condition d'activité : '<autre paramètre> == true'.
+    enabled_if: str | None = None
+
+
+class ParameterOut(ParameterIn):
+    name: str
+    system: bool
+    origin: str
+
+
+def _render_parameter(spec: ParameterSpec) -> ParameterOut:
+    return ParameterOut(
+        name=spec.name, label=spec.label, group=spec.group, type=spec.type,
+        default=spec.default, allowed_values=list(spec.allowed_values),
+        editable=spec.editable, options_from=spec.options_from,
+        enabled_if=spec.enabled_if, system=spec.system, origin=spec.origin,
+    )
+
+
+@router.get("/parameters/{name}", response_model=ParameterOut, tags=["input catalog"])
+async def get_parameter(parameters: Parameters, name: str) -> ParameterOut:
+    spec = await parameters.get(name)
+    if spec is None:
+        raise NotFoundError(f"paramètre inconnu : {name}")
+    return _render_parameter(spec)
+
+
+@router.put("/admin/parameters/{name}", response_model=ParameterOut)
+async def save_parameter(
+    parameters: Parameters, session: Session, name: str, payload: ParameterIn
+) -> ParameterOut:
+    """Écrire un paramètre. Toute écriture manuelle le bascule en USER."""
+    existant = await parameters.get(name)
+    spec = ParameterSpec(
+        name=name,
+        **payload.model_dump(exclude={"allowed_values"}),
+        allowed_values=tuple(payload.allowed_values),
+        # Un paramètre piloté par la plateforme le reste : ce n'est pas une
+        # propriété que l'administrateur décide.
+        system=existant.system if existant else False,
+        origin="USER",
+    )
+    saved = await use_cases.save_parameter(parameters, spec)
+    await session.commit()
+    return _render_parameter(saved)
+
+
+@router.post("/admin/parameters/{name}/restore", response_model=ParameterOut)
+async def restore_parameter(parameters: Parameters, session: Session, name: str) -> ParameterOut:
+    """Revenir à ce que le launcher déclare, et rendre le paramètre au seed."""
+    spec = await use_cases.restore_parameter(parameters, name, load_parameter_seed())
+    await session.commit()
+    return _render_parameter(spec)
+
+
+@router.delete("/admin/parameters/{name}", status_code=204)
+async def delete_parameter(parameters: Parameters, session: Session, name: str) -> None:
+    await use_cases.delete_parameter(parameters, name)
     await session.commit()

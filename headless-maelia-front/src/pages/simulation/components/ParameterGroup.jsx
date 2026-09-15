@@ -8,7 +8,9 @@ import ParameterField from "./ParameterField";
  *  une liste, ce serait un mur. Une section qui porte un écart s'ouvre d'office
  *  au premier rendu.
  */
-export default function ParameterGroup({ group, specs, values, onSet, onReset, forceOpen }) {
+export default function ParameterGroup({
+  group, specs, values, activation, onSet, onReset, forceOpen,
+}) {
   const modified = specs.filter((spec) => spec.name in values).length;
   const [open, setOpen] = useState(forceOpen || modified > 0);
 
@@ -42,6 +44,7 @@ export default function ParameterGroup({ group, specs, values, onSet, onReset, f
             spec={spec}
             value={values[spec.name]}
             modified={spec.name in values}
+            activation={activation?.[spec.name]}
             onChange={(value) => onSet(spec, value)}
             onReset={() => onReset(spec)}
           />

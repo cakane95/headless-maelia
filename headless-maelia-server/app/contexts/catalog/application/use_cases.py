@@ -6,11 +6,12 @@ Dependencies arrive as parameters: no concrete adapter is imported here.
 from collections.abc import Iterable
 from typing import Any
 
-from app.contexts.catalog.domain.models import DataSpec
+from app.contexts.catalog.domain.models import DataSpec, ParameterSpec
 from app.contexts.catalog.domain.ports import CatalogRepository
 from app.contexts.catalog.domain.services import (
     applicable_specs,
     order_by_dependencies,
+    validate_parameter,
     validate_spec,
 )
 from app.shared.errors import ConflictError, NotFoundError, ValidationError
@@ -91,6 +92,58 @@ async def restore_spec(
     if original is None:
         raise NotFoundError(
             f"{spec_id} ne figure pas dans le catalogue de référence : "
+            "il a été ajouté à la main, il n'y a rien à restaurer."
+        )
+    return await repository.upsert(original)
+
+
+# ── Paramètres de scénario ──────────────────────────────────────────────────
+
+class ParameterCatalog:
+    """Ce que ce module attend du catalogue de paramètres."""
+
+    async def list_all(self) -> list[ParameterSpec]: ...
+    async def get(self, name: str) -> ParameterSpec | None: ...
+    async def upsert(self, spec: ParameterSpec) -> ParameterSpec: ...
+    async def delete(self, name: str) -> None: ...
+
+
+async def save_parameter(repository: ParameterCatalog, spec: ParameterSpec) -> ParameterSpec:
+    """Créer ou modifier un paramètre, après avoir vérifié qu'il est servable.
+
+    Toute écriture manuelle bascule l'origine en USER : le seed ne l'écrasera
+    plus, et le paramètre cesse donc de suivre les montées de version du modèle.
+    """
+    connus = {p.name for p in await repository.list_all()}
+    issues = validate_parameter(spec, connus)
+    if issues:
+        raise ValidationError(
+            f"{spec.name} ne peut pas être enregistré",
+            issues=[{"field": i.field, "message": i.message} for i in issues],
+        )
+    return await repository.upsert(spec)
+
+
+async def delete_parameter(repository: ParameterCatalog, name: str) -> None:
+    spec = await repository.get(name)
+    if spec is None:
+        raise NotFoundError(f"paramètre inconnu : {name}")
+    if spec.origin == "SEED":
+        raise ConflictError(
+            f"{name} provient du launcher : c'est une variable que le modèle "
+            "expose réellement, elle ne peut pas être supprimée."
+        )
+    await repository.delete(name)
+
+
+async def restore_parameter(
+    repository: ParameterCatalog, name: str, reference: Iterable[ParameterSpec]
+) -> ParameterSpec:
+    """Revenir à ce que le launcher déclare."""
+    original = next((p for p in reference if p.name == name), None)
+    if original is None:
+        raise NotFoundError(
+            f"{name} ne figure pas dans le catalogue de référence : "
             "il a été ajouté à la main, il n'y a rien à restaurer."
         )
     return await repository.upsert(original)
