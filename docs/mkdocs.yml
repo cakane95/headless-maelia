@@ -85,6 +85,16 @@ markdown_extensions:
 
 nav:
   - Accueil: index.md
+  - Comprendre:
+      - Pourquoi une plateforme: comprendre/pourquoi.md
+      - Administration et Simulation: comprendre/les-deux-domaines.md
+      - Le modèle MAELIA en bref: comprendre/maelia-en-bref.md
+      - Rien n'est écrit dans le code: comprendre/rien-n-est-code-en-dur.md
+      - Le langage de conditions: comprendre/langage-de-conditions.md
+      - Ce que MAELIA écrit: comprendre/ce-que-maelia-ecrit.md
+      - L'isolation des exécutions: comprendre/isolation-des-executions.md
+      - Pièges de GAMA et de MAELIA: comprendre/pieges-gama-maelia.md
+      - L'héritage de la version Java: comprendre/heritage-java.md
   - Archive:
       - Documentation antérieure: archive/index.md
       - Accueil (2025): archive/accueil.md
