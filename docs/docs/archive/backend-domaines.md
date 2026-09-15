@@ -1,4 +1,15 @@
-# Backend — les domaines en détail
+---
+search:
+  exclude: true
+---
+
+# Archive — Backend — les domaines en détail
+
+!!! danger "Page archivée — ne pas s'y fier"
+    Rédigée avant la refonte de la documentation. Conservée pour mémoire :
+    elle peut décrire des types, des chemins ou des chiffres qui n'existent
+    plus. Remplacée par la section Architecture — voir [le sommaire](../index.md).
+
 
 !!! abstract "Objet de ce document"
     Décrire **ce qui est implémenté**, contexte par contexte : responsabilité,
@@ -199,7 +210,7 @@ du paramètre fait partie de ce que la source contient réellement.
 
 Le catalogue se **régénère depuis le code GAML** et les fichiers réellement
 livrés — jamais depuis le tableur `MAELIA_Schema_Donnees.xlsx`, qui contient des
-erreurs de collecte (cf. [l'inventaire](../reference/donnees-et-parametres.md)).
+erreurs de collecte (cf. [l'inventaire](donnees-et-parametres.md)).
 
 ```bash
 python headless-maelia-server/scripts/generate_catalog_seed.py     # 82 entrées

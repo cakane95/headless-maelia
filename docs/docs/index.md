@@ -3,103 +3,67 @@
 # Plateforme headless-MAELIA
 
 Simulation multi-agents **eau / agriculture / normes** sur moteur GAMA headless.
-Décrire un modèle, l'alimenter en données, composer des scénarios, exécuter — sans
-jamais installer GAMA.
+Décrire un modèle, l'alimenter en données, composer des scénarios, exécuter et
+lire les résultats — sans jamais installer GAMA.
 
 </div>
 
-## Par où commencer
+## Je veux…
 
-<div class="grid cards" markdown>
+| Je veux… | Section |
+|---|---|
+| **comprendre** ce que fait la plateforme et pourquoi elle existe | Comprendre |
+| **l'installer** et lancer une première simulation | Démarrer |
+| **m'en servir** pour une tâche précise | Guides |
+| **savoir comment c'est fait** avant d'y toucher | Architecture |
+| **chercher** un fichier, un paramètre, une route d'API | Référence |
+| **y contribuer** | Contribuer |
 
--   :material-cog-outline: **Architecture backend**
+Les sections apparaissent dans le menu du haut au fur et à mesure qu'elles sont
+écrites.
 
-    ---
+!!! abstract "En une phrase"
+    MAELIA est un modèle de simulation de socio-agrosystèmes écrit en GAML et
+    exécuté par GAMA. Cette plateforme met une interface web devant lui : elle
+    décrit ce que le modèle attend, versionne les données d'un territoire,
+    compose des scénarios, pilote les exécutions et rend les sorties lisibles.
 
-    Les six forces qui contraignent le backend, le découpage en contextes métier,
-    et le chemin de migration.
+## Démarrage en trois commandes
 
-    [:octicons-arrow-right-24: Architecture backend](architecture/backend.md)
-
--   :material-code-braces: **Backend — bonnes pratiques**
-
-    ---
-
-    Le *comment* : où placer un fichier, quoi mettre dans chaque couche, avec une
-    tranche verticale complète en code.
-
-    [:octicons-arrow-right-24: Bonnes pratiques](architecture/backend-bonnes-pratiques.md)
-
--   :material-monitor-dashboard: **Architecture frontend**
-
-    ---
-
-    Deux espaces, deux layouts. Structure du SPA React et règle d'isolation du
-    réseau.
-
-    [:octicons-arrow-right-24: Architecture frontend](architecture/frontend.md)
-
--   :material-palette-outline: **Frontend — bonnes pratiques**
-
-    ---
-
-    Découpage du code, design system MAELIA, responsive et accessibilité WCAG AA.
-
-    [:octicons-arrow-right-24: Bonnes pratiques](architecture/frontend-bonnes-pratiques.md)
-
--   :material-database-outline: **Données, sorties et paramètres**
-
-    ---
-
-    Inventaire de référence du modèle : 82 fichiers d'entrée, 128 sorties,
-    148 paramètres, et leurs relations.
-
-    [:octicons-arrow-right-24: Inventaire MAELIA](reference/donnees-et-parametres.md)
-
--   :material-file-tree-outline: **Modèle de domaine**
-
-    ---
-
-    Structure des données d'entrée attendues par le modèle.
-
-    [:octicons-arrow-right-24: Données d'entrée](architecture/modele-domaine-donnees-entree.md)
-
-</div>
-
-## Les deux domaines
-
-La plateforme couvre deux usages distincts, séparés jusque dans le front
-(`/admin` et `/simulation`).
-
-| | **Administration** | **Simulation** |
-|---|---|---|
-| Qui | administrateur de la plateforme | modélisateur, observateur |
-| Quoi | *décrire* un modèle : entrées, paramètres, sorties | *exploiter* un modèle sur un territoire |
-| Produit | des **schémas** | des **données** et des **résultats** |
-
-**Administration produit les schémas que Simulation consomme.** La dépendance va
-dans un seul sens — c'est ce qui permettra d'accueillir un second modèle que
-MAELIA sans réécrire la plateforme.
-
-## Démarrage rapide
+Prérequis : Docker et Docker Compose v2. **Rien d'autre** — ni Java, ni GAMA,
+ni Python.
 
 ```bash
+git clone <dépôt> && cd headless-maelia
 docker compose up -d
 curl http://localhost:8000/api/v1/health/dependencies   # doit répondre "status": "ok"
 ```
 
-| Service | URL |
-|---|---|
-| Frontend | <http://localhost:5173> |
-| API (Swagger) | <http://localhost:8000/docs> |
-| Documentation | <http://localhost:8082> |
-| Console MinIO | <http://localhost:9001> |
+--8<-- "_partials/services.md:urls"
 
-Le détail — dépannage, contraintes d'installation, état du projet — est dans le
-`README.md` du dépôt.
+## Le modèle, en chiffres
 
-!!! info "Sections en construction"
-    Les guides d'installation et d'utilisation, la référence de l'API REST et la
-    charte graphique n'ont pas encore de page dédiée : leur contenu vit
-    aujourd'hui dans le `README.md` et dans les documents d'architecture
-    ci-dessus.
+--8<-- "_partials/chiffres-modele.md:tout"
+
+Aucun de ces noms n'est écrit dans le code de la plateforme : les trois
+catalogues sont **engendrés depuis le GAML du modèle**, et se régénèrent à
+chaque montée de version.
+
+## Les deux domaines
+
+--8<-- "_partials/deux-domaines.md:tableau"
+
+--8<-- "_partials/deux-domaines.md:regle"
+
+C'est ce qui permettra d'accueillir un second modèle que MAELIA sans réécrire
+la plateforme.
+
+## État de cette documentation
+
+Cette documentation est en cours de refonte. Les sections listées ci-dessus
+apparaissent dans le menu **au fur et à mesure qu'elles sont écrites** ; ce qui
+n'y figure pas encore se trouve dans la
+[documentation antérieure](archive/index.md), conservée mais **non fiable** —
+elle contient des chiffres périmés, des chemins disparus et une page décrivant
+du code qui n'a jamais existé. Le détail de ce qui a motivé la refonte y est
+expliqué.

@@ -43,6 +43,9 @@ theme:
     - toc.follow
     - search.suggest
     - search.highlight
+    # Les pages d'archive se retirent de la recherche par leur front matter :
+    # sans cela un lecteur y retombe et prend un design abandonne pour la realite.
+    - search.exclude
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
@@ -62,7 +65,11 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets
+  # Les chiffres du modele vivent dans docs/_partials/ et nulle part ailleurs.
+  # check_paths casse la construction si un fragment disparait.
+  - pymdownx.snippets:
+      base_path: ['.', 'docs']
+      check_paths: true
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -78,15 +85,16 @@ markdown_extensions:
 
 nav:
   - Accueil: index.md
-  - Architecture:
-      - Backend: architecture/backend.md
-      - Backend — bonnes pratiques: architecture/backend-bonnes-pratiques.md
-      - Backend — les domaines: architecture/backend-domaines.md
-      - Frontend: architecture/frontend.md
-      - Frontend — bonnes pratiques: architecture/frontend-bonnes-pratiques.md
-      - Modèle de domaine — Données d'entrée: architecture/modele-domaine-donnees-entree.md
-  - Référence:
-      - Données, sorties et paramètres MAELIA: reference/donnees-et-parametres.md
+  - Archive:
+      - Documentation antérieure: archive/index.md
+      - Accueil (2025): archive/accueil.md
+      - Architecture backend: archive/backend.md
+      - Backend — bonnes pratiques: archive/backend-bonnes-pratiques.md
+      - Backend — les domaines: archive/backend-domaines.md
+      - Architecture frontend: archive/frontend.md
+      - Frontend — bonnes pratiques: archive/frontend-bonnes-pratiques.md
+      - Modèle de domaine — données d'entrée: archive/modele-domaine-donnees-entree.md
+      - Données, sorties et paramètres: archive/donnees-et-parametres.md
 
 extra:
   social:

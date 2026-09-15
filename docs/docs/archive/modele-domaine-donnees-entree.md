@@ -1,4 +1,15 @@
-# Modèle de domaine des données d'entrée
+---
+search:
+  exclude: true
+---
+
+# Archive — Modèle de domaine des données d'entrée
+
+!!! danger "Page archivée — ne pas s'y fier"
+    Rédigée avant la refonte de la documentation. Conservée pour mémoire :
+    elle peut décrire des types, des chemins ou des chiffres qui n'existent
+    plus. Remplacée par la section Architecture — voir [le sommaire](../index.md).
+
 
 Cette page présente le modèle de domaine **en partant du projet**, jusqu'à situer les données
 d'entrée, puis zoome sur la façon dont le **contenu** d'un dataset est représenté — qu'il

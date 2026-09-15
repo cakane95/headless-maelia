@@ -1,4 +1,15 @@
-# Frontend — bonnes pratiques & design system
+---
+search:
+  exclude: true
+---
+
+# Archive — Frontend — bonnes pratiques & design system
+
+!!! danger "Page archivée — ne pas s'y fier"
+    Rédigée avant la refonte de la documentation. Conservée pour mémoire :
+    elle peut décrire des types, des chemins ou des chiffres qui n'existent
+    plus. Remplacée par la section Contribuer — voir [le sommaire](../index.md).
+
 
 !!! abstract "Objet de ce document"
     Le **comment** du front. [Architecture frontend](frontend.md) décrit la

@@ -1,4 +1,15 @@
-# Architecture backend
+---
+search:
+  exclude: true
+---
+
+# Archive — Architecture backend
+
+!!! danger "Page archivée — ne pas s'y fier"
+    Rédigée avant la refonte de la documentation. Conservée pour mémoire :
+    elle peut décrire des types, des chemins ou des chiffres qui n'existent
+    plus. Remplacée par la section Architecture — voir [le sommaire](../index.md).
+
 
 !!! abstract "Objet de ce document"
     Décrire l'architecture cible du backend Python, les règles qui la tiennent, et

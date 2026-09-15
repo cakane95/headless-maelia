@@ -1,4 +1,15 @@
-# Données d'entrée, de sortie et paramètres
+---
+search:
+  exclude: true
+---
+
+# Archive — Données d'entrée, de sortie et paramètres
+
+!!! danger "Page archivée — ne pas s'y fier"
+    Rédigée avant la refonte de la documentation. Conservée pour mémoire :
+    elle peut décrire des types, des chemins ou des chiffres qui n'existent
+    plus. Remplacée par la section Référence — voir [le sommaire](../index.md).
+
 
 !!! abstract "Objet de ce document"
     Inventaire de référence du modèle MAELIA 1.4.29 : ce qu'il **lit**, ce qu'il
