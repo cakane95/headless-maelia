@@ -1,9 +1,11 @@
-import { moduleLabel } from "../../../utils/status";
+import { moduleLabel } from "../utils/status";
 
-/** Onglets des modules, avec l'avancement de chacun.
+/** Onglets par module, avec une pastille de comptage.
  *
- *  Le compte porté par l'onglet évite d'avoir à l'ouvrir pour savoir s'il reste
- *  quelque chose à charger : c'est la question qu'on se pose sur cet écran.
+ *  Chaque écran décide de ce que la pastille dit — l'avancement des données
+ *  d'un projet, le nombre de types de fichiers au catalogue. Le composant ne
+ *  l'interprète pas : deux sens différents sous la même forme induiraient en
+ *  erreur.
  */
 export default function ModuleTabs({ tabs, active, onSelect }) {
   return (
@@ -18,7 +20,7 @@ export default function ModuleTabs({ tabs, active, onSelect }) {
           onClick={() => onSelect(tab.id)}
         >
           {tab.id === "all" ? "Tous" : moduleLabel(tab.id)}
-          <span className="tab__count">{tab.supplied}/{tab.expected}</span>
+          {tab.badge && <span className="tab__count">{tab.badge}</span>}
         </button>
       ))}
     </div>

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { fileStatusLabel } from "../../../utils/status";
 import ExpectedFiles from "./ExpectedFiles";
-import ModuleTabs from "./ModuleTabs";
+import ModuleTabs from "../../../components/ModuleTabs";
 
 const STATUSES = ["MISSING", "DRAFT", "INVALID", "VALID"];
 
@@ -66,8 +66,12 @@ export default function ExpectedFilesBrowser({ completion, datasetsBySpec, proje
  *  de la carte Avancement, qui ne compte que les fichiers requis et valides.
  */
 function buildTabs(completion) {
+  const badge = ({ supplied, expected }) => `${supplied}/${expected}`;
   return [
-    { id: "all", expected: completion.expected, supplied: completion.supplied },
-    ...Object.entries(completion.by_module ?? {}).map(([id, counts]) => ({ id, ...counts })),
+    { id: "all", badge: badge(completion) },
+    ...Object.entries(completion.by_module ?? {}).map(([id, counts]) => ({
+      id,
+      badge: badge(counts),
+    })),
   ];
 }

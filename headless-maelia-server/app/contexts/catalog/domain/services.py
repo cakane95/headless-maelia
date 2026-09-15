@@ -2,6 +2,7 @@
 
 import re
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
 from typing import Any
 
 from app.contexts.catalog.domain.models import DataSpec
@@ -133,3 +134,63 @@ def order_by_dependencies(specs: Sequence[DataSpec]) -> list[list[str]]:
             deps.difference_update(ready)
 
     return levels
+
+
+@dataclass(frozen=True, slots=True)
+class SpecIssue:
+    """What is wrong with a spec, and where."""
+
+    field: str
+    message: str
+
+
+def validate_spec(spec: DataSpec, known_ids: Iterable[str] = ()) -> list[SpecIssue]:
+    """Check a spec written by hand, before it enters the catalog.
+
+    Every refusal here describes a spec the platform could store but never use:
+    a file it cannot name, a condition it cannot read, a dependency on something
+    that does not exist. Letting them through means discovering the problem when
+    a project asks for its files — screens later, and without the context.
+    """
+    issues: list[SpecIssue] = []
+
+    if not spec.file_name and not spec.file_name_pattern:
+        issues.append(SpecIssue(
+            "file_name", "un nom de fichier ou un motif est nécessaire pour le reconnaître"
+        ))
+    if spec.file_name and spec.file_name_pattern:
+        issues.append(SpecIssue(
+            "file_name_pattern",
+            "nom et motif sont exclusifs : un fichier unique ou une famille, pas les deux",
+        ))
+    if spec.file_name_pattern:
+        try:
+            re.compile(spec.file_name_pattern)
+        except re.error as exc:
+            issues.append(SpecIssue("file_name_pattern", f"motif illisible : {exc}"))
+
+    if not spec.relative_dir.strip():
+        issues.append(SpecIssue("relative_dir", "l'emplacement dans includes/ est nécessaire"))
+
+    if spec.required_if:
+        try:
+            evaluate_condition(spec.required_if, {})
+        except InvalidExpression:
+            issues.append(SpecIssue(
+                "required_if",
+                "condition illisible : forme attendue « param == valeur », "
+                "plusieurs conditions liées par &&",
+            ))
+
+    known = set(known_ids)
+    for reference in spec.depends_on:
+        if known and reference not in known:
+            issues.append(SpecIssue("depends_on", f"dépendance inconnue du catalogue : {reference}"))
+
+    positions = [f.position for f in spec.fields]
+    if len(positions) != len(set(positions)):
+        issues.append(SpecIssue(
+            "fields", "deux champs partagent la même position : c'est elle qui les identifie"
+        ))
+
+    return issues

@@ -19,6 +19,7 @@ from app.contexts.catalog.domain.models import (
     Orientation,
 )
 from app.contexts.catalog.infrastructure.repository import SqlCatalogRepository
+from app.contexts.catalog.infrastructure.seed import load_seed
 from app.shared.database import get_session
 
 router = APIRouter(prefix="/api/v1", tags=["input catalog"])
@@ -153,6 +154,14 @@ async def save(
     saved = await use_cases.save_spec(repo, spec)
     await session.commit()
     return _render(saved)
+
+
+@router.post("/admin/dataspecs/{spec_id}/restore", response_model=DataSpecOut)
+async def restore(repo: Repo, session: Session, spec_id: str) -> DataSpecOut:
+    """Revenir à ce que dit le catalogue de référence, et rendre la spec au seed."""
+    spec = await use_cases.restore_spec(repo, spec_id, load_seed())
+    await session.commit()
+    return _render(spec)
 
 
 @router.delete("/admin/dataspecs/{spec_id}", status_code=204)
