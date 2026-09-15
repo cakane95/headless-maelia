@@ -85,6 +85,9 @@ markdown_extensions:
 
 nav:
   - Accueil: index.md
+  - Démarrer:
+      - Installer et démarrer: demarrer/installation.md
+      - Votre première simulation: demarrer/premiere-simulation.md
   - Comprendre:
       - Pourquoi une plateforme: comprendre/pourquoi.md
       - Administration et Simulation: comprendre/les-deux-domaines.md
@@ -95,6 +98,24 @@ nav:
       - L'isolation des exécutions: comprendre/isolation-des-executions.md
       - Pièges de GAMA et de MAELIA: comprendre/pieges-gama-maelia.md
       - L'héritage de la version Java: comprendre/heritage-java.md
+  - Guides:
+      - Créer un projet: guides/creer-un-projet.md
+      - Importer et versionner des données: guides/importer-des-donnees.md
+      - Composer un scénario: guides/composer-un-scenario.md
+      - Choisir ce que l'exécution produira: guides/choisir-les-sorties.md
+      - Lancer et suivre une exécution: guides/lancer-et-suivre-une-execution.md
+      - Lire et comparer les résultats: guides/lire-les-resultats.md
+      - Administrer les catalogues: guides/administrer-les-catalogues.md
+      - Dépannage: guides/depannage.md
+  - Référence:
+      - Les chiffres du modèle: reference/chiffres.md
+      - Les fichiers d'entrée: reference/fichiers-entree.md
+      - Les paramètres de scénario: reference/parametres.md
+      - Les sorties du modèle: reference/sorties.md
+      - L'API REST: reference/api-rest.md
+      - Configuration et services: reference/configuration.md
+      - Écarts code / documentation: reference/ecarts-code-documentation.md
+      - Glossaire: reference/glossaire.md
   - Archive:
       - Documentation antérieure: archive/index.md
       - Accueil (2025): archive/accueil.md

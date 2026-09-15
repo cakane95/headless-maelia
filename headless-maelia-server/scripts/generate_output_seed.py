@@ -47,8 +47,18 @@ NON_EXPRIMABLE = "<?>"
 
 
 def lire(chemin: pathlib.Path) -> str:
-    """Le modele est en ISO-8859-1 : ses accents ne sont pas de l'UTF-8."""
-    return chemin.read_text(encoding="latin-1")
+    """Le texte d'un fichier du modele, quel que soit son encodage.
+
+    Le modele en melange deux : les fichiers recents sont en UTF-8, les plus
+    anciens en ISO-8859-1. Lire les premiers comme les seconds ne leve aucune
+    erreur — c'est ce qui rend le piege coûteux : les accents des commentaires
+    ressortaient en « Ã© » jusque dans le catalogue et dans l'API.
+    """
+    brut = chemin.read_bytes()
+    try:
+        return brut.decode("utf-8")
+    except UnicodeDecodeError:
+        return brut.decode("latin-1")
 
 
 def sans_commentaires(source: str) -> str:

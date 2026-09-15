@@ -3,7 +3,7 @@
     "id": "Assolement_SDC",
     "label": "Assolement SDC",
     "theme": "ASSOLEMENT",
-    "description": "[annee][SDC] Surface (ha) et nombre de parcelles par systeme de culture (ITK x rotation x sol x â¦)",
+    "description": "[annee][SDC] Surface (ha) et nombre de parcelles par systeme de culture (ITK x rotation x sol x …)",
     "flag": "Assolement_SDC",
     "default": false,
     "files": [
@@ -101,7 +101,7 @@
     "id": "recolteParcelles",
     "label": "Recolte Parcelles",
     "theme": "ASSOLEMENT",
-    "description": "Assolement ; recolteParcelles // Permet de dÃ©terminer pour quaque annÃ©e et pour chaque parcelle l'espece rÃ©coltÃ©e leur rendement (attention, les couverts ne sont pas pris en compte)",
+    "description": "Assolement ; recolteParcelles // Permet de déterminer pour quaque année et pour chaque parcelle l'espece récoltée leur rendement (attention, les couverts ne sont pas pris en compte)",
     "flag": "recolteParcelles",
     "default": false,
     "files": [
@@ -389,7 +389,7 @@
     "id": "RUEdesSOLs",
     "label": "RUEdes SOLs",
     "theme": "AqYield",
-    "description": "[annee][sol x BVe x itk x SDCref x materiel Irrigation] Fournit par annee l'information du rendement des volumes et de la plage d'irrigation, du drainage Sortie crÃ©e pour le projet RUEdesSOLs",
+    "description": "[annee][sol x BVe x itk x SDCref x materiel Irrigation] Fournit par annee l'information du rendement des volumes et de la plage d'irrigation, du drainage Sortie crée pour le projet RUEdesSOLs",
     "flag": "RUEdesSOLs",
     "default": false,
     "files": [
@@ -959,7 +959,7 @@
     "id": "sortieCalibration",
     "label": "Sortie Calibration",
     "theme": "CALIBRATION",
-    "description": "dÃ©bit simulÃ©: [jour][DOE][debit]",
+    "description": "débit simulé: [jour][DOE][debit]",
     "flag": "sortieCalibration",
     "default": false,
     "files": [
@@ -977,7 +977,7 @@
     "id": "GetClimatParZH",
     "label": "Get Climat Par ZH",
     "theme": "CLIMAT",
-    "description": "Climat : climatParZH ; [jour][Bve] Surface (km2), Tmoy (Â°C), Tmoy du mais (mode de calcul Arvalis)(Â°C), ETP(mm) et Precipitations (mm)",
+    "description": "Climat : climatParZH ; [jour][Bve] Surface (km2), Tmoy (°C), Tmoy du mais (mode de calcul Arvalis)(°C), ETP(mm) et Precipitations (mm)",
     "flag": "GetClimatParZH",
     "default": false,
     "files": [
@@ -1107,7 +1107,7 @@
     "id": "BilanExploitation",
     "label": "Bilan Exploitation",
     "theme": "ECONOMIE",
-    "description": "marges semi-nette exploitation (â¬) et marges semi-nette exploitation (â¬/ha) de l'exploitation",
+    "description": "marges semi-nette exploitation (€) et marges semi-nette exploitation (€/ha) de l'exploitation",
     "flag": "BilanExploitation",
     "default": false,
     "files": [
@@ -1125,7 +1125,7 @@
     "id": "ECO_SDCRef",
     "label": "ECO SDCRef",
     "theme": "ECONOMIE",
-    "description": "[annee][SDCref x type materiel irrigation x type de sol] Moyenne ponderee des surfaces des marges brutes et marges nettes (â¬/ha) pour la sequence de culture de reference pour un type de sol et un type de materiel d'irrigation",
+    "description": "[annee][SDCref x type materiel irrigation x type de sol] Moyenne ponderee des surfaces des marges brutes et marges nettes (€/ha) pour la sequence de culture de reference pour un type de sol et un type de materiel d'irrigation",
     "flag": "ECO_SDCRef",
     "default": false,
     "files": [
@@ -1143,7 +1143,7 @@
     "id": "ECO_coutIrrigationIlot",
     "label": "ECO cout Irrigation Ilot",
     "theme": "ECONOMIE",
-    "description": "[annee][Ilot] cout de l'irrigation sur l'ilot pour les surfaces irriguÃ©es (â¬/ha)",
+    "description": "[annee][Ilot] cout de l'irrigation sur l'ilot pour les surfaces irriguées (€/ha)",
     "flag": "ECO_coutIrrigationIlot",
     "default": false,
     "files": [
@@ -1161,7 +1161,7 @@
     "id": "ECO_espece",
     "label": "ECO espece",
     "theme": "ECONOMIE",
-    "description": "[annee][espece et Territoire] Marge brute et marge semi-nette (â¬/ha) par culture",
+    "description": "[annee][espece et Territoire] Marge brute et marge semi-nette (€/ha) par culture",
     "flag": "ECO_espece",
     "default": false,
     "files": [
@@ -1179,7 +1179,7 @@
     "id": "ECO_exploitationDetail",
     "label": "ECO exploitation Detail",
     "theme": "ECONOMIE",
-    "description": "[annee][exploitation x ITK] Marge brute et marge nette (â¬/ha) par ITK par exploitation a suivre (liste fournie en entree). La liste des exploitations a suivre est precisee dans la variable listAgriASuivre",
+    "description": "[annee][exploitation x ITK] Marge brute et marge nette (€/ha) par ITK par exploitation a suivre (liste fournie en entree). La liste des exploitations a suivre est precisee dans la variable listAgriASuivre",
     "flag": "ECO_exploitationDetail",
     "default": false,
     "files": [
@@ -1197,7 +1197,7 @@
     "id": "ECO_exploitationType",
     "label": "ECO exploitation Type",
     "theme": "ECONOMIE",
-    "description": "[annee][exploitations types] Marge brute et marge semi-nette (â¬/ha) par type d'exploitations. Un fichier de type d'exploitations est a renseigner en entree et a placer dans modeleAgricole/agriculteurs/exploitations.csv. Il est structure de maniere simple : 1 ligne d'entete. Puis ID exploitation , ID_Type_Exploitation",
+    "description": "[annee][exploitations types] Marge brute et marge semi-nette (€/ha) par type d'exploitations. Un fichier de type d'exploitations est a renseigner en entree et a placer dans modeleAgricole/agriculteurs/exploitations.csv. Il est structure de maniere simple : 1 ligne d'entete. Puis ID exploitation , ID_Type_Exploitation",
     "flag": "ECO_exploitationType",
     "default": false,
     "files": [
@@ -1215,7 +1215,7 @@
     "id": "ECO_itk",
     "label": "ECO itk",
     "theme": "ECONOMIE",
-    "description": "[annee][ITK et Territoire] Marge brute et marge semi-nette (â¬/ha) par ITK",
+    "description": "[annee][ITK et Territoire] Marge brute et marge semi-nette (€/ha) par ITK",
     "flag": "ECO_itk",
     "default": false,
     "files": [
@@ -1597,7 +1597,7 @@
     "id": "suiviOT",
     "label": "Suivi OT",
     "theme": "ITK",
-    "description": "[jour][parcelle x OT] Cumul des surfaces ou du nombre de parcelles ayant subit une operation technique pour un ITK pour le jour julien donnee Attention fichier probablement lourd a creer pour un territoire entier La liste des OT a suivre est definie dans listOTASuivreEnSortie Valeur par dÃ©faut : [\"IRRIGATION\", \"RECOLTE\", \"SEMIS\", \"BINAGE_SOL\", \"FERTI\", \"PHYTO\", \"REPRISE_TRAVAIL_SOL\", \"TRAVAIL_SOL\"]",
+    "description": "[jour][parcelle x OT] Cumul des surfaces ou du nombre de parcelles ayant subit une operation technique pour un ITK pour le jour julien donnee Attention fichier probablement lourd a creer pour un territoire entier La liste des OT a suivre est definie dans listOTASuivreEnSortie Valeur par défaut : [\"IRRIGATION\", \"RECOLTE\", \"SEMIS\", \"BINAGE_SOL\", \"FERTI\", \"PHYTO\", \"REPRISE_TRAVAIL_SOL\", \"TRAVAIL_SOL\"]",
     "flag": "suiviOT",
     "default": true,
     "files": [
@@ -2045,7 +2045,7 @@
     "id": "travailParAgri",
     "label": "Travail Par Agri",
     "theme": "TRAVAIL",
-    "description": "[jour et anne][Type d'Agri] temps de travail par agri (h) par jour ou par an et nombre de jour travaille (i.e. avec au moins une tÃ¢che sur la journee) par agri par an",
+    "description": "[jour et anne][Type d'Agri] temps de travail par agri (h) par jour ou par an et nombre de jour travaille (i.e. avec au moins une tâche sur la journee) par agri par an",
     "flag": "travailParAgri",
     "default": false,
     "files": [
@@ -2247,7 +2247,7 @@
     "id": "travailParTypeExploitation",
     "label": "Travail Par Type Exploitation",
     "theme": "TRAVAIL",
-    "description": "[jour et annee][Type d'exploitation] temps de travail, nombre moyen de jour travaille nombre moyen de jour a plus de 80% du temps de travail disponible, par type d'exploitations (h) , par jour ou par an et nombre de jour travaille (i.e. avec au moins une tÃ¢che sur la journee) par agri par an",
+    "description": "[jour et annee][Type d'exploitation] temps de travail, nombre moyen de jour travaille nombre moyen de jour a plus de 80% du temps de travail disponible, par type d'exploitations (h) , par jour ou par an et nombre de jour travaille (i.e. avec au moins une tâche sur la journee) par agri par an",
     "flag": "travailParTypeExploitation",
     "default": false,
     "files": [
