@@ -90,6 +90,32 @@
 }
 .chart-slot > * { width: 100%; }
 
+/* ── Lectures enregistrées ─────────────────────────────────────────── */
+/* Au-dessus de la barre : ce sont des raccourcis vers une configuration, pas
+   un réglage du graphique courant. */
+.saved { margin-bottom: var(--space-4); }
+.saved .chip {
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+}
+.saved .chip > button {
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+}
+.chip__remove {
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-1);
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+}
+.chip__remove:hover { color: var(--danger); }
+
 /* ── Lectures proposées ────────────────────────────────────────────── */
 .chips {
   display: flex;

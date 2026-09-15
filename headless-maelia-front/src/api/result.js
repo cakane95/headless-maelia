@@ -14,6 +14,14 @@ export const resultApi = {
     request(`/api/v1/runs/${runId}/outputs/${file(name)}/series`, json("POST", query)),
   comparison: (projectId, payload) =>
     request(`/api/v1/projects/${projectId}/output-comparison`, json("POST", payload)),
+  // Lectures enregistrées : une configuration de graphique, rejouable sur
+  // n'importe quelle exécution du projet.
+  views: (projectId) => request(`/api/v1/projects/${projectId}/output-views`),
+  saveView: (projectId, payload) =>
+    request(`/api/v1/projects/${projectId}/output-views`, json("POST", payload)),
+  deleteView: (viewId) =>
+    request(`/api/v1/output-views/${viewId}`, { method: "DELETE" }),
+
   // Téléchargement : le navigateur suit le lien lui-même, sans passer par fetch.
   downloadUrl: (runId, name) =>
     `${API_URL}/api/v1/runs/${runId}/outputs/${file(name)}/download`,

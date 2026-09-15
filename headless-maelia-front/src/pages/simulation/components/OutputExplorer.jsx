@@ -8,6 +8,7 @@ import { useChart } from "../../../hooks/useChart";
 import { describeChart, download, toCsv } from "../../../utils/chart";
 import ChartBuilder from "./ChartBuilder";
 import ChartHead from "./ChartHead";
+import SaveView from "./SaveView";
 import ChartSuggestions from "./ChartSuggestions";
 import ChartView from "./ChartView";
 import OutputPreview from "./OutputPreview";
@@ -18,17 +19,23 @@ import OutputPreview from "./OutputPreview";
  *  l'ajuste ensuite — et les réglages s'ouvrent **sous** lui pour qu'il reste
  *  visible pendant qu'on les change.
  */
-export default function OutputExplorer({ projectId, runIds, fileName }) {
+export default function OutputExplorer({ projectId, runIds, fileName, view, onSaved }) {
   const [config, setConfig] = useState(null);
   const [tuning, setTuning] = useState(false);
   const profile = useAsync(() => resultApi.profile(runIds[0], fileName), [runIds[0], fileName]);
 
-  // Le fichier s'ouvre sur la première lecture proposée : un graphique vide
-  // n'apprendrait rien de ce que la simulation a produit.
+  // Une lecture enregistrée l'emporte : si l'utilisateur en a choisi une, c'est
+  // elle qu'il veut voir, pas la proposition par défaut. Sinon, le fichier
+  // s'ouvre sur la première lecture proposée — un graphique vide n'apprendrait
+  // rien de ce que la simulation a produit.
   useEffect(() => {
+    if (view) {
+      setConfig({ title: view.name, chart: view.chart, query: view.query });
+      return;
+    }
     const first = profile.data?.suggestions?.[0];
     setConfig(first ? { title: first.title, chart: first.chart, query: first.query } : null);
-  }, [profile.data]);
+  }, [profile.data, view]);
 
   const chart = useChart(projectId, runIds, fileName, config?.query);
   const columns = profile.data?.columns ?? [];
@@ -52,6 +59,16 @@ export default function OutputExplorer({ projectId, runIds, fileName }) {
               exportable={chart.data?.rows?.length > 0}
               onTune={() => setTuning((open) => !open)}
               onExport={() => exportCsv(chart.data, config.query, fileName)}
+              save={
+                <SaveView
+                  projectId={projectId}
+                  fileName={fileName}
+                  chart={config.chart}
+                  query={config.query}
+                  suggestedName={config.title ?? ""}
+                  onSaved={onSaved}
+                />
+              }
             />
 
             <div className="chart-slot">

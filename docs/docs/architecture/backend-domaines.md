@@ -53,7 +53,7 @@ flowchart TB
 | `dataset` | 10 | 1 932 | `DatasetRepository`, `BlobStore`, `DraftStore`, `RecordProjection` |
 | `scenario` | 7 | 566 | `ScenarioRepository` |
 | `run` | 6 | 754 | — *(pilote GAMA directement)* |
-| `result` | 6 | 630 | `OutputStore` |
+| `result` | 9 | 860 | `OutputStore` |
 | `shared` + `worker` | 7 | 580 | — |
 
 ---
@@ -549,12 +549,24 @@ d'un scénario resterait une propriété invérifiable.
 Un run qui n'a pas produit le fichier est **ignoré, pas fatal** — un run en échec
 a toute sa place dans une comparaison.
 
+### Lectures enregistrées
+
+Une configuration de graphique se reconstruit à la main — une fois. Reconstruire
+les sept figures d'un rapport à chaque exécution, non : une lecture enregistrée
+porte son fichier, son type de tracé et sa requête, et **appartient au projet**,
+pas au run sur lequel elle a été bâtie. C'est ce qui permet de redessiner la même
+figure sur la simulation suivante.
+
+Enregistrer deux fois sous le même nom **met à jour** la lecture au lieu d'en
+créer une seconde : deux pastilles identiques ne seraient pas une fonctionnalité.
+
 ### API
 
 `GET /runs/{id}/outputs` · `GET /runs/{id}/outputs/{nom}/profile` ·
 `GET /runs/{id}/outputs/{nom}/preview` · `GET /runs/{id}/outputs/{nom}/text` ·
 `GET /runs/{id}/outputs/{nom}/download` · `POST /runs/{id}/outputs/{nom}/series` ·
-`POST /projects/{id}/output-comparison`
+`POST /projects/{id}/output-comparison` ·
+`GET|POST /projects/{id}/output-views` · `DELETE /output-views/{id}`
 
 !!! warning "Un nom de fichier vient du client"
     `FileOutputStore` résout le chemin puis vérifie qu'il est bien **sous** le

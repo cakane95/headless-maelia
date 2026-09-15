@@ -9,7 +9,7 @@ import OutputText from "./OutputText";
  *  Un binaire n'est pas une impasse : il se télécharge. Dire « illisible » sans
  *  proposer le fichier laisserait l'utilisateur sans recours.
  */
-export default function OutputPane({ projectId, runIds, file }) {
+export default function OutputPane({ projectId, runIds, file, view, onSaved }) {
   if (!file) {
     return (
       <Card>
@@ -19,7 +19,15 @@ export default function OutputPane({ projectId, runIds, file }) {
   }
 
   if (file.kind === "TABLE") {
-    return <OutputExplorer projectId={projectId} runIds={runIds} fileName={file.name} />;
+    return (
+      <OutputExplorer
+        projectId={projectId}
+        runIds={runIds}
+        fileName={file.name}
+        view={view}
+        onSaved={onSaved}
+      />
+    );
   }
   if (file.kind === "TEXT") {
     return <OutputText runId={runIds[0]} fileName={file.name} />;

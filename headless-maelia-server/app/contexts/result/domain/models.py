@@ -6,8 +6,10 @@ measures. Nothing here names a MAELIA file or column — the shape is *read* fro
 the file, so a new output works the day the model starts writing it.
 """
 
+import uuid
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
@@ -140,3 +142,20 @@ class SeriesResult:
             {"x": x, **{key: points.get(x) for key, points in keyed.items()}}
             for x in self.x_values
         ]
+
+
+@dataclass(frozen=True, slots=True)
+class OutputView:
+    """A reading of an output file, saved under a name.
+
+    It travels with its file and its chart type: applying it to another run is
+    the whole point, and a query without them would not be replayable.
+    """
+
+    id: uuid.UUID
+    project_id: uuid.UUID
+    name: str
+    file_name: str
+    chart: ChartType
+    query: SeriesQuery
+    created_at: datetime | None = None

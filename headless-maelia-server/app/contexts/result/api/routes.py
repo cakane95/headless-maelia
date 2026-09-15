@@ -11,6 +11,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.result.application import use_cases
 from app.contexts.result.domain.models import (
@@ -20,8 +21,11 @@ from app.contexts.result.domain.models import (
     OutputKind,
     SeriesQuery,
 )
+from app.contexts.result.domain.models import OutputView
 from app.contexts.result.infrastructure.file_store import FileOutputStore
+from app.contexts.result.infrastructure.repository import SqlOutputViewRepository
 from app.contexts.run.infrastructure import redis_store as runs
+from app.shared.database import get_session
 from app.shared.errors import NotFoundError, ValidationError
 
 router = APIRouter(prefix="/api/v1", tags=["results"])
@@ -32,6 +36,14 @@ def store() -> FileOutputStore:
 
 
 Store = Annotated[FileOutputStore, Depends(store)]
+Session = Annotated[AsyncSession, Depends(get_session)]
+
+
+def views(session: Session) -> SqlOutputViewRepository:
+    return SqlOutputViewRepository(session)
+
+
+Views = Annotated[SqlOutputViewRepository, Depends(views)]
 
 
 async def _run(run_id: str) -> dict[str, Any]:
@@ -222,3 +234,72 @@ async def compare(
                            series=_render_series(result))
         for run, result in results
     ]
+
+
+# ── Lectures enregistrées ───────────────────────────────────────────────────
+
+class ViewIn(BaseModel):
+    name: str = Field(min_length=1, max_length=160)
+    file_name: str
+    chart: ChartType
+    query: SeriesQueryIn
+
+
+class ViewOut(BaseModel):
+    id: uuid.UUID
+    name: str
+    file_name: str
+    chart: ChartType
+    query: SeriesQueryIn
+
+
+def _render_view(view: OutputView) -> ViewOut:
+    return ViewOut(
+        id=view.id,
+        name=view.name,
+        file_name=view.file_name,
+        chart=view.chart,
+        query=SeriesQueryIn(
+            x=view.query.x,
+            measures=list(view.query.measures),
+            series_by=view.query.series_by,
+            aggregate=view.query.aggregate,
+            filters={k: list(v) for k, v in view.query.filters.items()},
+            limit=view.query.limit,
+        ),
+    )
+
+
+@router.get("/projects/{project_id}/output-views", response_model=list[ViewOut])
+async def list_views(views: Views, project_id: uuid.UUID) -> list[ViewOut]:
+    """Readings saved for this project, applicable to any of its runs."""
+    return [_render_view(v) for v in await views.list_for_project(project_id)]
+
+
+@router.post("/projects/{project_id}/output-views", response_model=ViewOut, status_code=201)
+async def save_view(
+    views: Views, session: Session, project_id: uuid.UUID, payload: ViewIn
+) -> ViewOut:
+    """Save a reading. Saving twice under the same name updates it.
+
+    The reading belongs to the **project**, not to the run it was built on: a
+    figure of a report is meant to be redrawn on the next execution.
+    """
+    view = await views.save(
+        OutputView(
+            id=uuid.uuid4(),
+            project_id=project_id,
+            name=payload.name.strip(),
+            file_name=payload.file_name,
+            chart=payload.chart,
+            query=payload.query.to_query(),
+        )
+    )
+    await session.commit()
+    return _render_view(view)
+
+
+@router.delete("/output-views/{view_id}", status_code=204)
+async def delete_view(views: Views, session: Session, view_id: uuid.UUID) -> None:
+    await views.delete(view_id)
+    await session.commit()

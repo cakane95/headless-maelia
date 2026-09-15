@@ -9,6 +9,7 @@ import PageHeader from "../../components/PageHeader";
 import { useAsync } from "../../hooks/useAsync";
 import CompareRuns from "./components/CompareRuns";
 import OutputPane from "./components/OutputPane";
+import SavedViews from "./components/SavedViews";
 import ResultsToolbar from "./components/ResultsToolbar";
 
 /** Résultats d'une exécution.
@@ -21,9 +22,11 @@ export default function RunResults() {
   const { projectId, runId } = useParams();
   const [compared, setCompared] = useState([]);
   const [fileName, setFileName] = useState(null);
+  const [view, setView] = useState(null);
 
   const runs = useAsync(() => projectRunApi.list(projectId), [projectId]);
   const files = useAsync(() => resultApi.outputs(runId), [runId]);
+  const views = useAsync(() => resultApi.views(projectId), [projectId]);
   const runIds = [runId, ...compared];
 
   // Les fichiers changent avec l'exécution : on ouvre le premier qui se trace.
@@ -32,6 +35,18 @@ export default function RunResults() {
     const first = list.find((f) => f.kind === "TABLE") ?? list[0];
     setFileName((current) => (list.some((f) => f.name === current) ? current : first?.name ?? null));
   }, [files.data]);
+
+  /** Une lecture porte son fichier : l'appliquer peut donc en changer. */
+  function apply(chosen) {
+    setFileName(chosen.file_name);
+    setView(chosen);
+  }
+
+  async function forget(chosen) {
+    await resultApi.deleteView(chosen.id);
+    if (view?.id === chosen.id) setView(null);
+    views.reload();
+  }
 
   const finished = (runs.data ?? []).filter((run) => run.status === "FINISHED");
   const current = finished.find((run) => run.id === runId);
@@ -53,10 +68,22 @@ export default function RunResults() {
           </Card>
         ) : (
           <>
+            <SavedViews
+              views={views.data ?? []}
+              active={view?.id}
+              onApply={apply}
+              onDelete={forget}
+            />
+
             <ResultsToolbar
               files={files.data ?? []}
               fileName={fileName}
-              onFile={setFileName}
+              onFile={(name) => {
+                // Changer de fichier à la main quitte la lecture enregistrée :
+                // elle ne décrit pas les colonnes de celui-ci.
+                setView(null);
+                setFileName(name);
+              }}
               comparison={
                 <CompareRuns
                   runs={finished.filter((run) => run.id !== runId)}
@@ -69,6 +96,8 @@ export default function RunResults() {
               projectId={projectId}
               runIds={runIds}
               file={(files.data ?? []).find((f) => f.name === fileName)}
+              view={view}
+              onSaved={views.reload}
             />
           </>
         )}

@@ -245,12 +245,14 @@ avec le modèle. **Aucun graphique n'est donc écrit en dur.**
 
 ```
 RunResults                  écran : les résultats d'UNE exécution
+├── SavedViews              pastilles : les lectures enregistrées du projet
 ├── ResultsToolbar          barre collante : fichier + « Comparer »
 │   └── CompareRuns         modale : superposer d'autres exécutions
 └── OutputPane              aiguille selon la nature du fichier
     ├── OutputExplorer      TABLE
     │   ├── ChartSuggestions  lectures proposées par le backend
-    │   ├── ChartHead         résumé en une phrase + Réglages + Exporter
+    │   ├── ChartHead         résumé en une phrase + Réglages + Exporter + Enregistrer
+    │   │   └── SaveView      modale : nommer la lecture
     │   ├── ChartView         tracé recharts, couleurs du thème
     │   ├── ChartBuilder      axe · agrégat · répartition · filtres · mesures
     │   └── OutputPreview     lignes brutes, repliées
