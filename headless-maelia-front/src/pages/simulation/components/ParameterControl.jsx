@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
+import ParameterTextInput from "./ParameterTextInput";
+import SourcedValue from "./SourcedValue";
+import TagInput from "./TagInput";
+import { toText } from "../../../utils/parameters";
 
-import { fromText, sameValue, toText } from "../../../utils/parameters";
-
-/** Le contrôle de saisie d'un paramètre, choisi sur le type que le catalogue
- *  lui donne. Rien n'est câblé sur un nom de paramètre MAELIA. */
+/** Le contrôle de saisie d'un paramètre, choisi sur ce que le catalogue en dit.
+ *
+ *  Quatre cas, du plus contraint au plus libre : un booléen, une liste fermée,
+ *  une valeur qui désigne quelque chose dans un fichier du projet, une saisie
+ *  libre. Rien n'est câblé sur un nom de paramètre MAELIA.
+ */
 export default function ParameterControl({ spec, value, onChange }) {
   if (spec.type === "BOOL") {
     return (
@@ -29,45 +34,20 @@ export default function ParameterControl({ spec, value, onChange }) {
     );
   }
 
-  return <TextControl spec={spec} value={value} onChange={onChange} />;
-}
-
-const MODES = { INT: "numeric", FLOAT: "decimal" };
-
-/** Saisie libre, avec son propre texte.
- *
- *  Indispensable pour les nombres : sans texte local, « 1.5 » serait réécrit en
- *  « 1 » dès la frappe du point, et le chiffre décimal deviendrait insaisissable.
- */
-function TextControl({ spec, value, onChange }) {
-  const external = toText(value);
-  const [text, setText] = useState(external);
-
-  // La saisie ne suit la valeur que si elle ne la représente plus : c'est le cas
-  // après « Rétablir », jamais pendant une frappe en cours.
-  useEffect(() => {
-    if (!sameValue(fromText(spec.type, text), value)) setText(external);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [external]);
-
-  function type(next) {
-    setText(next);
-    onChange(fromText(spec.type, next));
+  // La valeur désigne une entité d'un fichier du projet : on la choisit dedans.
+  if (spec.options_from) {
+    return <SourcedValue spec={spec} value={value} onChange={onChange} />;
   }
 
-  const unreadable = MODES[spec.type] && text.trim() !== "" && fromText(spec.type, text) === null;
-
-  return (
-    <>
-      <input
+  if (spec.type === "LIST") {
+    return (
+      <TagInput
         id={spec.name}
-        type="text"
-        inputMode={MODES[spec.type]}
-        value={text}
-        placeholder={spec.type === "LIST" ? "valeurs séparées par des virgules" : undefined}
-        onChange={(event) => type(event.target.value)}
+        values={(Array.isArray(value) ? value : []).filter(Boolean)}
+        onChange={onChange}
       />
-      {unreadable && <small className="hint hint--warn">Valeur non numérique : ignorée.</small>}
-    </>
-  );
+    );
+  }
+
+  return <ParameterTextInput spec={spec} value={value} onChange={onChange} />;
 }

@@ -121,6 +121,7 @@ def load_parameter_seed(path: pathlib.Path | None = None) -> list[ParameterSpec]
             allowed_values=tuple(entry.get("allowed_values") or ()),
             system=entry.get("system", False),
             editable=entry.get("editable", True),
+            options_from=entry.get("options_from"),
             origin="SEED",
         )
         for entry in json.loads(source.read_text(encoding="utf-8"))

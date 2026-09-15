@@ -46,6 +46,29 @@ SYSTEM_PARAMETERS = {
     "idSimulationAPI",
 }
 
+# Parameters whose value designates something living in a data file.
+#
+# The launcher does not say it: `idExploitationAexecuter` expects an identifier
+# that must exist in `exploitations.csv`, and only a reading of the model tells
+# which column. The mapping is therefore explicit here rather than guessed at
+# runtime — the same choice as ORIENTATIONS in the file catalog.
+#
+# Format `<data_spec_id>#<field>`; an empty field means the options are the file
+# **instances** (one price-scenario file per scenario), not a column.
+#
+# Each entry below was checked against the shipped `terrainTest` data: the
+# parameter default is one of the values the source actually contains.
+OPTION_SOURCES = {
+    "idExploitationAexecuter": "agri.agriculteurs.exploitations#ID_EXPL",
+    "listIdExploitationAexecuter": "agri.agriculteurs.exploitations#ID_EXPL",
+    "nomParcelleAffichee": "agri.ilots.dansZone.parcelles#ID_PARCELL",
+    "listParcellesASuivre": "agri.ilots.dansZone.parcelles#ID_PARCELL",
+    "listParcellesPourSortiesAqYield": "agri.ilots.dansZone.parcelles#ID_PARCELL",
+    "idSdcForce": "agri.ilots.dansZone.parcelles#ID_SDC",
+    "listScenarioPrix": "agri.marcheAgricole.prixVentes#",
+    "scenarioDePrixPrincipal": "agri.marcheAgricole.prixVentes#",
+}
+
 GROUP_LABELS = {
     "CHEMINS SELON EXECUTION EN LOCAL OU SUR CLUSTER": "Chemins",
     "PARAMETRES GENERAUX": "Général",
@@ -132,6 +155,7 @@ def main() -> int:
             "system": name in SYSTEM_PARAMETERS,
             # An EXPRESSION default is not a value we can offer for editing.
             "editable": kind != "EXPRESSION" and name not in SYSTEM_PARAMETERS,
+            "options_from": OPTION_SOURCES.get(name),
         })
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)

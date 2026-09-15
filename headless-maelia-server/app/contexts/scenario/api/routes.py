@@ -12,13 +12,19 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.contexts.catalog.infrastructure.repository import SqlParameterRepository
+from app.contexts.catalog.infrastructure.repository import (
+    SqlCatalogRepository,
+    SqlParameterRepository,
+)
+from app.contexts.dataset.infrastructure.blob_store import MinioBlobStore
 from app.contexts.dataset.infrastructure.repository import SqlDatasetRepository
+from app.contexts.scenario.application import options as parameter_options
 from app.contexts.scenario.application import use_cases
 from app.contexts.scenario.domain.models import Scenario
 from app.contexts.scenario.domain.services import effective_parameters, grouped
 from app.contexts.scenario.infrastructure.repository import SqlScenarioRepository
 from app.shared.database import get_session
+from app.shared.errors import NotFoundError
 
 router = APIRouter(prefix="/api/v1", tags=["scenarios"])
 
@@ -51,6 +57,18 @@ class ParameterSpecOut(BaseModel):
     allowed_values: list[str] = Field(default_factory=list)
     system: bool
     editable: bool
+    # '<data_spec_id>#<champ>' : les valeurs acceptables vivent dans un fichier.
+    options_from: str | None = None
+
+
+class OptionsOut(BaseModel):
+    parameter: str
+    values: list[str]
+    data_spec_id: str | None = None
+    field: str | None = None
+    available: bool
+    message: str | None = None
+    truncated: bool
 
 
 class ScenarioIn(BaseModel):
@@ -95,7 +113,7 @@ async def list_parameters(parameters: Parameters) -> list[ParameterSpecOut]:
         ParameterSpecOut(
             name=p.name, label=p.label, group=p.group, type=p.type.value,
             default=p.default, allowed_values=list(p.allowed_values),
-            system=p.system, editable=p.editable,
+            system=p.system, editable=p.editable, options_from=p.options_from,
         )
         for p in await parameters.list_all()
     ]
@@ -108,6 +126,41 @@ async def parameter_groups(parameters: Parameters) -> dict[str, list[str]]:
         group: [s.name for s in specs]
         for group, specs in grouped(await parameters.list_all()).items()
     }
+
+
+@router.get(
+    "/projects/{project_id}/parameters/{name}/options", response_model=OptionsOut
+)
+async def options(
+    parameters: Parameters,
+    datasets: Datasets,
+    session: Session,
+    project_id: uuid.UUID,
+    name: str,
+) -> OptionsOut:
+    """Values this project allows for a parameter.
+
+    Read from the project's own data — the identifiers of *its* farms, not the
+    model's samples. A project that has not loaded the file yet gets
+    `available: false` and keeps a free field, rather than an empty list that
+    would look like « no choice ».
+    """
+    spec = await parameters.get(name)
+    if spec is None:
+        raise NotFoundError(f"paramètre inconnu : {name}")
+
+    found = await parameter_options.parameter_options(
+        spec, SqlCatalogRepository(session), datasets, MinioBlobStore(), project_id
+    )
+    return OptionsOut(
+        parameter=found.parameter,
+        values=list(found.values),
+        data_spec_id=found.data_spec_id,
+        field=found.field,
+        available=found.available,
+        message=found.message,
+        truncated=found.truncated,
+    )
 
 
 # ── Scenarios ───────────────────────────────────────────────────────────────

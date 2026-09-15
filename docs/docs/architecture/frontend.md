@@ -296,9 +296,23 @@ colonne « écarts au modèle » lisible dans la liste.
 champs d'un coup n'est pas une liste, c'est un mur. Une recherche ouvre les
 sections qui répondent.
 
-**Le contrôle vient du type déclaré au catalogue** — booléen, entier, flottant,
-liste, ou liste déroulante quand `allowed_values` est renseigné. Rien n'est câblé
-sur un nom de paramètre MAELIA.
+**Le contrôle vient du type déclaré au catalogue**, du plus contraint au plus
+libre :
+
+| Ce que le catalogue dit | Contrôle |
+|---|---|
+| `BOOL` | interrupteur |
+| `allowed_values` renseigné | liste déroulante |
+| `options_from` renseigné | **étiquettes + sélecteur** ouvert sur les valeurs du projet |
+| `LIST` sans source | **étiquettes libres**, une valeur ajoutée à la validation |
+| le reste | saisie texte ou numérique |
+
+Rien n'est câblé sur un nom de paramètre MAELIA.
+
+**Les valeurs d'un champ lié à un fichier sont chargées à l'ouverture du
+sélecteur**, pas au rendu du formulaire : aller chercher 749 identifiants de
+parcelle pour un champ que personne ne touchera coûterait une requête par
+paramètre et par ouverture de section.
 
 ```
 ScenarioEdit               page : catalogue + scénario
@@ -306,8 +320,17 @@ ScenarioEdit               page : catalogue + scénario
     └── ParameterEditor    écarts, groupement, recherche
         ├── ParameterBar   recherche · écarts seulement · tout rétablir
         └── ParameterGroup une section repliable
-            └── ParameterField  un paramètre, son défaut, son « Rétablir »
+            └── ParameterField      un paramètre, son défaut, son « Rétablir »
+                └── ParameterControl aiguille selon le catalogue
+                    ├── SourcedValue      étiquettes + OptionPicker (modale)
+                    ├── TagInput          liste libre en étiquettes
+                    └── ParameterTextInput saisie texte / numérique
 ```
+
+!!! danger "Une modale s'ouvre **dans** le formulaire du scénario"
+    `Modal` ne passe pas par un portail : la touche Entrée dans le champ de
+    filtrage du sélecteur soumettrait le formulaire, c'est-à-dire enregistrerait
+    le scénario au lieu de filtrer. Le sélecteur neutralise donc Entrée.
 
 !!! warning "Un `input type=number` contrôlé avale le point décimal"
     Analyser la saisie à chaque frappe réécrit « 1. » en « 1 » : le décimal

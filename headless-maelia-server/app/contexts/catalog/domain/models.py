@@ -158,6 +158,10 @@ class ParameterSpec:
     # Imposed by the platform (paths, run id): overriding it would have no effect.
     system: bool = False
     editable: bool = True
+    # Where the acceptable values live, as "<data_spec_id>#<field>". The launcher
+    # never says it: `idExploitationAexecuter` expects an identifier that exists
+    # in a data file, and only a reading of the model tells which one.
+    options_from: str | None = None
     origin: str = "SEED"
 
     def accepts(self, value: object) -> bool:
@@ -179,6 +183,19 @@ class ParameterSpec:
                 return isinstance(value, list)
             case _:
                 return False
+
+    @property
+    def options_source(self) -> tuple[str, str | None] | None:
+        """Where the possible values live: (data_spec_id, field).
+
+        A `None` field means the options are the **instances** of a
+        multi-instance file — one price-scenario file per scenario — and not
+        the values of a column.
+        """
+        if not self.options_from:
+            return None
+        spec_id, _, field = self.options_from.partition("#")
+        return spec_id, (field or None)
 
     def gama_type(self) -> str:
         """Type name expected in a gama-server `load` message."""

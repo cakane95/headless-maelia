@@ -97,4 +97,6 @@ class ParameterSpecRow(Base):
     # Imposed by the platform: overriding it in a scenario has no effect.
     system: Mapped[bool] = mapped_column(Boolean, default=False)
     editable: Mapped[bool] = mapped_column(Boolean, default=True)
+    # '<data_spec_id>#<field>' : ou lire les valeurs acceptables.
+    options_from: Mapped[str | None] = mapped_column(String(200), nullable=True)
     origin: Mapped[str] = mapped_column(String(10), default="SEED")

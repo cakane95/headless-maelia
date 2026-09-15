@@ -584,6 +584,35 @@ dépendances que le module de prétraitement devra respecter.
 | espèce | `culture/especesCultivees.csv` | `reglesDeDecisions.csv`, `prixVentes<scenario>.csv`, `chargesOp.csv` |
 | zone météo | `meteo/polygonesMeteoFrance.shp` | `meteo/observee/<annee>.csv` |
 
+### 6.5 Paramètres qui désignent une entité d'un fichier
+
+Huit paramètres n'attendent pas une valeur libre mais un **identifiant qui doit
+exister** dans les données du projet. Le launcher ne le dit pas : la
+correspondance est déclarée au catalogue (`ParameterSpec.options_from`) et la
+plateforme propose alors les valeurs réellement présentes, au lieu de laisser
+saisir un identifiant que seule l'exécution démentira.
+
+| Paramètre | Source | Champ |
+|---|---|---|
+| `idExploitationAexecuter` | `agriculteurs/exploitations.csv` | `ID_EXPL` |
+| `listIdExploitationAexecuter` | `agriculteurs/exploitations.csv` | `ID_EXPL` |
+| `nomParcelleAffichee` | `ilots/dansZone/parcelles.shp` | `ID_PARCELL` |
+| `listParcellesASuivre` | `ilots/dansZone/parcelles.shp` | `ID_PARCELL` |
+| `listParcellesPourSortiesAqYield` | `ilots/dansZone/parcelles.shp` | `ID_PARCELL` |
+| `idSdcForce` | `ilots/dansZone/parcelles.shp` | `ID_SDC` |
+| `listScenarioPrix` | `marcheAgricole/prixVentes<scenario>.csv` | *les fichiers eux-mêmes* |
+| `scenarioDePrixPrincipal` | `marcheAgricole/prixVentes<scenario>.csv` | *les fichiers eux-mêmes* |
+
+Chaque ligne a été vérifiée contre les données livrées : la valeur par défaut du
+paramètre figure bien parmi celles de la source. Les identifiants d'un shapefile
+sont lus dans son `.dbf` seul — la géométrie n'est pas nécessaire pour lister des
+identifiants.
+
+Deux familles restent à rattacher, faute de source vérifiable dans le code :
+`listAgriASuivre` (identifiants numériques d'agriculteurs) et
+`typeDeSolForceParcelle`. Les laisser libres vaut mieux qu'un rattachement
+approximatif qui proposerait les mauvaises valeurs.
+
 ## 7. Chiffres
 
 | | Quantité |

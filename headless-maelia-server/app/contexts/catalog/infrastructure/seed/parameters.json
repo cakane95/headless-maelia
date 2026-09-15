@@ -6,7 +6,8 @@
     "type": "BOOL",
     "default": false,
     "system": true,
-    "editable": false
+    "editable": false,
+    "options_from": null
   },
   {
     "name": "cheminRacineMaelia",
@@ -15,7 +16,8 @@
     "type": "EXPRESSION",
     "default": "mapCheminRacineMaeliaSelonClusterOuPas[executerSurCluster]",
     "system": true,
-    "editable": false
+    "editable": false,
+    "options_from": null
   },
   {
     "name": "cheminModeleVersDonnees",
@@ -24,7 +26,8 @@
     "type": "EXPRESSION",
     "default": "cheminRacineMaelia + \"includes/\"",
     "system": true,
-    "editable": false
+    "editable": false,
+    "options_from": null
   },
   {
     "name": "cheminRelatifDuDossierDeSortieDeSimulation",
@@ -33,7 +36,8 @@
     "type": "EXPRESSION",
     "default": "cheminRacineMaelia + \"models/main/log\"",
     "system": true,
-    "editable": false
+    "editable": false,
+    "options_from": null
   },
   {
     "name": "anneeDebutSimulation",
@@ -42,7 +46,8 @@
     "type": "INT",
     "default": 2019,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nbAnneesSimulation",
@@ -51,7 +56,8 @@
     "type": "INT",
     "default": 3,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nomSimulation",
@@ -60,7 +66,8 @@
     "type": "STRING",
     "default": "",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nomDecoupageZonePourLectureFichiers",
@@ -69,7 +76,8 @@
     "type": "STRING",
     "default": "terrainTest",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "executerModeleSurUneZH",
@@ -78,7 +86,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "listNomsZHsDecoupageZone",
@@ -89,7 +98,8 @@
       ""
     ],
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "executerUnSeulAgriculteur",
@@ -98,7 +108,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "idExploitationAexecuter",
@@ -107,7 +118,8 @@
     "type": "STRING",
     "default": "mineral_beauce_29",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": "agri.agriculteurs.exploitations#ID_EXPL"
   },
   {
     "name": "executerSurEnsembleExploit",
@@ -116,7 +128,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "listIdExploitationAexecuter",
@@ -128,7 +141,8 @@
       "expl_15"
     ],
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": "agri.agriculteurs.exploitations#ID_EXPL"
   },
   {
     "name": "executerUneSeuleParcelle",
@@ -137,7 +151,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nomParcelleAffichee",
@@ -146,7 +161,8 @@
     "type": "STRING",
     "default": "beauce_48_1",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": "agri.ilots.dansZone.parcelles#ID_PARCELL"
   },
   {
     "name": "nomScenarioClimatique",
@@ -155,7 +171,8 @@
     "type": "STRING",
     "default": "rcp8.5",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "utiliserMemeDonnesMeteoPartout",
@@ -164,7 +181,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "idPointMeteoUnique",
@@ -173,7 +191,8 @@
     "type": "STRING",
     "default": "3994",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "idSimulationAPI",
@@ -182,7 +201,8 @@
     "type": "STRING",
     "default": "",
     "system": true,
-    "editable": false
+    "editable": false,
+    "options_from": null
   },
   {
     "name": "verboseMode",
@@ -191,7 +211,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "executerModeleHydrographique",
@@ -200,7 +221,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nomChoixModeleHydrographique",
@@ -209,7 +231,8 @@
     "type": "STRING",
     "default": "SWAT",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "coefficientSurfaceRuissellementLag",
@@ -218,7 +241,8 @@
     "type": "FLOAT",
     "default": 4.0,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "retardEntreSortiSolEtEntreeAquifereGlobal",
@@ -227,7 +251,8 @@
     "type": "FLOAT",
     "default": 31.0,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "coefPercolationVersAquifereProfondGlobal",
@@ -236,7 +261,8 @@
     "type": "FLOAT",
     "default": 1.0,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "coefficientManningTerrain",
@@ -245,7 +271,8 @@
     "type": "FLOAT",
     "default": 0.12,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "isPrelevementEtRejetSimules",
@@ -254,7 +281,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "affecterEqIrrSiInexistant",
@@ -263,7 +291,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nomPtRefAffichee",
@@ -272,7 +301,8 @@
     "type": "STRING",
     "default": "O5882510",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "listNomsZHsDebitComplement",
@@ -283,7 +313,8 @@
       "549"
     ],
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "listeExutoiresZoneMaelia",
@@ -295,7 +326,8 @@
       "208"
     ],
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "ID_RESSOURCES_INFINIES",
@@ -306,7 +338,8 @@
       "SURF_EAU0000000025689668"
     ],
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "executerModeleAgricole",
@@ -315,7 +348,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nomChoixAssolement",
@@ -324,7 +358,8 @@
     "type": "STRING",
     "default": "Donnees",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "anneeDeReferenceRPG",
@@ -333,7 +368,8 @@
     "type": "INT",
     "default": 2014,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "activerITKalternatif",
@@ -342,7 +378,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "forcerSemisCI",
@@ -351,7 +388,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "avecContrainteDeMainOeuvre",
@@ -360,7 +398,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "plusieursTravauxDuSolParITK",
@@ -369,7 +408,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "plusieursFertilisationsParITK",
@@ -378,7 +418,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "plusieursTraitementsPhytoParITK",
@@ -387,7 +428,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "adaptationFertilisation",
@@ -396,7 +438,8 @@
     "type": "STRING",
     "default": "",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "corpenProfondeurTemporelle",
@@ -405,7 +448,8 @@
     "type": "INT",
     "default": 3,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "gestionStocksEngrais",
@@ -414,7 +458,8 @@
     "type": "STRING",
     "default": "territoire",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "avecIlotsHorsZone",
@@ -423,7 +468,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nomChoixModeleCroissancePlante",
@@ -432,7 +478,8 @@
     "type": "STRING",
     "default": "AqYieldNC",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nomChoixModeleCroissancePrairie",
@@ -441,7 +488,8 @@
     "type": "STRING",
     "default": "HerbSimNC",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "denit_fTemp_option",
@@ -450,7 +498,8 @@
     "type": "STRING",
     "default": "Stics",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "isIrrigationSimulee",
@@ -459,7 +508,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nomChoixModeleIrrigation",
@@ -468,7 +518,8 @@
     "type": "STRING",
     "default": "Simple",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "listScenarioPrix",
@@ -479,7 +530,8 @@
       ""
     ],
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": "agri.marcheAgricole.prixVentes#"
   },
   {
     "name": "scenarioDePrixPrincipal",
@@ -488,7 +540,8 @@
     "type": "STRING",
     "default": "",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": "agri.marcheAgricole.prixVentes#"
   },
   {
     "name": "PREFIXE_CI",
@@ -497,7 +550,8 @@
     "type": "STRING",
     "default": "ci",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "remplacerItkManquants",
@@ -506,7 +560,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "associerIlotMeteoZH",
@@ -515,7 +570,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "option_Finert_calc",
@@ -524,7 +580,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "avecStressClimatique",
@@ -533,7 +590,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "executerParcelleVirtuelle",
@@ -542,7 +600,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "rotationForceeParcelle",
@@ -551,7 +610,8 @@
     "type": "STRING",
     "default": "colza-precPauvre_CP-precRiche_feverole_CP-precRiche",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "gestionPaillesForceeParcelle",
@@ -560,7 +620,8 @@
     "type": "STRING",
     "default": "",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "idSdcForce",
@@ -569,7 +630,8 @@
     "type": "STRING",
     "default": "all",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": "agri.ilots.dansZone.parcelles#ID_SDC"
   },
   {
     "name": "typeDeSolForceParcelle",
@@ -578,7 +640,8 @@
     "type": "STRING",
     "default": "luvisols plateaux inferieurs",
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "surfaceHectareForceParcelle",
@@ -587,7 +650,8 @@
     "type": "FLOAT",
     "default": 10.0,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "executerModeleElevage",
@@ -596,7 +660,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "executerModeleNormatif",
@@ -605,7 +670,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "executerBarrage",
@@ -614,7 +680,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "accelerationTourEauSiRestriction",
@@ -623,7 +690,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "executerEcritureFichiers",
@@ -632,7 +700,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "nb_decimales_sorties",
@@ -641,7 +710,8 @@
     "type": "INT",
     "default": 2,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "sorties_eau",
@@ -650,7 +720,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "sorties_azote",
@@ -659,7 +730,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "sorties_carboneGES",
@@ -668,7 +740,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "sorties_retenues",
@@ -677,7 +750,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "sorties_barrages",
@@ -686,7 +760,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "listAgriASuivre",
@@ -861,7 +936,8 @@
       "343137"
     ],
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "listParcellesASuivre",
@@ -874,7 +950,8 @@
       "082-5658658_03"
     ],
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": "agri.ilots.dansZone.parcelles#ID_PARCELL"
   },
   {
     "name": "Assolement_SDC",
@@ -883,7 +960,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Assolement_itk",
@@ -892,7 +970,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Assolement_espece",
@@ -901,7 +980,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "ECO_espece",
@@ -910,7 +990,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "ECO_itk",
@@ -919,7 +1000,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "ECO_exploitationType",
@@ -928,7 +1010,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "ECO_exploitationDetail",
@@ -937,7 +1020,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "ECO_SDCRef",
@@ -946,7 +1030,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "ECO_coutIrrigationIlot",
@@ -955,7 +1040,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "variablesAqYieldSurParcellesSpecifiees",
@@ -964,7 +1050,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "variablesAqYieldSurParcellesSpecifiees_light",
@@ -973,7 +1060,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "listParcellesPourSortiesAqYield",
@@ -984,7 +1072,8 @@
       "082-5650603_00"
     ],
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": "agri.ilots.dansZone.parcelles#ID_PARCELL"
   },
   {
     "name": "aqYield_eva_trmax_trr_ITK_ZH",
@@ -993,7 +1082,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "debug_fusion_AqYieldNC",
@@ -1002,7 +1092,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "sortiesAqYieldNC",
@@ -1011,7 +1102,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_lixi_typeExploitation",
@@ -1020,7 +1112,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_total_eqC02_typeExploitation",
@@ -1029,7 +1122,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_Cstock_Parcelles",
@@ -1038,7 +1132,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "engrais_utilises_territoire",
@@ -1047,7 +1142,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "engrais_utilises_exploitation",
@@ -1056,7 +1152,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "eqCO2_emissions_NC_Parcelles",
@@ -1065,7 +1162,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_N2O_Parcelles",
@@ -1074,7 +1172,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_NH3_Parcelles",
@@ -1083,7 +1182,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_Nmin_som_res_Parcelles",
@@ -1092,7 +1192,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_Nmin_total_Parcelles",
@@ -1101,7 +1202,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_QNfix_Parcelles",
@@ -1110,7 +1212,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "tpsWFerti_Parcelles",
@@ -1119,7 +1222,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "prixFerti_Parcelles",
@@ -1128,7 +1232,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "recolteParcelles",
@@ -1137,7 +1242,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "eqCO2_synthesis_Parcelles",
@@ -1146,7 +1252,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_GES_Parcelles",
@@ -1155,7 +1262,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "N_lixi_Parcelles",
@@ -1164,7 +1272,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "suivi_journalier_1parc_HerbSimNC",
@@ -1173,7 +1282,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "suivi_ajout_pools_residus",
@@ -1182,7 +1292,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "DrainIlot",
@@ -1191,7 +1302,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "DrainIlot_mois",
@@ -1200,7 +1312,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "DrainIlot_quinzaine",
@@ -1209,7 +1322,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "DrainIlotDetail",
@@ -1218,7 +1332,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "DrainIlotDetail_mois",
@@ -1227,7 +1342,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "DrainIlotDetail_quinzaine",
@@ -1236,7 +1352,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "IrrigationParAgri",
@@ -1245,7 +1362,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "travailParAgri_Irrigation",
@@ -1254,7 +1372,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "DetailsGroupeIrrigation",
@@ -1263,7 +1382,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "irrigationDebug",
@@ -1272,7 +1392,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "IrrigationParcelle",
@@ -1281,7 +1402,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "RDT_itk",
@@ -1290,7 +1412,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "RDT_sol_itk",
@@ -1299,7 +1422,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "RDT_espece",
@@ -1308,7 +1432,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "RDT_parcelle_espece",
@@ -1317,7 +1442,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "sorties_iBio",
@@ -1326,7 +1452,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "DebistSTH",
@@ -1335,7 +1462,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Debit",
@@ -1344,7 +1472,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Prelevements",
@@ -1353,7 +1482,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "PrelevementsZH",
@@ -1362,7 +1492,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "PrelevementsZA",
@@ -1371,7 +1502,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Prelevements_sol_itk",
@@ -1380,7 +1512,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Prelevements_sol_espece",
@@ -1389,7 +1522,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Prelevements_espece",
@@ -1398,7 +1532,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Prelevements_za_espece",
@@ -1407,7 +1542,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Prelevements_za_sol_espece",
@@ -1416,7 +1552,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Prelevements_decoupage_itk",
@@ -1425,7 +1562,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Prelevements_decoupage_typePPA",
@@ -1434,7 +1572,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "Restrictions",
@@ -1443,7 +1582,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "GestionnaireDeBarrage",
@@ -1452,7 +1592,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "debugSortie1parcelleAqYield",
@@ -1461,7 +1602,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "suiviOT",
@@ -1470,7 +1612,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "suiviOTParParcelle",
@@ -1479,7 +1622,8 @@
     "type": "BOOL",
     "default": true,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "suiviOTParParcelleTemps",
@@ -1488,7 +1632,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "suiviOTParParcelle_humidite",
@@ -1497,7 +1642,8 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   },
   {
     "name": "listOTASuivreEnSortie",
@@ -1506,7 +1652,8 @@
     "type": "EXPRESSION",
     "default": "listOT",
     "system": false,
-    "editable": false
+    "editable": false,
+    "options_from": null
   },
   {
     "name": "plan_epandage_actif",
@@ -1515,6 +1662,7 @@
     "type": "BOOL",
     "default": false,
     "system": false,
-    "editable": true
+    "editable": true,
+    "options_from": null
   }
 ]

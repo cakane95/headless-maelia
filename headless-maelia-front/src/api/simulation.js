@@ -47,6 +47,9 @@ export const scenarioApi = {
   update: (id, payload) => request(`/api/v1/scenarios/${id}`, json("PUT", payload)),
   remove: (id) => request(`/api/v1/scenarios/${id}`, { method: "DELETE" }),
   gamaParameters: (id) => request(`/api/v1/scenarios/${id}/gama-parameters`),
+  // Valeurs acceptables d'un paramètre, lues dans les données DU projet.
+  parameterOptions: (projectId, name) =>
+    request(`/api/v1/projects/${projectId}/parameters/${encodeURIComponent(name)}/options`),
 };
 
 export const projectRunApi = {

@@ -107,3 +107,55 @@
 
 /* Saisie que le type ne reconnaît pas : dite, pas bloquée. */
 .hint--warn { color: var(--warning); }
+
+/* ── Valeurs multiples ─────────────────────────────────────────────── */
+/* Une étiquette par valeur : on voit ce que contient la liste, et on en retire
+   une sans recompter les virgules. */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border-radius: var(--radius-pill);
+}
+.tag button {
+  padding: 0;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: inherit;
+  background: none;
+  border: none;
+}
+.tag button:hover { color: var(--danger); }
+
+/* ── Liste de choix (modale) ───────────────────────────────────────── */
+.options {
+  max-height: 320px;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.options li {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+.options li:last-child { border-bottom: none; }
+.options li:hover { background: var(--surface-muted); }
+.options .switch { margin: 0; }
+.options__bulk { margin: var(--space-2) 0 0; }

@@ -186,6 +186,15 @@ cas réel n'en a besoin, et une règle doit rester lisible par un administrateur
 **Une condition illisible ne masque pas le fichier.** Mieux vaut un fichier
 réclamé à tort qu'un fichier silencieusement oublié.
 
+**Un paramètre peut désigner une entité d'un fichier.** `idExploitationAexecuter`
+attend un identifiant qui existe dans `exploitations.csv` — le launcher ne le dit
+pas, seule une lecture du modèle le sait. `ParameterSpec.options_from` porte ce
+lien sous la forme `<data_spec_id>#<champ>` ; un champ vide signifie que les
+choix sont les **instances** du fichier (un fichier de prix par scénario) et non
+les valeurs d'une colonne. Huit paramètres sont concernés, et chaque
+correspondance a été vérifiée contre les données livrées : la valeur par défaut
+du paramètre fait partie de ce que la source contient réellement.
+
 ### Seed
 
 Le catalogue se **régénère depuis le code GAML** et les fichiers réellement
@@ -352,10 +361,31 @@ l'écart au lieu de l'enregistrer.
     validation refuse un booléen là où un entier est attendu, et un test le
     verrouille.
 
+### Les valeurs acceptables viennent du projet
+
+`GET /projects/{id}/parameters/{nom}/options` lit les identifiants **dans les
+données de ce projet-là** : les exploitations de *ce* territoire, pas celles de
+l'échantillon du modèle. La lecture suit la version courante du dataset — celle
+qu'un run sans épinglage consommerait — et sait ouvrir un `.dbf` seul, sans
+télécharger la géométrie.
+
+Trois absences, trois messages distincts, parce qu'ils appellent trois gestes
+différents :
+
+| Situation | Réponse |
+|---|---|
+| Le paramètre n'a pas de source | *ce paramètre est libre* |
+| Le fichier n'est pas chargé dans le projet | *`exploitations.csv` n'est pas encore chargé* |
+| Le fichier est là, la colonne non | *la colonne `ID_SDC` est absente ou vide* |
+
+Dans les trois cas `available: false` : le champ reste **libre à la saisie**, une
+liste vide se lirait comme « aucun choix possible ».
+
 ### API
 
 `GET|POST /projects/{id}/scenarios` · `GET|PUT|DELETE /scenarios/{id}` ·
-`GET /scenarios/{id}/gama-parameters`
+`GET /scenarios/{id}/gama-parameters` ·
+`GET /projects/{id}/parameters/{nom}/options`
 
 ---
 

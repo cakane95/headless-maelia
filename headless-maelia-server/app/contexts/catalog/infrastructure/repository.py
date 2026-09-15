@@ -156,6 +156,7 @@ def _parameter_to_domain(row: ParameterSpecRow) -> ParameterSpec:
         allowed_values=tuple(row.allowed_values.split(SEPARATOR)) if row.allowed_values else (),
         system=row.system,
         editable=row.editable,
+        options_from=row.options_from,
         origin=row.origin,
     )
 
@@ -188,6 +189,7 @@ class SqlParameterRepository:
         row.allowed_values = SEPARATOR.join(spec.allowed_values) or None
         row.system = spec.system
         row.editable = spec.editable
+        row.options_from = spec.options_from
         row.origin = spec.origin
         await self._session.flush()
         return spec
