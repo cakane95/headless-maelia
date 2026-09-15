@@ -26,7 +26,7 @@ export default function ProjectData() {
         title="Données d'entrée"
         lede={
           project.data
-            ? `${project.data.name} — territoire ${project.data.territory}`
+            ? `${project.data.name} — ce que la configuration attend, ce qui est fourni.`
             : "Fichiers attendus par la configuration de modélisation."
         }
       />

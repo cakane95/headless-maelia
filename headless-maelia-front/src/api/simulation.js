@@ -9,7 +9,6 @@ export const projectApi = {
   remove: (id) => request(`/api/v1/projects/${id}`, { method: "DELETE" }),
   get: (id) => request(`/api/v1/projects/${id}`),
   create: (payload) => request("/api/v1/projects", json("POST", payload)),
-  territories: () => request("/api/v1/territories"),
   defaultConfiguration: () => request("/api/v1/default-configuration"),
   configure: (id, config) =>
     request(`/api/v1/projects/${id}/modeling-configuration`, json("PUT", config)),

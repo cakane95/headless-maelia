@@ -11,7 +11,6 @@ export default function ProjectsTable({ projects, onSelect }) {
       <thead>
         <tr>
           <th>Nom</th>
-          <th>Territoire</th>
           <th>Description</th>
         </tr>
       </thead>
@@ -19,7 +18,6 @@ export default function ProjectsTable({ projects, onSelect }) {
         {projects.map((project) => (
           <tr key={project.id} className="clickable" onClick={() => onSelect(project.id)}>
             <td>{project.name}</td>
-            <td><code>{project.territory}</code></td>
             <td className="muted">{project.description || "—"}</td>
           </tr>
         ))}

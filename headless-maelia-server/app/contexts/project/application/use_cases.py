@@ -9,7 +9,13 @@ from app.contexts.catalog.domain.services import applicable_specs
 from app.contexts.project.domain.models import Completion, Project
 from app.contexts.project.domain.ports import DatasetInventoryPort, ProjectRepository
 from app.contexts.project.domain.services import compute_completion
+from app.shared.config import settings
 from app.shared.errors import NotFoundError, ValidationError
+
+# Repli quand le volume partagé n'expose aucun territoire : le run échouera à la
+# matérialisation, avec un message clair, plutôt qu'à la création sur un champ
+# que personne n'a rempli.
+DEFAULT_TERRITORY = settings.MAELIA_DEFAULT_TERRITORY
 
 
 async def list_projects(repository: ProjectRepository) -> list[Project]:
@@ -26,18 +32,25 @@ async def get_project(repository: ProjectRepository, project_id: uuid.UUID) -> P
 async def create_project(
     repository: ProjectRepository,
     name: str,
-    territory: str,
     valid_territories: list[str],
+    territory: str | None = None,
     description: str | None = None,
     modeling_config: dict[str, Any] | None = None,
 ) -> Project:
-    # An unknown territory would only surface when launching a run, several
-    # screens later: reject it right away.
-    if valid_territories and territory not in valid_territories:
+    """Create a project. The territory is not a choice the user makes.
+
+    Every project starts from the reference data set and overlays its own files
+    onto it; `nomDecoupageZonePourLectureFichiers` remains a technical name the
+    run needs, not a decision. It stays accepted as a parameter for the test
+    bench and for tests — and is then checked, because an unknown territory
+    would otherwise only surface when launching a run, several screens later.
+    """
+    chosen = territory or (valid_territories[0] if valid_territories else DEFAULT_TERRITORY)
+    if territory and valid_territories and territory not in valid_territories:
         raise ValidationError(
             f"territoire inconnu : {territory}. Disponibles : {', '.join(valid_territories)}"
         )
-    return await repository.save(Project.create(name, territory, description, modeling_config))
+    return await repository.save(Project.create(name, chosen, description, modeling_config))
 
 
 async def update_project(

@@ -3,8 +3,9 @@ import { useState } from "react";
 import { projectApi } from "../../../api";
 import Field from "../../../components/Field";
 
-/** Nom et description d'un projet. Le territoire ne change pas : il détermine
- *  quels fichiers sont lus, le modifier invaliderait les données déjà chargées. */
+/** Nom et description d'un projet — les deux seules choses qu'il porte en
+ *  propre. Les données viennent des téléversements, la configuration a son
+ *  bloc, le reste n'est pas une décision de l'utilisateur. */
 export default function IdentityForm({ project, onSaved, onCancel }) {
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description ?? "");
@@ -30,7 +31,7 @@ export default function IdentityForm({ project, onSaved, onCancel }) {
       <Field label="Nom">
         <input value={name} onChange={(e) => setName(e.target.value)} required />
       </Field>
-      <Field label="Description" hint={`Territoire : ${project.territory} (non modifiable).`}>
+      <Field label="Description">
         <input value={description} onChange={(e) => setDescription(e.target.value)} />
       </Field>
       <p>

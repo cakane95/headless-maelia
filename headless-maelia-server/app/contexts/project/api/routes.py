@@ -38,7 +38,10 @@ Projects = Annotated[SqlProjectRepository, Depends(_projects)]
 
 class ProjectIn(BaseModel):
     name: str
-    territory: str
+    # Non renseigné : le projet prend le jeu de référence. Le territoire n'est
+    # pas un choix de l'utilisateur, c'est le socle sur lequel ses fichiers se
+    # superposent.
+    territory: str | None = None
     description: str | None = None
     modeling_config: dict[str, Any] = Field(default_factory=dict)
 
