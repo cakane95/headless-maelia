@@ -129,10 +129,15 @@ async def get_run(run_id: str) -> dict[str, Any]:
 
 @router.post("/runs/{run_id}/cancel")
 async def cancel_run(run_id: str) -> dict[str, Any]:
-    """Mark a run as cancelled.
+    """Demander l'arrêt d'une exécution.
 
-    Does not yet interrupt the simulation on the GAMA side: the worker task will
-    need to be signalled so it can send `stop` on its open session.
+    L'état passe à CANCELLED dans Redis ; c'est le signal que le worker guette
+    entre deux messages de GAMA. Il envoie alors `stop` sur sa session ouverte,
+    puis rend la main. L'arrêt n'est donc pas instantané — il prend le temps
+    d'un aller-retour, quelques secondes — mais il libère réellement la JVM.
+
+    Sans cela, un run abandonné continuait de tourner : il gardait sa mémoire,
+    et plusieurs d'entre eux finissaient par faire tuer `gama-headless`.
     """
     run = await runs.get(run_id)
     if run is None:

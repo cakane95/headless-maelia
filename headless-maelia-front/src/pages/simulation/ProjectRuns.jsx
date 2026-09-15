@@ -43,6 +43,10 @@ export default function ProjectRuns() {
             runs={runs.data ?? []}
             onSelect={(id) => navigate(`${base}/${id}`)}
             onResults={(id) => navigate(`${base}/${id}/resultats`)}
+            onStop={async (id) => {
+              await projectRunApi.cancel(id);
+              runs.reload();
+            }}
           />
         </AsyncBoundary>
       </Card>

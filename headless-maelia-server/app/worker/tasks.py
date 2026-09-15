@@ -9,7 +9,11 @@ from typing import Any
 
 from app.contexts.dataset.application import materialize as includes
 from app.contexts.run.infrastructure import redis_store as runs
-from app.contexts.run.infrastructure.gama_session import GamaError, GamaSession
+from app.contexts.run.infrastructure.gama_session import (
+    GamaError,
+    GamaSession,
+    RunCancelled,
+)
 from app.contexts.run.infrastructure.model_lock import model_load_lock
 from app.contexts.run.infrastructure.redis_store import RunStatus
 from app.shared.config import settings
@@ -88,6 +92,17 @@ async def run_simulation(ctx: dict[str, Any], run_id: str) -> dict[str, Any]:
             run_id, text.rstrip(), cycle=state["day"], current_date=state["date"]
         )
 
+    async def arret_demande() -> bool:
+        """L'utilisateur a-t-il demandé l'arrêt ?
+
+        L'état vit dans Redis, écrit par l'API : c'est le seul canal que le
+        worker et l'API partagent déjà. Une lecture toutes les deux secondes
+        pendant que la simulation parle coûte moins qu'un run qui continue
+        d'occuper la JVM après qu'on l'a abandonné.
+        """
+        courant = await runs.get(run_id)
+        return bool(courant and courant["status"] == RunStatus.CANCELLED)
+
     user_parameters = run.get("parameters") or []
     territory = resolve_territory(user_parameters)
 
@@ -132,7 +147,17 @@ async def run_simulation(ctx: dict[str, Any], run_id: str) -> dict[str, Any]:
             )
 
             await session.play()
-            await session.wait_for_end()
+            try:
+                await session.wait_for_end(cancelled=arret_demande)
+            except RunCancelled:
+                # `stop` doit partir TANT QUE le socket est ouvert : en sortant
+                # du `async with`, la session est fermee et GAMA detruit la
+                # simulation sans qu'on ait rendu la main proprement.
+                await runs.append_log(
+                    run_id, "[platform] arrêt demandé, envoi de stop à GAMA"
+                )
+                await session.stop()
+                raise
 
             # The run has ended: read the final cycle from GAMA, which is more
             # reliable than parsing the console.
@@ -141,6 +166,10 @@ async def run_simulation(ctx: dict[str, Any], run_id: str) -> dict[str, Any]:
             except Exception as exc:
                 log.warning("final cycle unavailable for %s: %s", run_id, exc)
 
+    except RunCancelled:
+        await runs.append_log(run_id, "[platform] arrêté à la demande")
+        await runs.update(run_id, status=RunStatus.CANCELLED, ended_at=time.time())
+        return {"status": RunStatus.CANCELLED}
     except (GamaError, TimeoutError, OSError) as exc:
         await runs.append_log(run_id, f"[platform] FAILED: {exc}")
         await runs.update(

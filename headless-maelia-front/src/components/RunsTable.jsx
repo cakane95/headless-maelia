@@ -1,14 +1,17 @@
 import EmptyState from "./EmptyState";
 import StatusBadge from "./StatusBadge";
+import StopRun from "./StopRun";
 import { formatDuration } from "../utils/format";
 import { runLabel } from "../utils/status";
 
 /** Historique des exécutions. Purement présentationnel.
  *
  *  `onResults` est optionnel : le banc d'essai n'a pas de projet, donc pas
- *  d'écran de résultats à ouvrir.
+ *  d'écran de résultats à ouvrir. `onStop` l'est aussi, mais la colonne
+ *  d'actions apparaît dès que l'un des deux est fourni.
  */
-export default function RunsTable({ runs, onSelect, onResults }) {
+export default function RunsTable({ runs, onSelect, onResults, onStop }) {
+  const actions = Boolean(onResults || onStop);
   if (runs.length === 0) return <EmptyState>Aucun run pour l'instant.</EmptyState>;
 
   return (
@@ -20,7 +23,7 @@ export default function RunsTable({ runs, onSelect, onResults }) {
           <th>Progression</th>
           <th>Durée</th>
           <th>Sorties</th>
-          {onResults && <th className="cell--actions" />}
+          {actions && <th className="cell--actions" />}
         </tr>
       </thead>
       <tbody>
@@ -33,9 +36,10 @@ export default function RunsTable({ runs, onSelect, onResults }) {
             <td className="muted">{run.current_date ?? "—"}</td>
             <td className="muted">{formatDuration(run)}</td>
             <td className="muted">{run.artifacts?.length ?? 0}</td>
-            {onResults && (
+            {actions && (
               <td className="cell--actions" onClick={(event) => event.stopPropagation()}>
-                {run.status === "FINISHED" && (
+                {onStop && <StopRun run={run} onStop={onStop} />}
+                {onResults && run.status === "FINISHED" && (
                   <button type="button" className="ghost" onClick={() => onResults(run.id)}>
                     Résultats
                   </button>

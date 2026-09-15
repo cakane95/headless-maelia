@@ -36,7 +36,11 @@ export default function TestBench() {
       </div>
 
       <Card title="Historique">
-        <RunsTable runs={runs} onSelect={(id) => navigate(`/admin/banc-essai/${id}`)} />
+        <RunsTable
+          runs={runs}
+          onSelect={(id) => navigate(`/admin/banc-essai/${id}`)}
+          onStop={adminApi.cancel}
+        />
       </Card>
 
       {launching && (

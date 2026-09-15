@@ -1,11 +1,13 @@
 import { Link, useParams } from "react-router";
 
+import { adminApi, projectRunApi } from "../api";
 import ArtifactsTable from "../components/ArtifactsTable";
 import AsyncBoundary from "../components/AsyncBoundary";
 import Card from "../components/Card";
 import ConsoleView from "../components/ConsoleView";
 import PageHeader from "../components/PageHeader";
 import RunSummary from "../components/RunSummary";
+import StopRun from "../components/StopRun";
 import { useRunStream } from "../hooks/useRunStream";
 
 /** Suivi d'une exécution : état, console GAMA en direct, artefacts produits.
@@ -32,14 +34,22 @@ export default function RunDetail() {
             <div>
               <PageHeader title={run.label} lede={`${run.experiment} — ${run.id}`} />
             </div>
-            {/* Les résultats s'ouvrent depuis l'exécution : c'est d'ici qu'on
-                sait qu'il y a quelque chose à lire. Le banc d'essai n'a pas de
-                projet, donc pas d'écran de résultats. */}
-            {projectId && run.status === "FINISHED" && (
-              <Link className="button-link" to={`${back.to}/${runId}/resultats`}>
-                Voir les résultats
-              </Link>
-            )}
+            <div className="setup__action">
+              {/* Une exécution qui tourne peut être arrêtée : sans cela elle
+                  garde sa mémoire dans la JVM jusqu'au bout. */}
+              <StopRun
+                run={run}
+                onStop={projectId ? projectRunApi.cancel : adminApi.cancel}
+              />{" "}
+              {/* Les résultats s'ouvrent depuis l'exécution : c'est d'ici qu'on
+                  sait qu'il y a quelque chose à lire. Le banc d'essai n'a pas de
+                  projet, donc pas d'écran de résultats. */}
+              {projectId && run.status === "FINISHED" && (
+                <Link className="button-link" to={`${back.to}/${runId}/resultats`}>
+                  Voir les résultats
+                </Link>
+              )}
+            </div>
           </div>
 
           <Card>

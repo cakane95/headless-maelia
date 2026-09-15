@@ -55,4 +55,7 @@ export const projectRunApi = {
   list: (projectId) => request(`/api/v1/projects/${projectId}/runs`),
   launch: (projectId, payload) =>
     request(`/api/v1/projects/${projectId}/runs`, json("POST", payload)),
+  // L'arrêt passe par la même route que le banc d'essai : une exécution est
+  // une exécution, qu'un projet l'ait lancée ou non.
+  cancel: (runId) => request(`/api/v1/admin/runs/${runId}/cancel`, { method: "POST" }),
 };

@@ -45,9 +45,18 @@ END_MARKERS = ("*********** FIN DE SIMULATION ***********",)
 FAILURE_MARKERS = ("ERREUR LORS DE L'INITIALISATION",)
 FAILED = {"SimulationError", "RuntimeError", "GamaServerError"}
 
+# Delai au bout duquel la lecture rend la main pour demander « doit-on
+# s'arreter ? ». MAELIA parle sans cesse, mais un modele silencieux ne doit pas
+# rendre l'annulation inoperante pour autant.
+CANCEL_POLL_SECONDS = 2.0
+
 
 class GamaError(RuntimeError):
     """Erreur remontée par gama-server (commande refusée ou simulation en échec)."""
+
+
+class RunCancelled(RuntimeError):
+    """L'arrêt a été demandé pendant que la simulation tournait."""
 
 
 class GamaSession:
@@ -90,6 +99,7 @@ class GamaSession:
         timeout: float,
         text_markers: tuple[str, ...] = (),
         failure_markers: tuple[str, ...] = FAILURE_MARKERS,
+        cancelled: Callable[[], Awaitable[bool]] | None = None,
     ) -> dict[str, Any]:
         """Lit le flux en relayant chaque message, jusqu'à un type `wanted`
         ou une ligne de console contenant l'un des `text_markers`.
@@ -101,9 +111,26 @@ class GamaSession:
         déjà mort. Surveiller la seule attente de fin ne suffirait donc pas.
         """
 
+        async def _attendre_message() -> dict[str, Any] | None:
+            """Le prochain message, ou None si l'attente a ete rendue pour un
+            controle d'annulation."""
+            if cancelled is None:
+                return json.loads(await self._ws.recv())
+            try:
+                brut = await asyncio.wait_for(
+                    self._ws.recv(), timeout=CANCEL_POLL_SECONDS
+                )
+            except TimeoutError:
+                return None
+            return json.loads(brut)
+
         async def _loop() -> dict[str, Any]:
             while True:
-                message = json.loads(await self._ws.recv())
+                if cancelled is not None and await cancelled():
+                    raise RunCancelled("arrêt demandé")
+                message = await _attendre_message()
+                if message is None:
+                    continue
                 await self._emit(message)
                 if message.get("type") in wanted:
                     return message
@@ -180,6 +207,7 @@ class GamaSession:
         timeout: float | None = None,
         text_markers: tuple[str, ...] = END_MARKERS,
         failure_markers: tuple[str, ...] = FAILURE_MARKERS,
+        cancelled: Callable[[], Awaitable[bool]] | None = None,
     ) -> dict[str, Any]:
         """Bloque jusqu'à la fin de la simulation, en relayant tout le flux au passage.
 
@@ -195,6 +223,7 @@ class GamaSession:
             timeout or settings.GAMA_RUN_TIMEOUT,
             text_markers=text_markers,
             failure_markers=failure_markers,
+            cancelled=cancelled,
         )
         if message.get("type") in FAILED:
             raise GamaError(f"simulation en échec : {message}")
