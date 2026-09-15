@@ -1,8 +1,17 @@
-"""Generate the scenario-parameter catalog from `launcherBase.gaml`.
+"""Generate the scenario-parameter catalog from the MAELIA launchers.
 
-The launcher is the reference: it is the exact list of variables that can be
-overridden in a `load` sent to gama-server. Anything not declared there cannot be
-changed by a scenario.
+Two launchers, two roles:
+
+  - `launcherBase.gaml` says **which** variables exist. It is the exact list of
+    what can be overridden in a `load` sent to gama-server, and `launcherTest`
+    — the launcher the platform actually runs — declares exactly the same 149.
+    Anything absent from it cannot be changed by a scenario.
+
+  - `launcherSasseme.gaml` says **what they are worth**. Its defaults are the
+    ones calibrated by the modellers on a real study, and they are the ones the
+    platform offers. It declares 140 of the 149: a variable it omits keeps the
+    value `launcherBase` gives it, and a variable it alone declares is ignored,
+    because `launcherTest` would not accept it.
 
 Types and groups are inferred from the file itself:
   - the type comes from the default value (`false` -> bool, `2019` -> int, ...);
@@ -20,9 +29,11 @@ import re
 import sys
 
 RACINE = pathlib.Path(__file__).resolve().parents[2]
-LAUNCHER = (
-    RACINE / "gama-models" / "MAELIA_1.4.29_GAMA_2025-06" / "models" / "main" / "launcherBase.gaml"
-)
+MAIN = RACINE / "gama-models" / "MAELIA_1.4.29_GAMA_2025-06" / "models" / "main"
+# Qui declare les variables, et donc ce qu'un scenario peut surcharger.
+LAUNCHER = MAIN / "launcherBase.gaml"
+# Qui donne les valeurs par defaut retenues.
+LAUNCHER_DEFAUTS = MAIN / "launcherSasseme.gaml"
 OUTPUT = (
     pathlib.Path(__file__).resolve().parents[1]
     / "app/contexts/catalog/infrastructure/seed/parameters.json"
@@ -33,6 +44,41 @@ PARAMETER = re.compile(
     r"^\s*parameter\s+(['\"])(?P<label>.*?)\1\s+var:\s*(?P<name>\w+)\s*<-\s*(?P<default>.+?);",
     re.M,
 )
+# Ce que `launcherSasseme` regle pour SON territoire, et qui ne designe rien
+# ailleurs : le territoire lui-meme, ses zones hydrographiques, et les annees
+# que ses donnees couvrent. Verifie par l'execution : `anneeDebutSimulation`
+# a 2018 fait echouer un run sur terrainTest, dont la meteo commence en 2019.
+# Les parametres a `options_from` sont ecartes pour la meme raison, mais le
+# catalogue les designe deja : leurs valeurs vivent dans les donnees du projet.
+PROPRES_AU_TERRITOIRE = {
+    "nomDecoupageZonePourLectureFichiers",
+    "listNomsZHsDecoupageZone",
+    "anneeDebutSimulation",
+    "anneeDeReferenceRPG",
+    # Le modele de croissance des prairies decide quelles especes fourrageres
+    # existent. Sasseme tourne en AqYield ; les ITK de terrainTest citent
+    # `lolMul`, que seul HerbSim declare — un run echoue alors a l'initialisation
+    # sur « l'espece lolMul n'existe pas ». Le choix est donc lie aux donnees du
+    # territoire, pas au gout du modelisateur.
+    "nomChoixModeleCroissancePrairie",
+    # Un interrupteur qui commande une liste propre au territoire ne s'en
+    # separe pas : pris seul, il restreint la simulation a des exploitations
+    # qui n'existent pas, et le run s'arrete sur « 0 exploitation creee ».
+    "executerSurEnsembleExploit",
+    "listAgriASuivre",
+    # terrainTest ne porte pas de modeleNormatif : pas de barrages a gerer.
+    "executerBarrage",
+    # Prefixe des cultures intermediaires dans le fichier d'especes. Sasseme
+    # ecrit « ci- », terrainTest « ci » : c'est une convention de nommage de
+    # donnees, pas un reglage.
+    "PREFIXE_CI",
+    # Ces deux-la decrivent la FORME du fichier d'itineraires techniques du
+    # territoire — combien de fertilisations, combien de traitements par ITK.
+    # Les changer sans changer le fichier le rend illisible.
+    "plusieursFertilisationsParITK",
+    "plusieursTraitementsPhytoParITK",
+}
+
 # Banner comments delimiting the sections of the launcher.
 BANNER = re.compile(r"/\*\s*-{4,}\s*(?P<title>[^-*]+?)\s*-{4,}", re.I)
 
@@ -189,12 +235,32 @@ def group_of(text: str, position: int) -> str:
     return last
 
 
+def defaults_from(launcher: pathlib.Path) -> dict[str, str]:
+    """Raw default expressions declared by a launcher, keyed by variable name.
+
+    Only the first declaration counts: the launchers carry commented variants
+    further down, and GAMA keeps the first.
+    """
+    if not launcher.is_file():
+        return {}
+    text = launcher.read_text(encoding="utf-8", errors="replace")
+    raw: dict[str, str] = {}
+    for match in PARAMETER.finditer(text):
+        raw.setdefault(match.group("name"), match.group("default"))
+    return raw
+
+
 def main() -> int:
     if not LAUNCHER.is_file():
         print(f"launcher not found: {LAUNCHER}", file=sys.stderr)
         return 1
 
     text = LAUNCHER.read_text(encoding="utf-8", errors="replace")
+    retenus = defaults_from(LAUNCHER_DEFAUTS)
+    if not retenus:
+        print(f"launcher of defaults not found: {LAUNCHER_DEFAUTS}", file=sys.stderr)
+        return 1
+    repris = 0
     conditions = dependances(text)
     parameters: list[dict] = []
     seen: set[str] = set()
@@ -207,7 +273,19 @@ def main() -> int:
             continue
         seen.add(name)
 
-        kind, default = infer_type(match.group("default"))
+        # La valeur vient du launcher de reference quand il declare la
+        # variable ; sinon on garde celle de launcherBase.
+        declare = match.group("default")
+        transposable = name not in PROPRES_AU_TERRITOIRE and name not in OPTION_SOURCES
+        brut = retenus[name] if transposable and name in retenus else declare
+        kind, default = infer_type(brut)
+        # Ce que le launcher execute declare, quand il dit autre chose. Sans
+        # cette trace, un defaut du catalogue resterait lettre morte : seuls les
+        # ecarts voyagent jusqu'a GAMA, et un defaut n'en est pas un.
+        _, declare_typed = infer_type(declare)
+        impose = declare_typed if brut != declare else None
+        if impose is not None:
+            repris += 1
         label = match.group("label").strip().rstrip(":").strip() or name
 
         parameters.append({
@@ -216,6 +294,7 @@ def main() -> int:
             "group": group_of(text, match.start()),
             "type": kind,
             "default": default,
+            "launcher_default": impose,
             "system": name in SYSTEM_PARAMETERS,
             # An EXPRESSION default is not a value we can offer for editing.
             "editable": kind != "EXPRESSION" and name not in SYSTEM_PARAMETERS,
@@ -231,8 +310,19 @@ def main() -> int:
         by_type[parameter["type"]] = by_type.get(parameter["type"], 0) + 1
     editable = sum(1 for p in parameters if p["editable"])
 
+    ecartes = sorted(
+        (PROPRES_AU_TERRITOIRE | set(OPTION_SOURCES)) & set(retenus)
+    )
+    absents = sorted({p["name"] for p in parameters} - set(retenus))
     print(f"{len(parameters)} parameters -> {OUTPUT.relative_to(RACINE)}")
     print(f"  editable: {editable} | system: {len(SYSTEM_PARAMETERS)} | types: {by_type}")
+    print(f"  defauts repris de {LAUNCHER_DEFAUTS.name} : {repris} modifies, "
+          f"{len(absents)} absents donc inchanges")
+    if absents:
+        print("  absents de sasseme :", ", ".join(absents))
+    print(f"  ecartes car propres au territoire sasseme : {len(ecartes)}")
+    if ecartes:
+        print("   ", ", ".join(ecartes))
     print(f"  groups: {sorted({p['group'] for p in parameters})}")
     return 0
 

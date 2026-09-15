@@ -157,6 +157,7 @@ def _parameter_to_domain(row: ParameterSpecRow) -> ParameterSpec:
         group=row.group,
         type=ParameterType(row.type),
         default=row.default,
+        launcher_default=row.launcher_default,
         allowed_values=tuple(row.allowed_values.split(SEPARATOR)) if row.allowed_values else (),
         system=row.system,
         editable=row.editable,
@@ -191,6 +192,7 @@ class SqlParameterRepository:
         row.group = spec.group
         row.type = spec.type.value
         row.default = spec.default
+        row.launcher_default = spec.launcher_default
         row.allowed_values = SEPARATOR.join(spec.allowed_values) or None
         row.system = spec.system
         row.editable = spec.editable

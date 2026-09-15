@@ -213,6 +213,9 @@ class ParameterOut(ParameterIn):
     name: str
     system: bool
     origin: str
+    # Ce que declare le launcher execute, quand il diverge du defaut retenu.
+    # Non nul = la plateforme envoie explicitement sa valeur a chaque run.
+    launcher_default: Any = None
 
 
 def _render_parameter(spec: ParameterSpec) -> ParameterOut:
@@ -221,6 +224,7 @@ def _render_parameter(spec: ParameterSpec) -> ParameterOut:
         default=spec.default, allowed_values=list(spec.allowed_values),
         editable=spec.editable, options_from=spec.options_from,
         enabled_if=spec.enabled_if, system=spec.system, origin=spec.origin,
+        launcher_default=spec.launcher_default,
     )
 
 
@@ -242,6 +246,9 @@ async def save_parameter(
         name=name,
         **payload.model_dump(exclude={"allowed_values"}),
         allowed_values=tuple(payload.allowed_values),
+        # La valeur du launcher est un fait du modele, pas un reglage : une
+        # ecriture manuelle ne la change pas.
+        launcher_default=existant.launcher_default if existant else None,
         # Un paramètre piloté par la plateforme le reste : ce n'est pas une
         # propriété que l'administrateur décide.
         system=existant.system if existant else False,

@@ -216,15 +216,28 @@ def test_toute_condition_du_seed_est_evaluable():
 def test_le_seed_reproduit_un_run_reel():
     """L'invariant : ce que le catalogue prédit est ce que GAMA a écrit.
 
-    Les neuf fichiers sont ceux d'un run terrainTest mené à terme avec les
-    réglages par défaut du launcher. Si l'extraction dérive, ce test tombe.
+    Les neuf fichiers sont ceux d'un run terrainTest mené à terme **avec les
+    valeurs que le launcher exécuté déclare**. Le catalogue, lui, propose
+    depuis les valeurs calées sur Sassème : quand les deux divergent, le champ
+    `launcher_default` porte celle du launcher, et c'est elle qu'il faut
+    reprendre ici — prédire depuis d'autres réglages que ceux du run ne
+    vérifierait rien.
+
+    Si l'extraction des gardes dérive, ce test tombe.
     """
     racine = pathlib.Path(__file__).resolve().parents[2]
     parametres = json.loads(
         (racine / "app/contexts/catalog/infrastructure/seed/parameters.json")
         .read_text(encoding="utf-8")
     )
-    valeurs = {entree["name"]: entree.get("default") for entree in parametres}
+    valeurs = {
+        entree["name"]: (
+            entree["launcher_default"]
+            if entree.get("launcher_default") is not None
+            else entree.get("default")
+        )
+        for entree in parametres
+    }
 
     specs = load_output_seed()
     # Les interrupteurs que le launcher n'expose pas gardent le défaut du modèle.

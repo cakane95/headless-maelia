@@ -121,6 +121,7 @@ def load_parameter_seed(path: pathlib.Path | None = None) -> list[ParameterSpec]
             group=entry["group"],
             type=ParameterType(entry["type"]),
             default=entry.get("default"),
+            launcher_default=entry.get("launcher_default"),
             allowed_values=tuple(entry.get("allowed_values") or ()),
             system=entry.get("system", False),
             editable=entry.get("editable", True),

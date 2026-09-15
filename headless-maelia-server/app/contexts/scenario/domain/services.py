@@ -57,11 +57,28 @@ def effective_parameters(
 ) -> list[dict[str, Any]]:
     """Turn the deltas into the payload gama-server expects at `load`.
 
-    Only the deltas travel: an unset parameter keeps the launcher's own default,
-    which is exactly what we want when the model is upgraded.
+    Deux choses voyagent, et seulement deux.
+
+    **Les ecarts du scenario.** Un parametre qu'il ne fixe pas garde la valeur
+    du modele, ce qui est exactement ce qu'on veut quand le modele monte de
+    version : le scenario ne fige que ce qu'il a voulu figer.
+
+    **Les defauts que le catalogue impose.** Le catalogue tient ses valeurs par
+    defaut du launcher de reference, qui n'est pas celui qu'on execute. Quand
+    les deux divergent, ne rien envoyer ferait mentir la plateforme : elle
+    afficherait une valeur et GAMA en appliquerait une autre. On envoie donc la
+    valeur annoncee, et le scenario reste prioritaire sur elle.
     """
+    specs = list(specs)
     by_name = {s.name: s for s in specs}
     payload: list[dict[str, Any]] = []
+
+    for spec in specs:
+        if spec.system or not spec.imposed or spec.name in values:
+            continue
+        payload.append({
+            "type": spec.gama_type(), "name": spec.name, "value": spec.default
+        })
 
     for name, value in values.items():
         spec = by_name.get(name)

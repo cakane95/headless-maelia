@@ -55,8 +55,9 @@ def _launchers() -> dict[str, ModelInfo]:
     """Launchers exposed to the test bench.
 
     Hard-coded for now: this catalog will move to the database with the `model`
-    context. Only launchers without an `output` block are headless-usable — hence
-    the absence of launcherBase and launcherSasseme.
+    context. Only launchers without an `output` block are headless-usable, and
+    whose experiment carries an `until:` — hence the absence of launcherBase and
+    launcherSasseme, and the presence of their headless twins.
     """
     main = settings.MAELIA_PROJECT_DIR / "models" / "main"
     return {
@@ -69,7 +70,18 @@ def _launchers() -> dict[str, ModelInfo]:
                 "Duplication de launcherBase adaptée au headless "
                 "(until: simulationTerminee, sans bloc output)."
             ),
-        )
+        ),
+        "launcherSassemeHeadless": ModelInfo(
+            id="launcherSassemeHeadless",
+            name="MAELIA — Sassème (Ferlo-Sine)",
+            path=str(main / "launcherSassemeHeadless.gaml"),
+            experiment="sasseme_headless",
+            description=(
+                "Duplication de launcherSasseme adaptée au headless. Ses 140 "
+                "paramètres gardent les valeurs calées par les modélisateurs "
+                "sur le territoire includes_sasseme, qu'il lit par défaut."
+            ),
+        ),
     }
 
 

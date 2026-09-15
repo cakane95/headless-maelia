@@ -63,6 +63,9 @@ class ParameterSpecOut(BaseModel):
     # '<autre paramètre> == true' : ce paramètre n'a d'effet que si la condition
     # est vraie. Le front grise, il n'évalue pas.
     enabled_if: str | None = None
+    # Ce que déclare le launcher exécuté, quand il diverge du défaut retenu.
+    # Non nul : la plateforme envoie sa propre valeur à chaque exécution.
+    launcher_default: Any = None
 
 
 class OptionsOut(BaseModel):
@@ -118,7 +121,7 @@ async def list_parameters(parameters: Parameters) -> list[ParameterSpecOut]:
             name=p.name, label=p.label, group=p.group, type=p.type.value,
             default=p.default, allowed_values=list(p.allowed_values),
             system=p.system, editable=p.editable, options_from=p.options_from,
-            enabled_if=p.enabled_if,
+            enabled_if=p.enabled_if, launcher_default=p.launcher_default,
         )
         for p in await parameters.list_all()
     ]

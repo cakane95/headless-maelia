@@ -93,6 +93,8 @@ class ParameterSpecRow(Base):
     type: Mapped[str] = mapped_column(String(20))
     # Kept as JSON: a default may be a boolean, a number, a string or a list.
     default: Mapped[Any | None] = mapped_column(JSONB, nullable=True)
+    # Ce que le launcher execute declare, quand il diverge du defaut retenu.
+    launcher_default: Mapped[Any | None] = mapped_column(JSONB, nullable=True)
     allowed_values: Mapped[str | None] = mapped_column(Text, nullable=True)  # '|'-separated
     # Imposed by the platform: overriding it in a scenario has no effect.
     system: Mapped[bool] = mapped_column(Boolean, default=False)

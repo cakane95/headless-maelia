@@ -154,6 +154,9 @@ class ParameterSpec:
     group: str
     type: ParameterType
     default: object = None
+    # Ce que le launcher execute declare, quand il declare autre chose que le
+    # defaut retenu. `None` signifie « les deux disent la meme chose ».
+    launcher_default: object = None
     allowed_values: tuple[str, ...] = ()
     # Imposed by the platform (paths, run id): overriding it would have no effect.
     system: bool = False
@@ -166,6 +169,18 @@ class ParameterSpec:
     # inactif est sans effet — le fixer ne change rien a la simulation.
     enabled_if: str | None = None
     origin: str = "SEED"
+
+    @property
+    def imposed(self) -> bool:
+        """Le catalogue impose-t-il une valeur que le launcher ne donnerait pas ?
+
+        Un defaut de catalogue ne suffit pas a changer une simulation : seuls
+        les ecarts d'un scenario voyagent jusqu'a GAMA, et un defaut n'en est
+        pas un. Quand les deux divergent, la valeur doit donc etre envoyee
+        explicitement, sans quoi le catalogue annoncerait une chose et le modele
+        en ferait une autre.
+        """
+        return self.launcher_default is not None
 
     def accepts(self, value: object) -> bool:
         """Is this value assignable to the parameter?"""
