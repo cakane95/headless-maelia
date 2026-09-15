@@ -41,11 +41,18 @@ class ModelInfo(BaseModel):
     path: str
     experiment: str
     description: str
+    # Le jeu de données que ce launcher lit par défaut. Le banc d'essai n'a pas
+    # de projet pour le lui dire : sans cette information il matérialiserait un
+    # territoire et le modèle en chercherait un autre.
+    territory: str
 
 
 class LaunchRequest(BaseModel):
     model_id: str = Field(default="launcherTest")
     label: str | None = None
+    # Pour essayer un launcher sur un autre jeu que le sien. Vide : celui que
+    # le launcher déclare.
+    territory: str | None = None
     # Deltas from the launcher defaults, in the format gama-server expects:
     # {"type": "int", "name": "nbAnneesSimulation", "value": 1}
     parameters: list[dict[str, Any]] = Field(default_factory=list)
@@ -70,17 +77,19 @@ def _launchers() -> dict[str, ModelInfo]:
                 "Duplication de launcherBase adaptée au headless "
                 "(until: simulationTerminee, sans bloc output)."
             ),
+            territory="terrainTest",
         ),
-        "launcherSassemeHeadless": ModelInfo(
-            id="launcherSassemeHeadless",
+        "launcherSassemeTest": ModelInfo(
+            id="launcherSassemeTest",
             name="MAELIA — Sassème (Ferlo-Sine)",
-            path=str(main / "launcherSassemeHeadless.gaml"),
-            experiment="sasseme_headless",
+            path=str(main / "launcherSassemeTest.gaml"),
+            experiment="sasseme_maelia",
             description=(
-                "Duplication de launcherSasseme adaptée au headless. Ses 140 "
-                "paramètres gardent les valeurs calées par les modélisateurs "
-                "sur le territoire includes_sasseme, qu'il lit par défaut."
+                "La structure de launcherTest, les valeurs de launcherSasseme : "
+                "les 149 paramètres du catalogue, réglés sur le territoire "
+                "includes_sasseme, qu'il lit par défaut."
             ),
+            territory="includes_sasseme",
         ),
     }
 
@@ -96,10 +105,23 @@ async def launch(payload: LaunchRequest) -> dict[str, Any]:
     if model is None:
         raise HTTPException(status_code=404, detail=f"modèle inconnu : {payload.model_id}")
 
+    # Le territoire du launcher voyage avec le run : le worker matérialise ce
+    # que le modèle lira réellement, et un banc d'essai sans projet n'a pas à le
+    # deviner.
+    parameters = [
+        p for p in payload.parameters
+        if p.get("name") != "nomDecoupageZonePourLectureFichiers"
+    ]
+    parameters.append({
+        "type": "string",
+        "name": "nomDecoupageZonePourLectureFichiers",
+        "value": payload.territory or model.territory,
+    })
+
     run = await runs.create(
         model=model.path,
         experiment=model.experiment,
-        parameters=payload.parameters,
+        parameters=parameters,
         label=payload.label or model.name,
     )
 

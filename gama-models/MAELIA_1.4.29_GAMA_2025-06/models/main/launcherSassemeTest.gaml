@@ -20,27 +20,32 @@
  * <http://www.gnu.org/licenses/>.
 ***************************************************************************/
 /**
- *  launcherSassemeHeadless
- *  Description: Duplication de launcherSasseme.gaml pour l'execution headless.
+ *  launcherSassemeTest
+ *  Description: la STRUCTURE de launcherTest, les VALEURS de launcherSasseme.
  *
- *  Strictement identique a launcherSasseme (memes parametres, memes valeurs par
- *  defaut, meme territoire includes_sasseme), a trois details pres, tous imposes
- *  par le mode headless — exactement ceux qui separent launcherTest de
- *  launcherBase :
- *    - `model launcherSassemeHeadless` : deux fichiers ne peuvent pas declarer
- *      le meme modele ;
- *    - experiment `sasseme_headless ... until: simulationTerminee` : sans cette
- *      condition l'experience ne s'arrete jamais, main.gaml posant le booleen
- *      en fin de run ;
- *    - suppression du bloc `output { display ... }` : purement GUI, GAMA
- *      headless ne peut pas construire d'affichage.
+ *  Chacun des deux apporte la moitie de ce qu'il faut pour executer le
+ *  territoire de Sasseme en headless :
  *
- *  Les parametres metier ne sont PAS figes ici : la plateforme les surcharge au
- *  `load`. Le worker impose en plus idSimulationAPI=<runId>, ce qui fait ecrire
- *  les sorties dans models/main/log/<runId> (cf. action majChemins).
+ *    - launcherTest est deja prouve headless (pas de bloc d'affichage,
+ *      until: simulationTerminee) et declare les 149 parametres que le
+ *      catalogue de la plateforme connait, si bien qu'un scenario peut
+ *      surcharger n'importe lequel d'entre eux ;
+ *
+ *    - launcherSasseme porte les valeurs que les modelisateurs ont calees sur
+ *      le territoire includes_sasseme, mais il n'en declare que 140.
+ *
+ *  Resultat : 30 valeurs par defaut reprises de Sasseme, 10
+ *  laissees a celles de launcherTest faute d'etre declarees par Sasseme.
+ *  Le territoire lu par defaut est includes_sasseme.
+ *
+ *  Les parametres ne sont PAS figes ici : la plateforme les surcharge au load,
+ *  et impose en plus idSimulationAPI=<runId>, ce qui fait ecrire les sorties
+ *  dans models/main/log/<runId> (cf. action majChemins).
+ *
+ *  Engendre par scripts/build_launcher_sasseme.py — ne pas editer a la main :
+ *  une montee de version du modele demande de le regenerer.
  */
-
-model launcherSassemeHeadless
+model launcherSassemeTest
 
 import "../modeleCommun/contourZoneMaelia.gaml"
 
@@ -55,7 +60,7 @@ global {
 	}	
 }
 
-experiment sasseme_headless type: gui benchmark:false until: simulationTerminee {
+experiment sasseme_maelia type: gui benchmark:false until: simulationTerminee {
 
  /* ---------------------------------- CHEMINS SELON EXECUTION EN LOCAL OU SUR CLUSTER ------------------------------------------------------------------
   * 	ne modifier que le booléen executerSurCluster, pas les chemins
@@ -69,35 +74,35 @@ experiment sasseme_headless type: gui benchmark:false until: simulationTerminee 
 
  /* ---------------------------------- PARAMETRES GENERAUX ------------------------------------------------------------------*/
  	// année de début de simulation
-	parameter 'anneeDebutSimulation : ' 		var: anneeDebutSimulation 		<- 2018; //update
+	parameter 'anneeDebutSimulation : ' 		var: anneeDebutSimulation 		<- 2018;
 	// nombre d'années de simulation
-	parameter 'nbAnneesSimulation : ' 			var: nbAnneesSimulation 		<- 7; //update
+	parameter 'nbAnneesSimulation : ' 			var: nbAnneesSimulation 		<- 7;
 	
 	// identifiant simulation, permet de personnaliser le nom du répertoire de sortie (<nomDecoupageZonePourLectureFichiers>_<nomSimulation>_horodatage)
 	parameter 'nomSimulation : ' 				var: nomSimulation 				<- "";
 
 	// nom territoire (un répertoire du même nom doit se trouver dans includes/)
-	parameter 'nomDecoupageZonePourLectureFichiers : ' 	var: nomDecoupageZonePourLectureFichiers 	<- 'includes_sasseme'; //update
+	parameter 'nomDecoupageZonePourLectureFichiers : ' 	var: nomDecoupageZonePourLectureFichiers 	<- 'includes_sasseme';
 	
 	// simulation sur un sous-ensemble de ZH (Zones Hydrographiques)
 	parameter 'simulationSurZH : '		 		var: executerModeleSurUneZH 	<- false;
 	// si oui liste des id de ZH à simuler (exemple ["549","3420"])
-	parameter 'idZHASimuler : '				 	var: listNomsZHsDecoupageZone 	<- ["SSM1"]; //["549","3420"];  //["2402","2265","193","192","575","115","114","183","1681","1680","4280","4653","4422","4295","2045","2044","3451","3450","2040","2043","2039","2407","2398","1600","574"];
+	parameter 'idZHASimuler : '				 	var: listNomsZHsDecoupageZone 	<- ["SSM1"];
 
 	// simulation sur une seule exploitation
-	parameter 'simulationSurExploitation : ' 	var: executerUnSeulAgriculteur 	<- false; //update
+	parameter 'simulationSurExploitation : ' 	var: executerUnSeulAgriculteur 	<- false;
 	// si oui id de l'exploitation à simuler
 	parameter 'idExploitationASimuler : ' 		var: idExploitationAexecuter 	<- "SSM1-0001";
 
 	// simulation sur un ensemble d'exploitations (JV 131222 a fusionner avec une seule exploit)
-	parameter 'simulationSurEnsembleExploitations : ' 	var: executerSurEnsembleExploit 	<- true; //update
+	parameter 'simulationSurEnsembleExploitations : ' 	var: executerSurEnsembleExploit 	<- true;
 	// si oui liste d'id d'exploitations à simuler
 	parameter 'idExploitationsASimuler : ' 		var: listIdExploitationAexecuter 	<- ["SSM1-0001","SSM1-0002","SSM1-0003", "SSM1-0004", "SSM1-0005", "SSM1-0006"];
 
 	// simulation sur une seule parcelle	
 	parameter 'simulationSurParcelle : '	 	var: executerUneSeuleParcelle 	<- false;
 	// si oui id de la parcelle à simuler	
-	parameter 'idParcelleASimuler : ' 			var: nomParcelleAffichee 		<- '1_001'; //update
+	parameter 'idParcelleASimuler : ' 			var: nomParcelleAffichee 		<- '1_001';
 	
 	// nom du scénario climatique pour les données météo projetées qui doivent se trouver dans /modeleCommun/simulee/nomScenarioClimatique
 	parameter 'nomScenarioClimatique :'			var: nomScenarioClimatique		<- "";
@@ -110,13 +115,16 @@ experiment sasseme_headless type: gui benchmark:false until: simulationTerminee 
     parameter 'idSimulationAPI'                    var: idSimulationAPI <- "";
     
     // mode verbeux: affichage d'informations complémentaires sur la console (débogage)
-	parameter 'modeVerbeux :'					var: verboseMode						<- true; //update
+	parameter 'modeVerbeux :'					var: verboseMode						<- true;
 	
 	
- /* ---------------------------------- PARAMETRES MODELE HYDROLOGIQUE ------------------------------------------------------------------*/
+	// Paramètres pour ID de simu dans l'API -- Ajout Renaud 01/09/22 pour execution via API
+//	parameter 'executionViaAPI' 				var: executionViaAPI <- true;
+//	parameter 'idSimulationAPI'					var: idSimulationAPI <- "default";
+	 /* ---------------------------------- PARAMETRES MODELE HYDROLOGIQUE ------------------------------------------------------------------*/
 
  	// exécuter un modèle hydrologique ?
-	parameter 'executerModeleHydrographique : ' 		var: executerModeleHydrographique 			<- false; //update
+	parameter 'executerModeleHydrographique : ' 		var: executerModeleHydrographique 			<- false;
 	// si oui nom du modèle hydrologique à exécuter (Simple ou SWAT)
 	parameter 'nomChoixModeleHydrographique : ' 		var: nomChoixModeleHydrographique 			<- 'SWAT'; // Simple  SWAT
 	
@@ -147,7 +155,7 @@ experiment sasseme_headless type: gui benchmark:false until: simulationTerminee 
  /* ---------------------------------- PARAMETRES MODELE AGRICOLE ------------------------------------------------------------------*/
 
 	// exécuter un modèle agricole
-	parameter 'executerModeleAgricole : ' 				var: executerModeleAgricole 				<- true; 
+	parameter 'executerModeleAgricole : ' 				var: executerModeleAgricole 				<- true;
 
 	// choix du modèle d'assolement (Donnees ou FonctionsDeCroyances)
 	parameter 'nomChoixAssolement : ' 					var: nomChoixAssolement 					<- 'Donnees';
@@ -158,29 +166,34 @@ experiment sasseme_headless type: gui benchmark:false until: simulationTerminee 
 	parameter 'activerITKAlternatif :'					var: activerITKalternatif					<- false;
 
 	// faut-il forcer le semis d'un CI (automatiquement à faux si ITK activerITKalternatif à vrai)
-	parameter 'forcerSemisCI :'							var: forcerSemisCI							<-false;
+	parameter 'forcerSemisCI :'							var: forcerSemisCI							<- false;
 
 	// prise en compte des contraintes de main d'oeuvre
 	parameter 'avecContrainteDeMainOeuvre : '          	var: avecContrainteDeMainOeuvre      		<- false;	
 
 	// présence d'ITK avec plusieurs opérations de travail du sol ou de fertilisation dans l'année 
-	parameter 'plusieursTravauxDuSolParITK : '			var: plusieursTravauxDuSolParITK			<- true; //update
-	parameter 'plusieursFertilisationsParITK : '		var: plusieursFertilisationsParITK			<- false; //update
+	parameter 'plusieursTravauxDuSolParITK : '			var: plusieursTravauxDuSolParITK			<- true;
+	parameter 'plusieursFertilisationsParITK : '		var: plusieursFertilisationsParITK			<- false;
 	parameter 'plusieursTraitementsPhytoParITK : '		var: plusieursTraitementsPhytoParITK		<- false;
 
 	// Adaptation de la fertilisation par rapport à la minéralisation
-	parameter 'Adaptation de la fertilisation'			var: adaptationFertilisation				<- "reliquat"; // simple (adaptationFertilisation Renaud 160922)
+	parameter 'Adaptation de la fertilisation'			var: adaptationFertilisation				<- "reliquat"; //  "corpen" ou "" (adaptationFertilisation Renaud 160922)
+	parameter 'Profondeur temporelle du bilan CORPEN'			var: corpenProfondeurTemporelle				<- 3; 
+
+	// Niveau de gestion des stocks d'engrais (exploitation / territoire / filiere)
+	parameter 'Niveau scalaire de gestion des stocks d engrais'	var: gestionStocksEngrais 			<- "territoire"; //territoire exploitation
 
 	// prise en compte des îlots hors zone
 	parameter 'avecIlotsHorsZone : ' 					var: avecIlotsHorsZone 						<- false;
 
 	// choix du modèle de croissance de plante (Simple ou AqYield ou AqYieldNC)
-	parameter 'nomChoixModeleCroissancePlante : ' 		var: nomChoixModeleCroissancePlante 		<- 'AqYield';//update
+	parameter 'nomChoixModeleCroissancePlante : ' 		var: nomChoixModeleCroissancePlante 		<- 'AqYield';
 
 	// choix du modèle de croissance de prairie (AqYield ou HerbSim)
 	// AqYield: jour de récolte spécifié dans fichier règles de décisions
 	// HerbSim: jour de récolte inféré (première OT de l'ITK suivant)
 	parameter 'nomChoixModeleCroissancePrairie : '		var: nomChoixModeleCroissancePrairie		<- 'AqYield';
+	parameter 'Choix fonction temp dénit : ' 			var: denit_fTemp_option					<- "Stics";   // "Stics" or "SystN" 
 		
 	// simulation de l'irrigation
 	parameter 'isIrrigationSimulee : ' 					var: isIrrigationSimulee 					<- true;		
@@ -203,8 +216,12 @@ experiment sasseme_headless type: gui benchmark:false until: simulationTerminee 
 	parameter 'associerIlotMeteoZH :'					var: associerIlotMeteoZH					<- false;
 
 	
-	parameter 'Séquence(s) à optimiser agricole : '		var: sequences_a_optimiser					<- "";
-
+	// paramètres sol
+	parameter 'fraction SOM inerte fonction du %MO '	var: option_Finert_calc					<- false; //Si true : détermination du Finert en fonction du % de MO du sol, équation Hugues Clivot 26/11/2024) ; Si false :  variable forcée (voir typeDeSol.gaml dans les 2 cas)
+	
+	// stress climatique (gel, échaudage)
+	parameter 'Gel et échaudage'						var: avecStressClimatique				<- false;
+	
 	// paramétrage d'une parcelle virtuelle
     parameter 'executerParcelleVirtuelle : ' 			var: executerParcelleVirtuelle 				<- false;
     parameter 'rotationForceeParcelle : '				var: rotationForceeParcelle                 <- 'colza-precPauvre_CP-precRiche_feverole_CP-precRiche'; // séquence article = 'colza-precPauvre_CP-precRiche_feverole_CP-precRiche' // Seq pour figure N min / N lix = colza-precPauvre_CP-precRiche_ciCruciCourt_maisDP_CP-precMais_ciCruciCourt_feverole_CP-precRiche_orgeh-precPauvre_colza-precPauvre_CP-precRiche
@@ -233,21 +250,24 @@ experiment sasseme_headless type: gui benchmark:false until: simulationTerminee 
  /* ---------------------------------- SORTIES ------------------------------------------------------------------*/
 	
 	// écrire les fichiers de sortie ?	
-	parameter 'executerEcritureFichiers : ' 			var: executerEcritureFichiers 				<- true; //update
+	parameter 'executerEcritureFichiers : ' 			var: executerEcritureFichiers 				<- true;
+
+	// nombre de décimales pour les nombres réels
+	parameter "nb décimales sorties"						var: nb_decimales_sorties				<- 2;
 	
 	// sorties eau (nécessite AqYield ou AqYieldNC)
 	parameter "sorties eau"								var: sorties_eau							<- true;
 
 	// sorties azote et carbone/GES (nécessite AqYieldNC)
-	parameter "sorties azote"							var: sorties_azote							<- false; //update
-	parameter "sorties carbone et GES"					var: sorties_carboneGES						<- false; //update
+	parameter "sorties azote"							var: sorties_azote							<- false;
+	parameter "sorties carbone et GES"					var: sorties_carboneGES						<- false;
 	
 	parameter "sorties retenues"						var: sorties_retenues						<- false;
 	parameter "sorties barrages"						var: sorties_barrages						<- false;
 	
 	// liste des agriculteurs et des parcelles à suivre pour les sorties concernées	
-	parameter 'listAgriASuivre : ' 						var: listAgriASuivre 						<-[];  //['344877','345341','346156','346838','345630','345225','346823','347327','345857','344736','343392','345120','344376','344467','343607','344483','345756','344630','345039','344464','345772','345459','346630','343768','343023','347505','343772','343677','344156','345099','347320','345234','342842','347130','190567','345215','346058','346472','346646','347312','343329','343505','343770','346680','343729','342973','343409','346530','345611','343321','344675','346673','343610','344226','345593','343078','344442','345259','345343','344095','343658','343086','347174','347533','347180','345041','344491','346591','346048','190428','346878','345509','343805','343020','346374','346136','343700','345530','343968','343910','343180','345363','345314','346991','343243','343251','344590','344399','344329','343200','346195','345121','344061','345539','345355','344611','344517','342987','344342','346790','345851','344532','346040','345458','346867','346683','346239','346222','346879','347183','343774','343500','346055','343057','347498','345586','345206','345937','343193','346872','346318','345297','346763','347472','347248','347617','346504','343149','344938','347019','345284','346783','343638','343368','345952','346440','344201','347155','344023','345211','347441','344963','345592','347120','347249','346881','347325','346387','345720','345262','346199','345283','345351','346215','343966','345652','345714','346045','346619','346919','347507','346276','346807','346252','343137'] ;
-	parameter 'listParcellesASuivre : ' 				var: listParcellesASuivre 					<- ['21_001'];//update
+	parameter 'listAgriASuivre : ' 						var: listAgriASuivre 						<- [];
+	parameter 'listParcellesASuivre : ' 				var: listParcellesASuivre 					<- ['21_001'];
 	
 	/* ---------------------------------- ASSOLEMENT ---------------------------------------------------------------- */
 	parameter 'Sortie Assolement_SDC : '			var: Assolement_SDC 				<- false;
@@ -260,26 +280,33 @@ experiment sasseme_headless type: gui benchmark:false until: simulationTerminee 
 	parameter 'Sortie ECO_SDCRef : '				var: ECO_SDCRef 					<- false;
 	parameter 'Sortie ECO_coutIrrigationIlot : '	var: ECO_coutIrrigationIlot 					<- false;
 	parameter 'Sortie AqYield parcelles' 			var: variablesAqYieldSurParcellesSpecifiees <- false;
-	parameter 'Sortie AqYield parcelles light' 		var: variablesAqYieldSurParcellesSpecifiees_light <- false; 
-	parameter 'Liste parcelles sorties AqYield' 	var: listParcellesPourSortiesAqYield <- ['20_001']; //update
+	parameter 'Sortie AqYield parcelles light' 		var: variablesAqYieldSurParcellesSpecifiees_light <- false;
+	parameter 'Liste parcelles sorties AqYield' 	var: listParcellesPourSortiesAqYield <- ['20_001'];
 	parameter 'Sortie eva, trmax, trreelle ITK ZH'	var: aqYield_eva_trmax_trr_ITK_ZH	<- false;
 	parameter 'debug_fusion_AqYieldNC'				var: debug_fusion_AqYieldNC			<- false;
-	parameter 'Sorties AqYield NC'					var: sortiesAqYieldNC <-true; //updare
+	parameter 'Sorties AqYield NC'					var: sortiesAqYieldNC <- true;
 	parameter 'Sortie N_lixi_typeExploitation '		var: N_lixi_typeExploitation <- false;
 	parameter 'Sortie N_total_eqC02_typeExploitation'	var: N_total_eqC02_typeExploitation <- false;
-	parameter 'Sortie N_Cstock_Parcelles'			var: N_Cstock_Parcelles <- true;//update
+	parameter 'Sortie N_Cstock_Parcelles'			var: N_Cstock_Parcelles <- true;
 	parameter 'Sortie engrais_utilises_territoire'	var: engrais_utilises_territoire <- false;
+	parameter 'Sortie engrais_utilises_exploitation'	var: engrais_utilises_exploitation <- true;
 	parameter 'Sortie eqCO2_emissions_NC_Parcelles'	var: eqCO2_emissions_NC_Parcelles <- false;
 	parameter 'Sortie N_N2O_Parcelles'				var: N_N2O_Parcelles <- false;
 	parameter 'Sortie N_NH3_Parcelles'				var: N_NH3_Parcelles <- false;
 	parameter 'Sortie N_Nmin_som_res_Parcelles'		var: N_Nmin_som_res_Parcelles <- false;
+	parameter 'Sortie N_Nmin_total'					var: N_Nmin_total_Parcelles <- false;
 	parameter 'Sortie N_QNfix_Parcelles'			var: N_QNfix_Parcelles <- false;
 	parameter 'Sortie tpsWFerti_Parcelles'			var: tpsWFerti_Parcelles <- false;
 	parameter 'Sortie prixFerti_Parcelles'			var: prixFerti_Parcelles <- false;
 	parameter 'Sortie recolteParcelles'				var: recolteParcelles <- false;
 	parameter 'Sortie eqCO2_synthesis_Parcelles'	var: eqCO2_synthesis_Parcelles <- false;
-	parameter 'Sortie N_GES_Parcelles'				var: N_GES_Parcelles <- false; //update
-	parameter 'Sortie N_lixi_Parcelles'				var: N_lixi_Parcelles <- false; //update
+	parameter 'Sortie N_GES_Parcelles'				var: N_GES_Parcelles <- false;
+	parameter 'Sortie N_lixi_Parcelles'				var: N_lixi_Parcelles <- false;
+	
+	parameter 'Sortie journalière HerbSimNC'		var: suivi_journalier_1parc_HerbSimNC <- false;
+	
+	/* ---------------------------------- BILAN NC ------------------------------------------------------------ */
+	parameter 'Sortie Ajout_Pools_Residus'			var: suivi_ajout_pools_residus <- true; // NR sortie pool
 	
 	/* ---------------------------------- BILAN HYDRIQUE ------------------------------------------------------------ */
 	parameter 'Sortie DrainIlot : '					var: DrainIlot 						<- false;
@@ -327,20 +354,15 @@ experiment sasseme_headless type: gui benchmark:false until: simulationTerminee 
 	/* ---------------------------------- OPÉRATIONS TECHNIQUES ----------------------------------------------------- */
 	parameter 'Sortie debugSortie1parcelleAqYield : '					var: debugSortie1parcelleAqYield 		<- true;
 	parameter 'Suivi de la realisation des operations techniques : '	var: suiviOT							<- false;
-	parameter 'Suivi détaillé des OT par parcelle : '					var: suiviOTParParcelle					<- true; //update
+	parameter 'Suivi détaillé des OT par parcelle : '					var: suiviOTParParcelle					<- true;
 	parameter 'Suivi detaille des OT par parcelle avec duree : '		var: suiviOTParParcelleTemps			<- false;
 	parameter 'Suivi des OT semis, irrigation, récolte + humidité : '	var: suiviOTParParcelle_humidite		<- false;
 	// listOT pour inclure toutes les OT, attention plus d'OT -> plus lent
 	parameter 'liste des OT a suivre en sortie' 						var: listOTASuivreEnSortie 				<- listOT; //["IRRIGATION", "RECOLTE", "SEMIS", "FAUCHE"];
-	
+
 	parameter "Plan épandage "											var: plan_epandage_actif				<- false;
 
 	float seed <- 354.1;
-
 	
 	// Pas de bloc `output { display ... }` : execution headless pilotee par load/play.
 }
-
-
-	
-
