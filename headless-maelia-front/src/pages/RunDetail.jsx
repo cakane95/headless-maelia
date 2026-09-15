@@ -28,7 +28,19 @@ export default function RunDetail() {
           <p className="muted">
             <Link to={back.to}>← {back.label}</Link>
           </p>
-          <PageHeader title={run.label} lede={`${run.experiment} — ${run.id}`} />
+          <div className="page-head">
+            <div>
+              <PageHeader title={run.label} lede={`${run.experiment} — ${run.id}`} />
+            </div>
+            {/* Les résultats s'ouvrent depuis l'exécution : c'est d'ici qu'on
+                sait qu'il y a quelque chose à lire. Le banc d'essai n'a pas de
+                projet, donc pas d'écran de résultats. */}
+            {projectId && run.status === "FINISHED" && (
+              <Link className="button-link" to={`${back.to}/${runId}/resultats`}>
+                Voir les résultats
+              </Link>
+            )}
+          </div>
 
           <Card>
             <RunSummary run={run} />

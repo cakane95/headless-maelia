@@ -16,7 +16,7 @@ import Scenarios from "../pages/simulation/Scenarios";
 
 // Les résultats embarquent la bibliothèque de graphiques (~400 ko) : la charger
 // à la demande garde le reste de l'application léger.
-const ProjectResults = lazy(() => import("../pages/simulation/ProjectResults"));
+const RunResults = lazy(() => import("../pages/simulation/RunResults"));
 
 /** Espace SIMULATION : exploiter un modèle sur un territoire.
  *
@@ -40,7 +40,7 @@ export const simulationRoutes = (
       <Route path="scenarios/:scenarioId" element={<ScenarioEdit />} />
       <Route path="simulations" element={<ProjectRuns />} />
       <Route path="simulations/:runId" element={<RunDetail />} />
-      <Route path="resultats" element={<ProjectResults />} />
+      <Route path="simulations/:runId/resultats" element={<RunResults />} />
     </Route>
   </Route>
 );

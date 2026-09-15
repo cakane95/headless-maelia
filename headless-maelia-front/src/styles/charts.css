@@ -23,6 +23,14 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* L'exécution étant déjà choisie, la barre se réduit au fichier et à la
+   comparaison : le graphique commence plus haut. */
+.toolbar--slim {
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.toolbar__aside { padding-bottom: 2px; }
+
 .toolbar__group {
   flex: 1 1 320px;
   min-width: 0;

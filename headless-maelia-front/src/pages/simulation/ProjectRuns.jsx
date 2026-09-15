@@ -15,13 +15,14 @@ export default function ProjectRuns() {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [launching, setLaunching] = useState(false);
+  const base = `/simulation/projets/${projectId}/simulations`;
 
   const scenarios = useAsync(() => scenarioApi.listForProject(projectId), [projectId]);
   const runs = useAsync(() => projectRunApi.list(projectId), [projectId]);
 
   async function launch(payload) {
     const run = await projectRunApi.launch(projectId, payload);
-    navigate(`/simulation/projets/${projectId}/simulations/${run.id}`);
+    navigate(`${base}/${run.id}`);
   }
 
   return (
@@ -40,7 +41,8 @@ export default function ProjectRuns() {
         <AsyncBoundary error={runs.error} loading={runs.loading}>
           <RunsTable
             runs={runs.data ?? []}
-            onSelect={(id) => navigate(`/simulation/projets/${projectId}/simulations/${id}`)}
+            onSelect={(id) => navigate(`${base}/${id}`)}
+            onResults={(id) => navigate(`${base}/${id}/resultats`)}
           />
         </AsyncBoundary>
       </Card>

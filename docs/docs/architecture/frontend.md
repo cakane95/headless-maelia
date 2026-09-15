@@ -244,8 +244,9 @@ tableaux larges, différents d'un fichier à l'autre, et dont les colonnes chang
 avec le modèle. **Aucun graphique n'est donc écrit en dur.**
 
 ```
-ProjectResults              écran : exécutions cochées → fichier choisi
-├── ResultsToolbar          barre collante : chips d'exécutions + fichier
+RunResults                  écran : les résultats d'UNE exécution
+├── ResultsToolbar          barre collante : fichier + « Comparer »
+│   └── CompareRuns         modale : superposer d'autres exécutions
 └── OutputPane              aiguille selon la nature du fichier
     ├── OutputExplorer      TABLE
     │   ├── ChartSuggestions  lectures proposées par le backend
@@ -261,6 +262,13 @@ ProjectResults              écran : exécutions cochées → fichier choisi
 réglages s'ouvrent **sous** lui : on voit l'effet de chaque changement sans
 remonter. La barre de contexte est collée sous le bandeau pour la même raison —
 changer de fichier ne doit pas faire perdre le graphique des yeux.
+
+**On entre par l'exécution, pas par le projet.** Il n'y a pas de rubrique
+« Résultats » dans la barre latérale : des résultats sont ceux d'un run, et on
+les ouvre depuis lui (bouton dans l'historique, ou sur son écran de suivi).
+L'écran n'a donc pas à demander de quelle exécution il s'agit, et tout l'espace
+va au graphique. Comparer plusieurs runs reste possible — c'est la lecture qui
+donne son sens au gel des versions — mais par un geste explicite.
 
 **Ce qui vient du backend.** Le profil des colonnes (rôle, unité, valeurs), les
 lectures proposées, et les points agrégés. Le front ne calcule ni moyenne ni

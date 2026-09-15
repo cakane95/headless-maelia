@@ -21,7 +21,10 @@ export const adminNav = [
 ];
 
 /** Rubriques d'un projet. Elles transportent son identifiant : chaque projet a
- *  ses propres données, scénarios et résultats. */
+ *  ses propres données et scénarios.
+ *
+ *  Pas de « Résultats » ici : des résultats sont ceux d'UNE exécution, et on y
+ *  entre depuis elle. Ça libère l'écran pour le graphique. */
 export function projectNav(projectId, projectName) {
   const base = `/simulation/projets/${projectId}`;
   return [
@@ -32,7 +35,6 @@ export function projectNav(projectId, projectName) {
         { to: `${base}/donnees`, label: "Données d'entrée" },
         { to: `${base}/scenarios`, label: "Scénarios" },
         { to: `${base}/simulations`, label: "Simulations" },
-        { to: `${base}/resultats`, label: "Résultats" },
       ],
     },
   ];
