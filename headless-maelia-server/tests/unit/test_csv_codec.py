@@ -4,9 +4,9 @@ Runs against the REAL files shipped under `includes/` when they are reachable â€
 a synthetic fixture would not exercise the BOM, the latin-1 fallback or the meta
 column of `reglesDeDecisions.csv`.
 
-Which territory supplies them does not matter, and is not fixed here: those
-folders exist to exercise GAMA, they come and go. The test takes the first
-territory that has the file, and skips when none does.
+They come from the reference territory, and from another shipped set only for a
+file it does not carry â€” those folders exist to exercise GAMA, they come and go.
+The test skips when no set has the file.
 """
 
 import pathlib
@@ -21,11 +21,17 @@ INCLUDES = pathlib.Path(
 )
 
 
+# The reference set: the one proven to carry a run through to the end. Another
+# set only stands in for a file this one does not have.
+REFERENCE_TERRITORY = "terrainTest"
+
+
 def shipped(relative: str) -> pathlib.Path | None:
-    """The file under whichever shipped territory happens to carry it."""
+    """The file under the reference territory, or failing that any other."""
     if not INCLUDES.is_dir():
         return None
-    for territory in sorted(p for p in INCLUDES.iterdir() if p.is_dir()):
+    folders = [d for d in INCLUDES.iterdir() if d.is_dir() and not d.name.startswith(".")]
+    for territory in sorted(folders, key=lambda d: (d.name != REFERENCE_TERRITORY, d.name)):
         candidate = territory / relative
         if candidate.is_file():
             return candidate

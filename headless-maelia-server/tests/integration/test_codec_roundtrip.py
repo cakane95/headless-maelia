@@ -30,7 +30,10 @@ def _real_csv_specs() -> list[tuple[str, DataSpec, pathlib.Path]]:
     for entry in json.loads(SEED.read_text(encoding="utf-8")):
         if entry["kind"] != "CSV" or not entry["file_name"]:
             continue
-        for territory in sorted(p for p in INCLUDES.iterdir() if p.is_dir()):
+        folders = [d for d in INCLUDES.iterdir() if d.is_dir() and not d.name.startswith(".")]
+        # Jeu de référence d'abord : c'est lui qui fait foi quand deux jeux
+        # portent le même fichier.
+        for territory in sorted(folders, key=lambda d: (d.name != "terrainTest", d.name)):
             path = territory / entry["relative_dir"] / entry["file_name"]
             if path.is_file():
                 spec = DataSpec(

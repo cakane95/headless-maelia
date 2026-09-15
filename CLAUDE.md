@@ -53,6 +53,11 @@ après toute modification de `app/worker/` ou `app/contexts/`.
    `gama-models/.../includes/` sont là pour **exercer GAMA depuis le banc
    d'essai**. Ils ne sont pas des territoires à proposer à la création d'un
    projet : les données d'un projet viennent de ses propres téléversements.
+   **`terrainTest` est le jeu de référence** — le seul dont on ait la preuve
+   qu'il mène un run à terme (un an, ~140 s, 9 fichiers de sortie). C'est lui
+   que prennent le territoire par défaut, le générateur de catalogue et les
+   tests sur fichiers réels ; un autre jeu ne dépanne que pour un fichier qu'il
+   ne porterait pas.
 7. **Invariant de chemins** : `api`, `worker` et `gama-headless` montent
    `./gama-models` sur `/usr/lib/gama/workspace/gama-models`. Un chemin calculé en
    Python est un chemin valide côté GAML.
@@ -126,4 +131,5 @@ services. « C'est plus propre » n'en est pas un.
 | ~+0,7 Gio par run simultané | dimensionner `WORKER_MAX_JOBS` sur la RAM, pas sur les cœurs |
 | Sorties écrites dans l'arbre du modèle | `models/main/log/` est ignoré par git |
 | `nomScenarioClimatique` non vide → météo **simulée** | `includes_sasseme` ne livre que l'observée : laisser ce paramètre vide sur ce jeu |
+| `includes_sasseme` n'a jamais mené un run à terme | il s'arrête sans rien dire sur « Création des systèmes de cultures » (739 parcelles, 44 exploitations) — utiliser `terrainTest` |
 | Une initialisation ratée n'émet aucun événement | le run resterait EN COURS sans fin — le marqueur console `ERREUR LORS DE L'INITIALISATION` le fait échouer |

@@ -258,15 +258,28 @@ def chemins_lus() -> dict[str, str]:
     return trouves
 
 
+# Jeu de référence : le seul dont on ait la preuve qu'il mène un run à terme
+# (un an, ~140 s, 9 fichiers de sortie). Les autres passent après, et ne
+# servent que pour un fichier qu'il ne porterait pas.
+REFERENCE_TERRITORY = "terrainTest"
+
+
+def territories(root):
+    """Les jeux livrés, le jeu de référence en tête."""
+    if not root.is_dir():
+        return []
+    found = [d for d in root.iterdir() if d.is_dir() and not d.name.startswith(".")]
+    return sorted(found, key=lambda d: (d.name != REFERENCE_TERRITORY, d.name))
+
+
 def main() -> int:
     if not MODELS.is_dir():
         print(f"modele introuvable : {MODELS}", file=sys.stderr)
         return 1
 
-    # Les territoires livres servent a exercer GAMA ; ils vont et viennent. On
-    # prend donc ce qui est present, sans en nommer aucun : le premier qui porte
-    # le fichier fournit ses en-tetes.
-    territoires = sorted(d for d in INCLUDES.iterdir() if d.is_dir() and not d.name.startswith("."))
+    # Les en-tetes viennent du jeu de reference ; un autre jeu ne depanne que
+    # pour un fichier qu'il ne porterait pas.
+    territoires = territories(INCLUDES)
     specs: list[dict] = []
 
     # Deux fichiers de meme nom mais d'extension differente (canaux.csv et

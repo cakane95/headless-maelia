@@ -73,9 +73,12 @@ class EmptyInventory:
 def available_territories() -> list[str]:
     """Territories shipped with the model, read from the shared volume.
 
+    The reference set comes first: it is the one proven to carry a run through
+    to the end, so it is the one a caller taking the first entry should get.
     `.runs` holds the per-run working copies, it is not a territory.
     """
     root = settings.MAELIA_PROJECT_DIR / "includes"
     if not root.is_dir():
         return []
-    return sorted(d.name for d in root.iterdir() if d.is_dir() and not d.name.startswith("."))
+    names = [d.name for d in root.iterdir() if d.is_dir() and not d.name.startswith(".")]
+    return sorted(names, key=lambda name: (name != settings.MAELIA_DEFAULT_TERRITORY, name))
