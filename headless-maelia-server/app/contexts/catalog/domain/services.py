@@ -97,18 +97,48 @@ def matches_instance(spec: DataSpec, file_name: str) -> bool:
     return re.fullmatch(spec.file_name_pattern, file_name) is not None
 
 
-def resolve_spec(specs: Sequence[DataSpec], file_name: str) -> DataSpec | None:
+def _situee_dans(spec: DataSpec, chemin: str) -> int:
+    """Longueur du dossier de la spec retrouve dans le chemin de l'archive.
+
+    Zero si le chemin ne passe pas par la. Sert a departager, donc la spec la
+    plus precise (le dossier le plus long) gagne.
+    """
+    dossier = chemin.replace("\\", "/").rsplit("/", 1)[0] if "/" in chemin else ""
+    attendu = (spec.relative_dir or "").strip("/")
+    if not attendu or not dossier:
+        return 0
+    return len(attendu) if attendu in dossier else 0
+
+
+def resolve_spec(
+    specs: Sequence[DataSpec], file_name: str, archive_path: str | None = None
+) -> DataSpec | None:
     """Find the spec matching a file name.
 
     Exact matches win over patterns: `canaux.csv` must land on its own spec, not
     on the "one file per canal" family.
+
+    Quand plusieurs specs acceptent le meme nom, le chemin dans l'archive
+    tranche : `meteo/observee/2019.csv` et `meteo/simulee/rcp8.5/2019.csv`
+    portent le meme nom et ne sont pas le meme fichier. Sans cet arbitrage, les
+    quatre series climatiques d'un territoire finissent dans la meme, et le run
+    reclame une meteo qu'il ne trouve pas.
     """
-    for spec in specs:
-        if spec.file_name == file_name:
-            return spec
-    for spec in specs:
-        if matches_instance(spec, file_name):
-            return spec
+    for candidats in (
+        [s for s in specs if s.file_name == file_name],
+        [s for s in specs if matches_instance(s, file_name)],
+    ):
+        if not candidats:
+            continue
+        if len(candidats) > 1 and archive_path:
+            situees = sorted(
+                ((_situee_dans(s, archive_path), s) for s in candidats),
+                key=lambda couple: couple[0],
+                reverse=True,
+            )
+            if situees[0][0] > 0:
+                return situees[0][1]
+        return candidats[0]
     return None
 
 

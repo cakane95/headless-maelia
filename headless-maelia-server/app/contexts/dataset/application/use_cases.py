@@ -348,9 +348,15 @@ async def build_overlays(
         if spec is None:
             continue
 
+        # Une cle d'instance peut porter un sous-dossier (`rcp8.5/2019.csv`) :
+        # c'est la que le modele va chercher le fichier.
+        sous_dossier = ""
+        if dataset.instance_key and "/" in dataset.instance_key:
+            sous_dossier = dataset.instance_key.rsplit("/", 1)[0]
+
         for entry in version.files:
             overlays.append(OverlayFile(
-                relative_dir=spec.relative_dir,
+                relative_dir=f"{spec.relative_dir}/{sous_dossier}".rstrip("/"),
                 file_name=entry.file_name,
                 content=await blobs.get(entry.content_hash),
             ))
@@ -450,8 +456,10 @@ def group_archive(members: dict[str, bytes], specs: Sequence[DataSpec]) -> list[
 
     Two rules do the work:
       - a shapefile travels as a set, so its sidecars are grouped by base name;
-      - the path inside the archive is ignored, only the file name matters —
-        users zip their folder the way they please.
+      - le nom du fichier suffit a le reconnaitre — chacun zippe son dossier
+        comme il l'entend — mais le chemin sert d'arbitre quand deux fichiers
+        portent le meme nom, et porte le sous-dossier d'une famille
+        (`meteo/simulee/<scenario>/<annee>.csv`).
     """
     groups: dict[tuple[str, str | None], dict] = {}
     unmatched: list[dict] = []
@@ -461,17 +469,17 @@ def group_archive(members: dict[str, bytes], specs: Sequence[DataSpec]) -> list[
         if not file_name or file_name.startswith("."):
             continue
 
-        spec = resolve_spec(specs, file_name)
+        spec = resolve_spec(specs, file_name, path)
         if spec is None and file_name.lower().endswith(SHAPEFILE_EXTENSIONS):
             # A sidecar carries no spec of its own: it follows its .shp.
             stem = file_name.rsplit(".", 1)[0]
-            spec = resolve_spec(specs, f"{stem}.shp")
+            spec = resolve_spec(specs, f"{stem}.shp", path)
 
         if spec is None:
             unmatched.append({"files": {file_name: payload}, "spec": None, "instance": None})
             continue
 
-        instance = instance_key_for(spec, file_name)
+        instance = instance_key_for(spec, file_name, path)
         key = (spec.id, instance)
         group = groups.setdefault(key, {"files": {}, "spec": spec, "instance": instance})
         group["files"][file_name] = payload

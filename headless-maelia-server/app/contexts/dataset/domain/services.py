@@ -95,9 +95,27 @@ def check_shapefile_set(spec: DataSpec, file_names: Sequence[str]) -> list[Valid
     )]
 
 
-def instance_key_for(spec: DataSpec, file_name: str) -> str | None:
-    """Instance name to store for a file, or None for a single-file spec."""
-    return file_name if spec.multi_instance else None
+def instance_key_for(
+    spec: DataSpec, file_name: str, archive_path: str | None = None
+) -> str | None:
+    """Instance name to store for a file, or None for a single-file spec.
+
+    Elle porte le sous-dossier quand l'archive en a un sous le dossier de la
+    spec : le modele lit `meteo/simulee/<scenario>/<annee>.csv`, et le scenario
+    ne se devine pas depuis le seul nom du fichier.
+    """
+    if not spec.multi_instance:
+        return None
+    if not archive_path:
+        return file_name
+
+    chemin = archive_path.replace(chr(92), "/").strip("/")
+    dossier = (spec.relative_dir or "").strip("/")
+    if dossier and dossier in chemin:
+        reste = chemin.split(dossier, 1)[1].strip("/")
+        if reste:
+            return reste
+    return file_name
 
 
 def normalise_upload_name(spec: DataSpec, uploaded: str, instance_key: str | None) -> str:
@@ -107,12 +125,15 @@ def normalise_upload_name(spec: DataSpec, uploaded: str, instance_key: str | Non
     keeps materialisation a plain byte copy.
     """
     extension = uploaded.rsplit(".", 1)[-1].lower() if "." in uploaded else ""
+    # La cle d'instance peut porter un sous-dossier : il decrit ou ecrire, pas
+    # comment le fichier s'appelle.
+    instance = instance_key.rsplit("/", 1)[-1] if instance_key else None
 
     if spec.kind is FileKind.SHAPEFILE:
-        stem = (spec.file_name or instance_key or uploaded).rsplit(".", 1)[0]
+        stem = (spec.file_name or instance or uploaded).rsplit(".", 1)[0]
         return f"{stem}.{extension}" if extension else stem
 
-    return spec.file_name or instance_key or uploaded
+    return spec.file_name or instance or uploaded
 
 
 def match_instance_name(spec: DataSpec, file_name: str) -> bool:
