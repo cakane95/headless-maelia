@@ -2,11 +2,14 @@ import { useNavigate } from "react-router";
 
 import EmptyState from "../../../components/EmptyState";
 import FileStatusBadge from "../../../components/FileStatusBadge";
+import { moduleLabel } from "../../../utils/status";
 
 /** Fichiers attendus par la configuration, et leur état. */
 export default function ExpectedFiles({ entries, datasetsBySpec, projectId }) {
   const navigate = useNavigate();
-  if (!entries?.length) return <EmptyState>Aucun fichier attendu.</EmptyState>;
+  if (!entries?.length) {
+    return <EmptyState>Aucun fichier ne correspond à ce filtre.</EmptyState>;
+  }
 
   return (
     <table>
@@ -16,6 +19,7 @@ export default function ExpectedFiles({ entries, datasetsBySpec, projectId }) {
           <th>Module</th>
           <th>État</th>
           <th>Versions</th>
+          <th className="cell--actions" />
         </tr>
       </thead>
       <tbody>
@@ -32,9 +36,10 @@ export default function ExpectedFiles({ entries, datasetsBySpec, projectId }) {
               }
             >
               <td>{entry.label}</td>
-              <td className="muted">{entry.module}</td>
+              <td className="muted">{moduleLabel(entry.module)}</td>
               <td><FileStatusBadge status={entry.status} /></td>
               <td className="muted">{dataset?.versions?.length ?? 0}</td>
+              <td className="cell--actions muted">{dataset ? "Ouvrir →" : ""}</td>
             </tr>
           );
         })}

@@ -7,7 +7,7 @@ import PageHeader from "../../components/PageHeader";
 import ProgressBar from "../../components/ProgressBar";
 import { useAsync } from "../../hooks/useAsync";
 import CompletionByModule from "./components/CompletionByModule";
-import ExpectedFiles from "./components/ExpectedFiles";
+import ExpectedFilesBrowser from "./components/ExpectedFilesBrowser";
 
 /** Données d'entrée d'un projet : ce qui est attendu, ce qui est fourni. */
 export default function ProjectData() {
@@ -45,8 +45,8 @@ export default function ProjectData() {
 
             <Card title="Fichiers attendus">
               <AsyncBoundary error={datasets.error} loading={datasets.loading}>
-                <ExpectedFiles
-                  entries={completion.data.entries}
+                <ExpectedFilesBrowser
+                  completion={completion.data}
                   datasetsBySpec={bySpec}
                   projectId={projectId}
                 />
