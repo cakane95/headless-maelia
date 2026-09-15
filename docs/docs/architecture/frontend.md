@@ -260,6 +260,12 @@ RunResults                  écran : les résultats d'UNE exécution
     └── (téléchargement)    BINARY
 ```
 
+**Une famille a son écran.** Un type d'entrée qui compte plusieurs fichiers —
+33 années de météo, 99 séries simulées — ne peut pas mener directement à « son »
+fichier : la table des fichiers attendus affiche alors leur **nombre** et ouvre
+la liste des instances, d'où l'on entre dans chacune. Ce que le projet détient
+sans que sa configuration le réclame est affiché à part, plutôt que tu.
+
 **L'ordre à l'écran est un choix.** Le tracé vient avant ses réglages, et les
 réglages s'ouvrent **sous** lui : on voit l'effet de chaque changement sans
 remonter. La barre de contexte est collée sous le bandeau pour la même raison —

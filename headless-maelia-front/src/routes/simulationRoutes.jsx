@@ -6,6 +6,7 @@ import SimulationShell from "../layouts/SimulationShell";
 import RunDetail from "../pages/RunDetail";
 import DatasetDetail from "../pages/simulation/DatasetDetail";
 import DatasetEdit from "../pages/simulation/DatasetEdit";
+import DatasetFamily from "../pages/simulation/DatasetFamily";
 import ProjectData from "../pages/simulation/ProjectData";
 import ProjectImport from "../pages/simulation/ProjectImport";
 import ProjectRuns from "../pages/simulation/ProjectRuns";
@@ -33,6 +34,7 @@ export const simulationRoutes = (
       <Route path="initialisation" element={<ProjectSetup />} />
       <Route path="import" element={<ProjectImport />} />
       <Route path="donnees" element={<ProjectData />} />
+      <Route path="donnees/famille/:specId" element={<DatasetFamily />} />
       <Route path="donnees/:datasetId" element={<DatasetDetail />} />
       <Route path="donnees/:datasetId/edition" element={<DatasetEdit />} />
       <Route path="scenarios" element={<Scenarios />} />

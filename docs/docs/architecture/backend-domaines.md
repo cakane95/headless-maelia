@@ -306,6 +306,23 @@ octet pour octet.
     reconstruire l'ordre des colonnes depuis les clés du brouillon réordonnerait
     le fichier, celui-ci étant stocké en JSONB dont la base normalise les clés.
 
+### Une famille de fichiers, un même type d'entrée
+
+Tous les types d'entrée n'ont pas un fichier unique : une série climatique en
+compte un par année, les prix un par scénario. Le catalogue les décrit par un
+**motif** (`\d{4}\.csv`) plutôt que par un nom, et chaque fichier reçu devient
+un `dataset` distinct, porteur d'une **clé d'instance** — c'est elle qui les
+distingue, la description et la validation restant communes.
+
+!!! danger "Le chemin de l'archive porte du sens"
+    Un territoire contient `meteo/observee/2019.csv` **et**
+    `meteo/simulee/rcp8.5/2019.csv` : même nom, fichiers différents. L'import
+    ignore l'arborescence — chacun zippe comme il l'entend — mais s'en sert pour
+    **départager** quand plusieurs specs acceptent le même nom, et pour porter le
+    sous-dossier dans la clé d'instance (`rcp8.5/2019.csv`). Sans cela les quatre
+    séries climatiques d'un territoire atterrissent dans la même, et le run
+    réclame ensuite une météo introuvable.
+
 ### Isolation par exécution
 
 MAELIA ne se contente pas de *lire* ses includes : il en **réécrit** certains

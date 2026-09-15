@@ -19,22 +19,23 @@ export default function ExpectedFiles({ entries, datasetsBySpec, projectId }) {
           <th>Attendu</th>
           <th>Module</th>
           <th>État</th>
-          <th>Versions</th>
+          <th>Fichiers</th>
           <th className="cell--actions" />
         </tr>
       </thead>
       <tbody>
         {entries.map((entry) => {
           const dataset = datasetsBySpec?.[entry.data_spec_id];
+          // Une famille mene a la liste de ses fichiers ; un fichier unique
+          // mene directement a ses versions.
+          const cible = entry.multi_instance
+            ? `/simulation/projets/${projectId}/donnees/famille/${encodeURIComponent(entry.data_spec_id)}`
+            : dataset && `/simulation/projets/${projectId}/donnees/${dataset.id}`;
           return (
             <tr
               key={entry.data_spec_id}
-              className={dataset ? "clickable" : undefined}
-              onClick={
-                dataset
-                  ? () => navigate(`/simulation/projets/${projectId}/donnees/${dataset.id}`)
-                  : undefined
-              }
+              className={cible ? "clickable" : undefined}
+              onClick={cible ? () => navigate(cible) : undefined}
             >
               <td>{entry.label}</td>
               <td>
@@ -46,8 +47,12 @@ export default function ExpectedFiles({ entries, datasetsBySpec, projectId }) {
               </td>
               <td className="muted">{moduleLabel(entry.module)}</td>
               <td><FileStatusBadge status={entry.status} /></td>
-              <td className="muted">{dataset?.versions?.length ?? 0}</td>
-              <td className="cell--actions muted">{dataset ? "Ouvrir →" : ""}</td>
+              <td className="muted">
+                {entry.multi_instance
+                  ? `${entry.instances} fichier${entry.instances > 1 ? "s" : ""}`
+                  : `${dataset?.versions?.length ?? 0} version${(dataset?.versions?.length ?? 0) > 1 ? "s" : ""}`}
+              </td>
+              <td className="cell--actions muted">{cible ? "Ouvrir →" : ""}</td>
             </tr>
           );
         })}

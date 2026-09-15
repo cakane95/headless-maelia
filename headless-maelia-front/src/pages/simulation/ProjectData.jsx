@@ -8,6 +8,7 @@ import ProgressBar from "../../components/ProgressBar";
 import { useAsync } from "../../hooks/useAsync";
 import CompletionByModule from "./components/CompletionByModule";
 import ExpectedFilesBrowser from "./components/ExpectedFilesBrowser";
+import UnexpectedData from "./components/UnexpectedData";
 
 /** Données d'entrée d'un projet : ce qui est attendu, ce qui est fourni. */
 export default function ProjectData() {
@@ -18,6 +19,21 @@ export default function ProjectData() {
 
   const bySpec = Object.fromEntries(
     (datasets.data ?? []).map((d) => [d.data_spec_id, d]),
+  );
+
+  // Ce que le projet détient sans que sa configuration le réclame : une archive
+  // de territoire en apporte, et les taire ferait croire à un import manqué.
+  const attendus = new Set((completion.data?.entries ?? []).map((e) => e.data_spec_id));
+  const horsConfiguration = Object.values(
+    (datasets.data ?? [])
+      .filter((d) => !attendus.has(d.data_spec_id))
+      .reduce((groupes, d) => {
+        const groupe = (groupes[d.data_spec_id] ??= {
+          specId: d.data_spec_id, count: 0, datasetId: d.id, instance: d.instance_key,
+        });
+        groupe.count += 1;
+        return groupes;
+      }, {}),
   );
 
   return (
@@ -53,6 +69,8 @@ export default function ProjectData() {
                 />
               </AsyncBoundary>
             </Card>
+
+            <UnexpectedData groups={horsConfiguration} projectId={projectId} />
           </>
         )}
       </AsyncBoundary>
