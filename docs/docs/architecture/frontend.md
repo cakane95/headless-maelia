@@ -348,6 +348,14 @@ ScenarioEdit               page : catalogue + scénario
     filtrage du sélecteur soumettrait le formulaire, c'est-à-dire enregistrerait
     le scénario au lieu de filtrer. Le sélecteur neutralise donc Entrée.
 
+!!! warning "Une ouverture dérivée se referme sous les doigts"
+    `<details open={nombreDEcarts > 0}>` rouvre la section quand on ajoute un
+    écart — et la **referme** quand on retire le dernier. Décocher une case
+    fermait donc la section qu'on était en train de remplir. L'ouverture
+    appartient à l'utilisateur dès qu'il y a touché : la section garde son état
+    local, que seuls la recherche et le filtre rouvrent, parce qu'eux changent
+    ce qu'on regarde.
+
 !!! warning "Un `input type=number` contrôlé avale le point décimal"
     Analyser la saisie à chaque frappe réécrit « 1. » en « 1 » : le décimal
     devient insaisissable. `ParameterField` garde donc son **texte** en état

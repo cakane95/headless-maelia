@@ -58,7 +58,8 @@ export default function ParameterEditor({ specs, values, onChange }) {
             onSet={set}
             onReset={reset}
             // Une recherche ou un filtre a déjà réduit la liste : on l'ouvre.
-            open={Boolean(query.trim()) || onlyModified}
+            // Au-delà, l'ouverture appartient à l'utilisateur.
+            forceOpen={Boolean(query.trim()) || onlyModified}
           />
         ))
       )}
