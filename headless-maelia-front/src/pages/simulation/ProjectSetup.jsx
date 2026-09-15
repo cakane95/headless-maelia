@@ -1,33 +1,30 @@
 import { useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 import { projectApi } from "../../api";
 import AsyncBoundary from "../../components/AsyncBoundary";
-import Card from "../../components/Card";
 import Modal from "../../components/Modal";
 import PageHeader from "../../components/PageHeader";
 import { useAsync } from "../../hooks/useAsync";
-import ArchiveUpload from "./components/ArchiveUpload";
-import IdentityCard from "./components/IdentityCard";
+import DataSummary from "./components/DataSummary";
+import IdentityFacts from "./components/IdentityFacts";
 import IdentityForm from "./components/IdentityForm";
 import ModelingConfigForm from "./components/ModelingConfigForm";
+import SetupSection from "./components/SetupSection";
 
 /** Initialisation d'un projet : identité, configuration, données de départ.
  *
- *  L'ordre des blocs suit celui du travail réel : la configuration décide des
- *  fichiers attendus, l'archive les fournit.
+ *  L'ordre suit celui du travail réel : la configuration décide des fichiers
+ *  attendus, l'import les fournit. L'import a sa propre page — il produit un
+ *  compte rendu qui mérite mieux qu'un bloc en bas d'écran.
  */
 export default function ProjectSetup() {
   const { projectId } = useParams();
+  const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const { data: project, error, loading, reload } = useAsync(
     () => projectApi.get(projectId), [projectId],
   );
-
-  function saved() {
-    setEditing(false);
-    reload();
-  }
 
   return (
     <>
@@ -39,9 +36,22 @@ export default function ProjectSetup() {
       <AsyncBoundary error={error} loading={loading}>
         {project && (
           <>
-            <IdentityCard project={project} onEdit={() => setEditing(true)} />
+            <SetupSection
+              title="Le projet"
+              lede="Le territoire ne change pas : il détermine quelles données sont lues."
+              action={
+                <button type="button" className="ghost" onClick={() => setEditing(true)}>
+                  Modifier
+                </button>
+              }
+            >
+              <IdentityFacts project={project} />
+            </SetupSection>
 
-            <Card title="Configuration de modélisation">
+            <SetupSection
+              title="Configuration de modélisation"
+              lede="Activer un module rend ses fichiers d'entrée obligatoires."
+            >
               <ModelingConfigForm
                 config={project.modeling_config}
                 onSubmit={async (config) => {
@@ -49,17 +59,31 @@ export default function ProjectSetup() {
                   reload();
                 }}
               />
-            </Card>
+            </SetupSection>
 
-            <Card title="Données de départ">
-              <ArchiveUpload projectId={projectId} onImported={reload} />
-            </Card>
+            <SetupSection
+              title="Données de départ"
+              lede="Ce que le projet contient, au regard de ce que la configuration attend."
+              action={
+                <button
+                  type="button"
+                  onClick={() => navigate(`/simulation/projets/${projectId}/import`)}
+                >
+                  Importer des données
+                </button>
+              }
+            >
+              <DataSummary projectId={projectId} />
+            </SetupSection>
 
             {editing && (
               <Modal title="Modifier le projet" onClose={() => setEditing(false)}>
                 <IdentityForm
                   project={project}
-                  onSaved={saved}
+                  onSaved={() => {
+                    setEditing(false);
+                    reload();
+                  }}
                   onCancel={() => setEditing(false)}
                 />
               </Modal>

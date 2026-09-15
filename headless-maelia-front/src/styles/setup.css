@@ -1,0 +1,142 @@
+/* =====================================================================
+   Initialisation d'un projet : trois étapes lues à la suite.
+   Le blanc sépare, pas la bordure — une page qui empile trois cartes
+   encadrées fabrique du bruit sans hiérarchiser quoi que ce soit.
+   ===================================================================== */
+
+.setup {
+  padding-bottom: var(--space-7);
+  margin-bottom: var(--space-7);
+  border-bottom: 1px solid var(--border);
+}
+.setup:last-of-type {
+  padding-bottom: 0;
+  margin-bottom: var(--space-6);
+  border-bottom: none;
+}
+
+.setup__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.setup__title {
+  margin: 0 0 var(--space-1);
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.setup__lede {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.setup__action { flex-shrink: 0; }
+
+/* La conséquence d'un réglage, dite avant de l'enregistrer. */
+.setup__consequence {
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-5) 0 0;
+  font-size: 0.85rem;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Modules ───────────────────────────────────────────────────────── */
+.modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-3);
+}
+
+.module {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  max-width: none;
+  margin: 0;
+  padding: var(--space-4);
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color var(--transition), background var(--transition);
+}
+.module:hover { border-color: var(--border-strong); }
+.module--on {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.module input {
+  width: auto;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+}
+.module__text {
+  display: block;
+  margin: 0;
+}
+.module__text b {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.module__text small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.76rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* ── Choix dépendants d'un module ──────────────────────────────────── */
+.choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0 var(--space-5);
+  margin-top: var(--space-5);
+}
+
+/* ── Zone de dépôt ─────────────────────────────────────────────────── */
+.dropzone {
+  padding: var(--space-7) var(--space-5);
+  text-align: center;
+  background: var(--surface);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition), background var(--transition);
+}
+.dropzone--over {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.dropzone__icon {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--text-muted);
+}
+.dropzone__title {
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.dropzone__hint {
+  margin: 0 0 var(--space-5);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Ce qu'il faut savoir avant de déposer : court, en liste. */
+.notes {
+  margin: var(--space-5) 0 0;
+  padding-left: var(--space-5);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.notes li { margin-bottom: var(--space-2); }

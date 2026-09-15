@@ -38,6 +38,11 @@ TERMINAL = {
 ENDED = {"SimulationEnded"}
 # Marqueur écrit par main.gaml juste avant `do pause` (cf. wait_for_end).
 END_MARKERS = ("*********** FIN DE SIMULATION ***********",)
+# Le modèle signale une initialisation ratée sur la console, puis ne fait plus
+# rien : ni cycle, ni `SimulationEnded`. Sans ce marqueur, le run reste EN COURS
+# jusqu'au délai de garde — une heure à ne rien produire (données météo absentes,
+# fichier d'entrée illisible...).
+FAILURE_MARKERS = ("ERREUR LORS DE L'INITIALISATION",)
 FAILED = {"SimulationError", "RuntimeError", "GamaServerError"}
 
 
@@ -84,9 +89,17 @@ class GamaSession:
         wanted: set[str],
         timeout: float,
         text_markers: tuple[str, ...] = (),
+        failure_markers: tuple[str, ...] = FAILURE_MARKERS,
     ) -> dict[str, Any]:
         """Lit le flux en relayant chaque message, jusqu'à un type `wanted`
-        ou une ligne de console contenant l'un des `text_markers`."""
+        ou une ligne de console contenant l'un des `text_markers`.
+
+        `failure_markers` interrompt la lecture sur une erreur annoncée par le
+        modèle : il ne la remonte pas au protocole, il l'écrit sur la console et
+        s'arrête. Elle survient **pendant le chargement** — l'`exp_id` est
+        renvoyé ensuite comme si de rien n'était, et `play` réussit sur un modèle
+        déjà mort. Surveiller la seule attente de fin ne suffirait donc pas.
+        """
 
         async def _loop() -> dict[str, Any]:
             while True:
@@ -94,8 +107,10 @@ class GamaSession:
                 await self._emit(message)
                 if message.get("type") in wanted:
                     return message
+                text = self._text_of(message) if (text_markers or failure_markers) else ""
+                if any(marker in text for marker in failure_markers):
+                    raise GamaError(text.strip())
                 if text_markers:
-                    text = self._text_of(message)
                     if any(marker in text for marker in text_markers):
                         return {
                             "type": "SimulationEnded",
@@ -164,6 +179,7 @@ class GamaSession:
         self,
         timeout: float | None = None,
         text_markers: tuple[str, ...] = END_MARKERS,
+        failure_markers: tuple[str, ...] = FAILURE_MARKERS,
     ) -> dict[str, Any]:
         """Bloque jusqu'à la fin de la simulation, en relayant tout le flux au passage.
 
@@ -171,10 +187,14 @@ class GamaSession:
         AVANT de poser `simulationTerminee`, si bien que l'expérience est déjà en
         pause quand la condition `until:` devient vraie — GAMA n'émet alors pas
         toujours l'événement. On surveille donc aussi le marqueur que le modèle
-        écrit sur la console en fin de run.
+        écrit sur la console en fin de run, et celui d'une initialisation ratée :
+        après lui, plus rien ne viendra.
         """
         message = await self._read_until(
-            ENDED | FAILED, timeout or settings.GAMA_RUN_TIMEOUT, text_markers=text_markers
+            ENDED | FAILED,
+            timeout or settings.GAMA_RUN_TIMEOUT,
+            text_markers=text_markers,
+            failure_markers=failure_markers,
         )
         if message.get("type") in FAILED:
             raise GamaError(f"simulation en échec : {message}")

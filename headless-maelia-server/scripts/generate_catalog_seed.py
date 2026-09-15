@@ -2,7 +2,7 @@
 
 Deux sources, dans cet ordre d'autorité :
   1. le **code GAML** — quels fichiers sont lus, où, par quel module ;
-  2. les **fichiers livrés** de `includes/terrainTest` — quels champs existent vraiment.
+  2. les **fichiers livrés** sous `includes/` — quels champs existent vraiment.
 
 Le tableur `MAELIA_Schema_Donnees.xlsx` n'est PAS utilisé : l'analyse
 (cf. docs/docs/reference/donnees-et-parametres.md §5.3) a montré qu'il contient des
@@ -263,8 +263,10 @@ def main() -> int:
         print(f"modele introuvable : {MODELS}", file=sys.stderr)
         return 1
 
-    base = INCLUDES / "terrainTest"
-    secours = INCLUDES / "includes_sasseme"
+    # Les territoires livres servent a exercer GAMA ; ils vont et viennent. On
+    # prend donc ce qui est present, sans en nommer aucun : le premier qui porte
+    # le fichier fournit ses en-tetes.
+    territoires = sorted(d for d in INCLUDES.iterdir() if d.is_dir() and not d.name.startswith("."))
     specs: list[dict] = []
 
     # Deux fichiers de meme nom mais d'extension differente (canaux.csv et
@@ -299,7 +301,7 @@ def main() -> int:
             "fields": [],
         }
 
-        for racine in (base, secours):
+        for racine in territoires:
             if kind == "CSV":
                 fichier = racine / chemin
                 if fichier.is_file():

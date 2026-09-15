@@ -49,13 +49,17 @@ après toute modification de `app/worker/` ou `app/contexts/`.
    téléchargement depuis Docker Hub avant tout build.
 5. **`pull_policy: build`** sur `api`, `worker`, `frontend` — sans quoi Compose
    tente de *pull* un tag local inexistant au premier démarrage.
-6. **Invariant de chemins** : `api`, `worker` et `gama-headless` montent
+6. **`includes/` n'est pas du matériel de projet.** Les jeux livrés sous
+   `gama-models/.../includes/` sont là pour **exercer GAMA depuis le banc
+   d'essai**. Ils ne sont pas des territoires à proposer à la création d'un
+   projet : les données d'un projet viennent de ses propres téléversements.
+7. **Invariant de chemins** : `api`, `worker` et `gama-headless` montent
    `./gama-models` sur `/usr/lib/gama/workspace/gama-models`. Un chemin calculé en
    Python est un chemin valide côté GAML.
-7. **Un run travaille sur une copie de ses includes.** MAELIA réécrit ses fichiers
+8. **Un run travaille sur une copie de ses includes.** MAELIA réécrit ses fichiers
    d'entrée pendant l'exécution ; deux runs partageant un répertoire se corrompent
    silencieusement.
-8. **Aucune boucle d'attente non bornée.** Elle doit rendre la main
+9. **Aucune boucle d'attente non bornée.** Elle doit rendre la main
    périodiquement et rester annulable.
 
 ## Règles de code — backend
@@ -121,3 +125,5 @@ services. « C'est plus propre » n'en est pas un.
 | `.project` requis | sans ce descripteur Eclipse, GAMA refuse de charger le modèle |
 | ~+0,7 Gio par run simultané | dimensionner `WORKER_MAX_JOBS` sur la RAM, pas sur les cœurs |
 | Sorties écrites dans l'arbre du modèle | `models/main/log/` est ignoré par git |
+| `nomScenarioClimatique` non vide → météo **simulée** | `includes_sasseme` ne livre que l'observée : laisser ce paramètre vide sur ce jeu |
+| Une initialisation ratée n'émet aucun événement | le run resterait EN COURS sans fin — le marqueur console `ERREUR LORS DE L'INITIALISATION` le fait échouer |

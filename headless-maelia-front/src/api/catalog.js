@@ -7,4 +7,10 @@ export const catalogApi = {
   dataspec: (id) => request(`/api/v1/dataspecs/${encodeURIComponent(id)}`),
   graph: () => request("/api/v1/dataspecs/graph"),
   parameters: () => request("/api/v1/parameters"),
+  // Fichiers attendus par une configuration de modélisation donnée.
+  applicable: (config) =>
+    request("/api/v1/dataspecs/applicable", {
+      method: "POST",
+      body: JSON.stringify(config ?? {}),
+    }),
 };

@@ -1,8 +1,12 @@
 """CSV codec: the symmetry that protects the "bytes are never regenerated" rule.
 
-Runs against the REAL files of `includes/terrainTest` when they are reachable —
+Runs against the REAL files shipped under `includes/` when they are reachable —
 a synthetic fixture would not exercise the BOM, the latin-1 fallback or the meta
 column of `reglesDeDecisions.csv`.
+
+Which territory supplies them does not matter, and is not fixed here: those
+folders exist to exercise GAMA, they come and go. The test takes the first
+territory that has the file, and skips when none does.
 """
 
 import pathlib
@@ -13,8 +17,19 @@ from app.contexts.catalog.domain.models import DataSpec, FileKind, Orientation
 from app.contexts.dataset.domain.codec import Table, decode, encode
 
 INCLUDES = pathlib.Path(
-    "/usr/lib/gama/workspace/gama-models/MAELIA_1.4.29_GAMA_2025-06/includes/terrainTest"
+    "/usr/lib/gama/workspace/gama-models/MAELIA_1.4.29_GAMA_2025-06/includes"
 )
+
+
+def shipped(relative: str) -> pathlib.Path | None:
+    """The file under whichever shipped territory happens to carry it."""
+    if not INCLUDES.is_dir():
+        return None
+    for territory in sorted(p for p in INCLUDES.iterdir() if p.is_dir()):
+        candidate = territory / relative
+        if candidate.is_file():
+            return candidate
+    return None
 
 
 def spec(**kw) -> DataSpec:
@@ -132,8 +147,8 @@ def test_roundtrip_on_shipped_files(relative, orientation, start):
     across every shipped file. Here we guard the weaker but faster property:
     a published version, once serialised, decodes back to the same table.
     """
-    path = INCLUDES / relative
-    if not path.is_file():
+    path = shipped(relative)
+    if path is None:
         pytest.skip(f"shipped file unavailable: {relative}")
 
     file_spec = spec(

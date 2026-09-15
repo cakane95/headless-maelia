@@ -4,7 +4,7 @@ A version published from an edited draft is serialised ONCE, then frozen. If
 `encode(decode(x)) != x`, that serialisation silently rewrites the file the model
 will read — and the results change for a reason nobody asked for.
 
-These tests run against the files actually shipped in `includes/terrainTest`.
+These tests run against every file actually shipped under `includes/`.
 """
 
 import json
@@ -30,8 +30,8 @@ def _real_csv_specs() -> list[tuple[str, DataSpec, pathlib.Path]]:
     for entry in json.loads(SEED.read_text(encoding="utf-8")):
         if entry["kind"] != "CSV" or not entry["file_name"]:
             continue
-        for territory in ("terrainTest", "includes_sasseme"):
-            path = INCLUDES / territory / entry["relative_dir"] / entry["file_name"]
+        for territory in sorted(p for p in INCLUDES.iterdir() if p.is_dir()):
+            path = territory / entry["relative_dir"] / entry["file_name"]
             if path.is_file():
                 spec = DataSpec(
                     id=entry["id"], label=entry["label"], module=entry["module"],
