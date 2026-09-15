@@ -1,16 +1,17 @@
 import { useState } from "react";
 
+import Card from "../../../components/Card";
 import Field from "../../../components/Field";
-import PinEditor from "./PinEditor";
+import ParameterEditor from "./ParameterEditor";
 
-/** Écarts de paramètres et versions épinglées d'un scénario.
+/** Un scénario : une identité, et des écarts aux valeurs par défaut du modèle.
  *
  *  `scenario` absent : création. Présent : modification de ce scénario.
  */
-export default function ScenarioForm({ datasets, scenario, onSubmit, onCancel }) {
+export default function ScenarioForm({ specs, scenario, onSubmit, onCancel }) {
   const [name, setName] = useState(scenario?.name ?? "");
-  const [years, setYears] = useState(scenario?.parameter_values?.nbAnneesSimulation ?? 1);
-  const [pins, setPins] = useState(scenario?.dataset_pins ?? {});
+  const [description, setDescription] = useState(scenario?.description ?? "");
+  const [values, setValues] = useState(scenario?.parameter_values ?? {});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
@@ -19,15 +20,9 @@ export default function ScenarioForm({ datasets, scenario, onSubmit, onCancel })
     setBusy(true);
     setError(null);
     try {
-      // Seuls les écarts voyagent : un paramètre non fourni garde le défaut du
-      // launcher, ce qui rend le scénario robuste aux montées de version.
-      await onSubmit({
-        name,
-        parameter_values: { nbAnneesSimulation: Number(years) },
-        dataset_pins: pins,
-      });
-    } catch (err) {
-      setError(err.message);
+      await onSubmit({ name, description: description || null, parameter_values: values });
+    } catch (failure) {
+      setError(failure.message);
     } finally {
       setBusy(false);
     }
@@ -35,20 +30,25 @@ export default function ScenarioForm({ datasets, scenario, onSubmit, onCancel })
 
   return (
     <form onSubmit={submit}>
-      <Field label="Nom">
-        <input value={name} onChange={(e) => setName(e.target.value)}
-               placeholder="ITK bas intrants" required />
-      </Field>
+      <Card title="Identité">
+        <Field label="Nom">
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Rotation bas intrants"
+            required
+          />
+        </Field>
+        <Field label="Description (optionnelle)" hint="Ce que ce scénario cherche à montrer.">
+          <input value={description} onChange={(event) => setDescription(event.target.value)} />
+        </Field>
+      </Card>
 
-      <Field label="Nombre d'années simulées">
-        <input type="number" min="1" max="10" value={years}
-               onChange={(e) => setYears(e.target.value)} />
-      </Field>
+      <Card title="Paramètres du modèle">
+        <ParameterEditor specs={specs} values={values} onChange={setValues} />
+      </Card>
 
-      <p className="muted">Versions de données</p>
-      <PinEditor datasets={datasets} pins={pins} onChange={setPins} />
-
-      <p>
+      <div className="form-actions form-actions--sticky">
         <button disabled={busy || !name}>
           {busy ? "Enregistrement…" : scenario ? "Enregistrer" : "Créer le scénario"}
         </button>{" "}
@@ -57,8 +57,8 @@ export default function ScenarioForm({ datasets, scenario, onSubmit, onCancel })
             Annuler
           </button>
         )}
-      </p>
-      {error && <p className="error">{error}</p>}
+        {error && <span className="error">{error}</span>}
+      </div>
     </form>
   );
 }

@@ -54,6 +54,25 @@ button.ghost:hover:not(:disabled) {
   background: var(--surface-muted);
 }
 
+/* Action irréversible : la couleur ne remplace pas la confirmation, elle
+   annonce ce que le bouton va faire. */
+button.danger {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+button.danger:hover:not(:disabled) { filter: brightness(0.92); }
+
+/* Bouton qui se lit comme un lien : action secondaire dans un bloc dense. */
+button.link {
+  padding: 0;
+  font-size: 0.72rem;
+  color: var(--accent-text);
+  background: none;
+  border: none;
+}
+button.link:hover:not(:disabled) { text-decoration: underline; }
+
 /* ── Formulaires ───────────────────────────────────────────────────── */
 label {
   display: block;
@@ -108,6 +127,29 @@ select:focus {
   margin: 0;
   color: var(--text);
   font-weight: 400;
+}
+
+/* Actions de bas de formulaire, détachées des champs. */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-top: var(--space-5);
+}
+
+/* Formulaire long (142 paramètres) : l'enregistrement reste à portée sans
+   qu'il faille redescendre au bas de la page. */
+.form-actions--sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  padding: var(--space-4);
+  margin-top: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
 }
 
 /* ── ThemeToggle ───────────────────────────────────────────────────── */

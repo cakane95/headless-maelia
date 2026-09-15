@@ -90,3 +90,18 @@ tr.selected td {
   border-radius: var(--radius-sm);
 }
 .button-link:hover { background: var(--accent-hover); }
+
+/* Colonne d'actions : collée à droite, sans largeur imposée. */
+.cell--actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Précision sous un libellé de ligne (description d'un scénario). */
+.row__note {
+  display: block;
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import EmptyState from "../../../components/EmptyState";
 import Field from "../../../components/Field";
+import { summarise } from "../../../utils/parameters";
 
 /** Choix du scénario à exécuter. Le reste — paramètres, versions de données —
  *  est déjà porté par le scénario : le lancement ne rouvre pas ces décisions. */
@@ -11,6 +12,7 @@ export default function LaunchScenarioForm({ scenarios, onLaunch, onCancel }) {
   const [error, setError] = useState(null);
 
   const selected = scenarioId || scenarios[0]?.id || "";
+  const chosen = scenarios.find((scenario) => scenario.id === selected);
 
   if (scenarios.length === 0) {
     return <EmptyState>Créez d'abord un scénario : il porte les paramètres du run.</EmptyState>;
@@ -31,7 +33,10 @@ export default function LaunchScenarioForm({ scenarios, onLaunch, onCancel }) {
 
   return (
     <form onSubmit={submit}>
-      <Field label="Scénario">
+      <Field
+        label="Scénario"
+        hint={chosen && `Écarts : ${summarise(chosen.parameter_values, 4)}`}
+      >
         <select value={selected} onChange={(e) => setScenarioId(e.target.value)}>
           {scenarios.map((scenario) => (
             <option key={scenario.id} value={scenario.id}>{scenario.name}</option>

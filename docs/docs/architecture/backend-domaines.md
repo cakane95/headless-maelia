@@ -24,7 +24,7 @@ flowchart TB
     subgraph SIMU["Domaine SIMULATION — exploite un modèle"]
         project["<b>project</b><br/><small>territoire + configuration<br/>complétude</small>"]
         dataset["<b>dataset</b><br/><small>versions immuables<br/>blobs · brouillon · validation</small>"]
-        scenario["<b>scenario</b><br/><small>écarts de paramètres<br/>versions épinglées</small>"]
+        scenario["<b>scenario</b><br/><small>écarts aux valeurs<br/>par défaut du launcher</small>"]
         run["<b>run</b><br/><small>résolution figée<br/>session GAMA</small>"]
         result["<b>result</b><br/><small>profil des sorties<br/>séries · comparaison</small>"]
     end
@@ -38,7 +38,7 @@ flowchart TB
     catalog -->|"ParameterSpec"| scenario
     project --> dataset
     project --> scenario
-    dataset -->|"versions"| scenario
+    dataset -.->|"pins (API)"| scenario
     scenario -->|"pins + écarts"| run
     dataset -->|"overlays"| run
     run -->|"fichiers produits"| result
@@ -322,16 +322,20 @@ flowchart LR
 
 ## 6. `scenario` — ce qui rend une exécution différente
 
-Un scénario porte deux choses, et rien d'autre : les **écarts** aux valeurs par
-défaut du launcher, et les **versions épinglées**.
+Un scénario est une **configuration de paramètres** : les écarts aux valeurs par
+défaut du launcher, et rien d'autre.
 
 **Seuls les écarts voyagent.** Stocker les 148 valeurs figerait les défauts du
 launcher au moment de la création ; une montée de version du modèle conserverait
-alors silencieusement des valeurs périmées.
+alors silencieusement des valeurs périmées. Reposer la valeur par défaut retire
+l'écart au lieu de l'enregistrer.
 
-**On n'épingle que ce qui doit varier.** Un fichier non épinglé suit la dernière
-version valide de son dataset, ce qui garde le scénario utile à mesure que les
-données sont corrigées.
+!!! info "Les entrées ne sont pas des scénarios"
+    L'API accepte toujours des `dataset_pins`, et la résolution au lancement s'en
+    sert quand ils existent — c'est le mécanisme de gel, il n'a pas bougé. Mais
+    **l'interface ne les expose plus** : un fichier suit la dernière version
+    valide de son dataset, et varier les données se fait en versionnant le
+    fichier, pas en créant un scénario. Un scénario parle de paramètres.
 
 ### Quatre refus, chacun avec une raison actionnable
 
@@ -340,7 +344,8 @@ données sont corrigées.
 | Paramètre inconnu du launcher | *il serait ignoré par GAMA* |
 | Paramètre système | *le fixer n'aurait aucun effet* |
 | Mauvais type | *« trois » n'est pas un int valide* |
-| Version épinglée absente | *introuvable pour `agri.culture.reglesDeDecisions`* |
+| Paramètre non modifiable | *sa valeur par défaut est une expression* |
+| Version épinglée absente | *introuvable pour `agri.culture.reglesDeDecisions`* (API seulement) |
 
 !!! note "`bool` est un `int` en Python"
     Sans garde explicite, `True` passerait pour `1` sur `nbAnneesSimulation`. La

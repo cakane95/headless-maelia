@@ -282,6 +282,41 @@ chaque clé par le libellé du run.
 
 ---
 
+## 6 ter. L'éditeur de paramètres
+
+Un scénario, c'est **142 paramètres modifiables** répartis en quinze sections du
+launcher. Trois décisions rendent l'écran utilisable :
+
+**Le formulaire ne stocke que les écarts.** Reposer un paramètre sur sa valeur
+par défaut ne l'enregistre pas — il sort du scénario. C'est ce qui permet à un
+scénario de survivre à une montée de version du modèle, et ce qui rend la
+colonne « écarts au modèle » lisible dans la liste.
+
+**Les sections sont repliées, sauf celles qui portent un écart.** Déplier 142
+champs d'un coup n'est pas une liste, c'est un mur. Une recherche ouvre les
+sections qui répondent.
+
+**Le contrôle vient du type déclaré au catalogue** — booléen, entier, flottant,
+liste, ou liste déroulante quand `allowed_values` est renseigné. Rien n'est câblé
+sur un nom de paramètre MAELIA.
+
+```
+ScenarioEdit               page : catalogue + scénario
+└── ScenarioForm           identité + éditeur + barre d'enregistrement collante
+    └── ParameterEditor    écarts, groupement, recherche
+        ├── ParameterBar   recherche · écarts seulement · tout rétablir
+        └── ParameterGroup une section repliable
+            └── ParameterField  un paramètre, son défaut, son « Rétablir »
+```
+
+!!! warning "Un `input type=number` contrôlé avale le point décimal"
+    Analyser la saisie à chaque frappe réécrit « 1. » en « 1 » : le décimal
+    devient insaisissable. `ParameterField` garde donc son **texte** en état
+    local et ne le resynchronise que lorsqu'il ne représente plus la valeur —
+    après « Rétablir », jamais pendant la frappe.
+
+---
+
 ## 7. Styles
 
 CSS natif, variables déclarées sur `:root`, classes sémantiques.

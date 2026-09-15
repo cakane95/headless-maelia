@@ -1,0 +1,109 @@
+/* =====================================================================
+   Édition des paramètres d'un scénario : barre de recherche, sections
+   repliables, champs marqués quand ils portent un écart.
+   ===================================================================== */
+
+/* ── Barre de filtrage ─────────────────────────────────────────────── */
+.params-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.params-bar__search {
+  flex: 1 1 240px;
+  max-width: 360px;
+  margin: 0;
+}
+.params-bar .switch { margin: 0; }
+.params-bar__count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ── Section du launcher ───────────────────────────────────────────── */
+.group {
+  margin-bottom: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.group[open] { background: var(--surface-muted); }
+
+.group__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.group__head::-webkit-details-marker { display: none; }
+/* Chevron dessiné en CSS : pas d'icône à charger pour une flèche. */
+.group__head::before {
+  content: "›";
+  display: inline-block;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+}
+.group[open] .group__head::before { transform: rotate(90deg); }
+
+.group__title {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+.group__count {
+  padding: 0 var(--space-2);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--neutral-soft);
+  border-radius: var(--radius-pill);
+}
+.group__badge {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 0.72rem;
+  color: var(--accent-text);
+}
+
+/* ── Champs ────────────────────────────────────────────────────────── */
+.params {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.param {
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+}
+/* Un écart se voit sans lire : c'est ce qui distingue le scénario du modèle. */
+.param--modified { border-left-color: var(--accent); }
+
+.param__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.param__name {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.param input,
+.param select { margin: 0; }
+.param .hint { display: block; margin-top: var(--space-1); }
+.param .switch { margin: 0; }
+
+/* Saisie que le type ne reconnaît pas : dite, pas bloquée. */
+.hint--warn { color: var(--warning); }
