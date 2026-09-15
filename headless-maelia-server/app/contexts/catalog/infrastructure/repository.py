@@ -13,13 +13,17 @@ from app.contexts.catalog.domain.models import (
     FieldSpec,
     FieldType,
     FileKind,
+    Granularity,
     Orientation,
+    OutputFileSpec,
+    OutputSpec,
     ParameterSpec,
     ParameterType,
 )
 from app.contexts.catalog.infrastructure.persistence import (
     DataSpecRow,
     FieldSpecRow,
+    OutputSpecRow,
     ParameterSpecRow,
 )
 
@@ -195,3 +199,73 @@ class SqlParameterRepository:
         row.origin = spec.origin
         await self._session.flush()
         return spec
+
+
+def _output_to_domain(row: OutputSpecRow) -> OutputSpec:
+    return OutputSpec(
+        id=row.id,
+        label=row.label,
+        theme=row.theme,
+        files=tuple(
+            OutputFileSpec(
+                name=entry["name"],
+                granularity=Granularity(entry.get("granularity") or "UNKNOWN"),
+            )
+            for entry in (row.files or [])
+        ),
+        description=row.description,
+        flag=row.flag,
+        produced_if=row.produced_if,
+        guard_source=row.guard_source,
+        exact=row.exact,
+        gaml_source=row.gaml_source,
+        origin=row.origin,
+    )
+
+
+class SqlOutputRepository:
+    """Output catalog: what the model can write, and under what conditions."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def list_all(self) -> list[OutputSpec]:
+        result = await self._session.execute(
+            select(OutputSpecRow).order_by(OutputSpecRow.theme, OutputSpecRow.id)
+        )
+        return [_output_to_domain(r) for r in result.scalars()]
+
+    async def get(self, spec_id: str) -> OutputSpec | None:
+        row = await self._session.get(OutputSpecRow, spec_id)
+        return _output_to_domain(row) if row else None
+
+    async def upsert(self, spec: OutputSpec) -> OutputSpec:
+        row = await self._session.get(OutputSpecRow, spec.id)
+        if row is None:
+            row = OutputSpecRow(id=spec.id)
+            self._session.add(row)
+        row.label = spec.label
+        row.theme = spec.theme
+        row.module = spec.module
+        row.description = spec.description
+        row.flag = spec.flag
+        row.files = [
+            {"name": f.name, "granularity": f.granularity.value} for f in spec.files
+        ]
+        row.produced_if = spec.produced_if
+        row.guard_source = spec.guard_source
+        row.exact = spec.exact
+        row.gaml_source = spec.gaml_source
+        row.origin = spec.origin
+        await self._session.flush()
+        return spec
+
+    async def delete(self, spec_id: str) -> bool:
+        result = await self._session.execute(
+            sql_delete(OutputSpecRow).where(OutputSpecRow.id == spec_id)
+        )
+        return result.rowcount > 0
+
+    async def count(self) -> int:
+        result = await self._session.execute(select(func.count()).select_from(OutputSpecRow))
+        return int(result.scalar_one())

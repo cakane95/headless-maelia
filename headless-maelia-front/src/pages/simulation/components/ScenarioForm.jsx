@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import Card from "../../../components/Card";
 import Field from "../../../components/Field";
+import { useExpectedOutputs } from "../../../hooks/useExpectedOutputs";
+import ExpectedOutputs from "./ExpectedOutputs";
 import ParameterEditor from "./ParameterEditor";
 
 /** Un scénario : une identité, et des écarts aux valeurs par défaut du modèle.
@@ -14,6 +16,9 @@ export default function ScenarioForm({ specs, scenario, onSubmit, onCancel }) {
   const [values, setValues] = useState(scenario?.parameter_values ?? {});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  // Ce que ces écarts feront écrire au modèle. Annoncé pendant la saisie, pas
+  // découvert à la fin d'un run.
+  const expectations = useExpectedOutputs(values);
 
   async function submit(event) {
     event.preventDefault();
@@ -47,6 +52,8 @@ export default function ScenarioForm({ specs, scenario, onSubmit, onCancel }) {
       <Card title="Paramètres du modèle">
         <ParameterEditor specs={specs} values={values} onChange={setValues} />
       </Card>
+
+      <ExpectedOutputs expectations={expectations} />
 
       <div className="form-actions form-actions--sticky">
         <button disabled={busy || !name}>

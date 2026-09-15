@@ -36,6 +36,27 @@ export const catalogApi = {
   restoreSpec: (id) =>
     request(`/api/v1/admin/dataspecs/${encodeURIComponent(id)}/restore`, { method: "POST" }),
 
+  // Sorties du modèle : ce qu'il peut écrire, et sous quelles conditions.
+  outputs: (module) =>
+    request(`/api/v1/outputs${module ? `?module=${encodeURIComponent(module)}` : ""}`),
+  output: (id) => request(`/api/v1/outputs/${encodeURIComponent(id)}`),
+  // Ce qu'un scénario portant ces écarts produirait. La condition est évaluée
+  // par le backend : le front affiche, il ne décide pas.
+  expectedOutputs: (values) =>
+    request("/api/v1/outputs/expected", {
+      method: "POST",
+      body: JSON.stringify({ values: values ?? {} }),
+    }),
+  saveOutput: (id, payload) =>
+    request(`/api/v1/admin/outputs/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  deleteOutput: (id) =>
+    request(`/api/v1/admin/outputs/${encodeURIComponent(id)}`, { method: "DELETE" }),
+  restoreOutput: (id) =>
+    request(`/api/v1/admin/outputs/${encodeURIComponent(id)}/restore`, { method: "POST" }),
+
   // Fichiers attendus par une configuration de modélisation donnée.
   applicable: (config) =>
     request("/api/v1/dataspecs/applicable", {

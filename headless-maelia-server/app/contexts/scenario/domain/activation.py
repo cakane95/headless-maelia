@@ -14,7 +14,11 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.contexts.catalog.domain.models import ParameterSpec
-from app.contexts.catalog.domain.services import InvalidExpression, evaluate_condition
+from app.contexts.catalog.domain.services import (
+    InvalidExpression,
+    evaluate_condition,
+    referenced_parameters,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,10 +80,13 @@ def activation(
 
 
 def _explication(condition: str, par_nom: Mapping[str, ParameterSpec]) -> str:
-    """Phrase lisible : « demande que X soit activé »."""
+    """Phrase lisible : « demande que X soit activé ».
+
+    Une condition peut lier ses termes par && ou par || ; on nomme les
+    paramètres cités, sans répéter celui qui apparaît deux fois.
+    """
     morceaux = []
-    for partie in condition.split("&&"):
-        nom = partie.strip().split("==")[0].split("!=")[0].strip()
+    for nom in referenced_parameters(condition):
         spec = par_nom.get(nom)
         morceaux.append(spec.label if spec and spec.label != nom else nom)
     return "demande que " + ", ".join(morceaux) + " soit activé"

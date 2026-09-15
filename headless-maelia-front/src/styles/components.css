@@ -233,3 +233,38 @@ select:focus {
   background: var(--surface-muted);
   color: var(--text);
 }
+
+/* ── Garde GAML en lecture ─────────────────────────────────────────── */
+/* La condition d'origine peut être longue ; elle doit rester lisible sans
+   déborder du formulaire. */
+.guard {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ── En-tête de carte ──────────────────────────────────────────────── */
+/* Titre, sous-titre et action se partagent la première ligne : l'action reste
+   au bord, à hauteur du titre, et ne s'intercale pas dans le contenu. */
+.card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.card__head > div { min-width: 0; }
+.card__head h3 { margin-bottom: 0; }
+.card__lede {
+  margin: var(--space-1) 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Une modale qui porte un tableau a besoin de la largeur d'une page. */
+.modal--wide { width: min(900px, 100%); }

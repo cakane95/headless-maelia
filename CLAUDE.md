@@ -74,8 +74,9 @@ après toute modification de `app/worker/` ou `app/contexts/`.
   ni websockets.
 - **Découper par contexte métier**, pas par couche technique.
 - **Rien de MAELIA en dur** : nom de fichier, de paramètre, de colonne — tout vient
-  du catalogue. 82 types de fichiers, 148 paramètres : le code par fichier est
-  une impasse.
+  du catalogue. 82 types de fichiers, 148 paramètres, 121 sorties : le code par
+  fichier est une impasse. Les trois catalogues se **régénèrent depuis le GAML**
+  (`scripts/generate_*_seed.py`), ils ne se saisissent pas.
 - **Ports = `typing.Protocol`**, créés seulement pour isoler une dépendance externe
   ou permettre une substitution réelle. Jamais par symétrie.
 - **Domaine en `@dataclass(frozen=True)`**, bords en Pydantic, persistance en
@@ -109,6 +110,10 @@ après toute modification de `app/worker/` ou `app/contexts/`.
   La version Java avait tout le reste au vert sans jamais l'avoir passé.
 - Après une modification du pipeline d'exécution : lancer un run d'un an
   (~75 s, 9 fichiers de sortie) et vérifier qu'il atteint `FINISHED`.
+- **Invariant du catalogue des sorties** : ce que le catalogue prédit pour des
+  réglages donnés est exactement ce que le run écrit — ni manquant, ni hors
+  catalogue. Tenu par `tests/unit/test_output_catalog.py` ; le revérifier après
+  toute régénération du seed.
 
 ## Calibrage
 
@@ -133,3 +138,5 @@ services. « C'est plus propre » n'en est pas un.
 | `nomScenarioClimatique` non vide → météo **simulée** | `includes_sasseme` ne livre que l'observée : laisser ce paramètre vide sur ce jeu |
 | `includes_sasseme` n'a jamais mené un run à terme | il s'arrête sans rien dire sur « Création des systèmes de cultures » (739 parcelles, 44 exploitations) — utiliser `terrainTest` |
 | Une initialisation ratée n'émet aucun événement | le run resterait EN COURS sans fin — le marqueur console `ERREUR LORS DE L'INITIALISATION` le fait échouer |
+| **Le modèle n'écrit rien par défaut** | chaque sortie est derrière un booléen, imbriqué dans les gardes de ses modules — un fichier absent n'est pas une panne |
+| 41 drapeaux de sortie absents du launcher | la sortie qu'ils commandent est inatteignable depuis un scénario ; l'écran le signale |

@@ -13,6 +13,12 @@ from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.contexts.catalog.application import outputs as output_cases
+from app.contexts.catalog.domain.outputs import Production
+from app.contexts.catalog.infrastructure.repository import (
+    SqlOutputRepository,
+    SqlParameterRepository,
+)
 from app.contexts.result.application import use_cases
 from app.contexts.result.domain.models import (
     Aggregate,
@@ -303,3 +309,60 @@ async def save_view(
 async def delete_view(views: Views, session: Session, view_id: uuid.UUID) -> None:
     await views.delete(view_id)
     await session.commit()
+
+
+# ── Ce que le run devait produire ───────────────────────────────────────────
+
+
+class OutputReviewOut(BaseModel):
+    """Les fichiers d'un run, confrontés à ce que ses réglages demandaient."""
+
+    produced: list[str] = Field(default_factory=list)
+    # Demandés par le scénario, absents du run : le problème est dans le modèle
+    # ou dans les données, pas dans les réglages.
+    missing: list[str] = Field(default_factory=list)
+    # Écrits sans que le catalogue les connaisse : une sortie à recenser.
+    undeclared: list[str] = Field(default_factory=list)
+    # Non demandés, avec le levier qui les obtiendrait.
+    available: list[dict[str, Any]] = Field(default_factory=list)
+
+
+@router.get("/runs/{run_id}/output-review", response_model=OutputReviewOut)
+async def output_review(
+    store: Store, session: Session, run_id: str
+) -> OutputReviewOut:
+    """Pourquoi tel fichier est là, et pourquoi tel autre ne l'est pas.
+
+    Sans ce croisement, un fichier absent ne se distingue pas d'un fichier
+    jamais demandé — et l'utilisateur cherche dans le modèle une panne qui
+    n'existe pas.
+    """
+    run = await _run(run_id)
+    outputs = SqlOutputRepository(session)
+    parameters = await SqlParameterRepository(session).list_all()
+    # Le run garde les écarts envoyés à GAMA ; les défauts viennent du catalogue.
+    values = {entry["name"]: entry.get("value") for entry in run.get("parameters") or []}
+
+    produced = [f.name for f in await use_cases.list_outputs(store, run)]
+    bilan = await output_cases.review_run(outputs, parameters, values, produced)
+
+    attentes = await output_cases.expectations(outputs, parameters, values)
+    available = [
+        {
+            "id": spec.id,
+            "label": spec.label,
+            "theme": spec.theme,
+            "files": list(spec.file_names),
+            "blocking": list(attente.blocking),
+            "reason": attente.reason,
+        }
+        for spec, attente in attentes
+        if attente.production is Production.ABSENT and attente.blocking
+    ]
+
+    return OutputReviewOut(
+        produced=list(bilan.produced),
+        missing=list(bilan.missing),
+        undeclared=list(bilan.undeclared),
+        available=sorted(available, key=lambda entry: (len(entry["blocking"]), entry["label"])),
+    )

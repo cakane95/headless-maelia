@@ -204,6 +204,7 @@ erreurs de collecte (cf. [l'inventaire](../reference/donnees-et-parametres.md)).
 ```bash
 python headless-maelia-server/scripts/generate_catalog_seed.py     # 82 entrées
 python headless-maelia-server/scripts/generate_parameter_seed.py   # 148 paramètres
+python headless-maelia-server/scripts/generate_output_seed.py      # 121 sorties
 ```
 
 Le seed est **idempotent et non destructif** : les specs modifiées à la main
@@ -214,7 +215,47 @@ retirées, sans quoi la plateforme réclamerait un fichier que GAMA ne lit plus.
 
 `GET /dataspecs` · `GET /dataspecs/{id}` · `GET /dataspecs/graph` ·
 `POST /dataspecs/applicable` · `GET /parameters` · `GET /parameters/groups` ·
-`PUT|DELETE /admin/dataspecs/{id}`
+`PUT|DELETE /admin/dataspecs/{id}` · `GET /outputs` · `GET /outputs/{id}` ·
+`POST /outputs/expected` · `PUT|DELETE /admin/outputs/{id}`
+
+### Les sorties : ce que le modèle peut écrire
+
+`OutputSpec` complète le catalogue du côté de la restitution. Elle ne décrit pas
+le **contenu** d'un fichier — le contexte `result` le lit (cf. §8) — mais la
+**condition** de son existence :
+
+```python
+@dataclass(frozen=True, slots=True)
+class OutputSpec:
+    id: str                    # l'interrupteur, quand il y en a un : « sorties_eau »
+    files: tuple[OutputFileSpec, ...]   # nom réel + pas de temps
+    produced_if: str | None    # condition évaluable, en forme normale disjonctive
+    guard_source: str | None   # la garde GAML telle quelle
+    exact: bool                # False si la traduction a dû abandonner un terme
+```
+
+MAELIA n'écrit rien par défaut : chaque sortie est derrière un booléen, imbriqué
+dans les gardes des modules dont elle dépend. Sans ce lien, **un scénario ne sait
+pas ce qu'il produira et un fichier absent ne s'explique pas** — il ne se
+distingue même pas d'un fichier jamais demandé.
+
+Trois lectures en découlent :
+
+| Question | Réponse |
+|---|---|
+| Que produira ce scénario ? | `POST /outputs/expected` avec ses écarts |
+| Pourquoi ce fichier manque-t-il ? | `GET /runs/{id}/output-review` |
+| Que dois-je activer pour l'obtenir ? | `Expectation.blocking`, la route la plus courte |
+
+**`exact = False` est la part d'honnêteté.** Cinq gardes sur 121 portent un terme
+que le langage de conditions ne sait pas dire (`length(listeCanaux) > 0`) ; le
+terme est écarté, la prédiction devient plus permissive que le modèle, et la
+sortie est annoncée *possible* — jamais certaine. Le texte GAML d'origine reste
+là pour vérifier.
+
+Le langage a dû gagner le `||` à cette occasion — les gardes de sortie en ont
+besoin, celles des entrées jamais. Il reste **sans parenthèses** : `&&` lie plus
+fort, et l'extraction distribue en forme normale disjonctive.
 
 ---
 
@@ -546,6 +587,14 @@ Neuf fichiers de sortie, jusqu'à trente colonnes chacun, et la liste grandit av
 le modèle : un catalogue de sorties saisi à la main serait faux à la première
 montée de version. La forme est donc **lue dans le fichier**, et les graphiques
 s'en déduisent.
+
+!!! note "Ce que `catalog` déclare, ce que `result` lit"
+    Le partage est net, et c'est ce qui permet aux deux d'exister :
+    `catalog.OutputSpec` dit **si** un fichier sera écrit et sous quelle
+    condition ; `result` dit **ce qu'il contient**, en l'ouvrant. Déclarer les
+    colonnes de 143 fichiers à la main serait faux dès la montée de version
+    suivante ; déduire la condition de production en lisant le fichier est
+    impossible — il n'est pas là.
 
 ```mermaid
 flowchart LR

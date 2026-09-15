@@ -209,3 +209,101 @@ class ParameterSpec:
             ParameterType.STRING: "string",
             ParameterType.LIST: "list",
         }.get(self.type, "string")
+
+
+class Granularity(StrEnum):
+    """Time step at which a result file is written.
+
+    Read from the variable the output module assigns (`nomFichierJournalier`,
+    `nomFichierFinAnnuel`…): the model states the step there and nowhere else.
+    """
+
+    DAILY = "DAILY"
+    YEAR_START = "YEAR_START"
+    YEAR_END = "YEAR_END"
+    MONTHLY = "MONTHLY"
+    FORTNIGHTLY = "FORTNIGHTLY"
+    UNKNOWN = "UNKNOWN"
+
+
+@dataclass(frozen=True, slots=True)
+class OutputFileSpec:
+    """One file a result module writes."""
+
+    name: str
+    granularity: Granularity = Granularity.UNKNOWN
+
+
+# Each model module is commanded by one switch, and that switch guards a whole
+# subtree of the code — the same convention the input catalog uses for
+# `required_if`.
+MODULE_SWITCHES = {
+    "executerModeleHydrographique": "modeleHydrographique",
+    "executerModeleNormatif": "modeleNormatif",
+    "executerModeleAgricole": "modeleAgricole",
+}
+
+
+@dataclass(frozen=True, slots=True)
+class OutputSpec:
+    """One family of result files, and what has to be true for it to be written.
+
+    MAELIA writes nothing by default: every result module sits behind a boolean
+    switch, itself nested inside the guards of the modules it needs. Without this
+    spec a scenario cannot say what it will produce, and a results screen cannot
+    explain a file that is not there.
+
+    `produced_if` is the guard translated into the catalog's condition language;
+    `guard_source` keeps the GAML verbatim, because a translation that drops a
+    term must remain auditable — `exact` says whether anything was dropped.
+    """
+
+    id: str
+    label: str
+    theme: str
+    files: tuple[OutputFileSpec, ...] = ()
+    description: str | None = None
+    flag: str | None = None
+    produced_if: str | None = None
+    guard_source: str | None = None
+    exact: bool = True
+    gaml_source: str | None = None
+    origin: str = "SEED"
+
+    @property
+    def unconditional(self) -> bool:
+        """Written on every run, whatever the scenario says."""
+        return not self.produced_if
+
+    @property
+    def module(self) -> str:
+        """Which model module has to run for this output to exist.
+
+        Read from the condition rather than stored: the module switch is already
+        one of its terms, and two copies of the same fact drift apart the day an
+        administrator edits the condition.
+        """
+        for switch, module in MODULE_SWITCHES.items():
+            if switch in (self.produced_if or ""):
+                return module
+        return "modeleCommun"
+
+    @property
+    def file_names(self) -> tuple[str, ...]:
+        return tuple(f.name for f in self.files)
+
+    def owns(self, file_name: str) -> bool:
+        """Is this produced file one of ours?
+
+        `nomDeLaSimulation` is appended to the base name before the extension.
+        It has been empty since 1.4.29 — the model now personalises the
+        directory instead — but a territory that still sets it would otherwise
+        make every file unrecognised.
+        """
+        for declared in self.file_names:
+            if file_name == declared:
+                return True
+            base, _, extension = declared.rpartition(".")
+            if base and file_name.startswith(base) and file_name.endswith(f".{extension}"):
+                return True
+        return False

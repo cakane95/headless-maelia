@@ -13,9 +13,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.contexts.catalog.api import routes as catalog_routes
 from app.contexts.catalog.infrastructure.repository import (
     SqlCatalogRepository,
+    SqlOutputRepository,
     SqlParameterRepository,
 )
-from app.contexts.catalog.infrastructure.seed import apply_parameter_seed, apply_seed
+from app.contexts.catalog.infrastructure.seed import (
+    apply_output_seed,
+    apply_parameter_seed,
+    apply_seed,
+)
 from app.contexts.dataset.api import routes as dataset_routes
 from app.contexts.project.api import routes as project_routes
 from app.contexts.result.api import routes as result_routes
@@ -42,8 +47,11 @@ async def lifespan(_: FastAPI):
         async with session_factory() as session:
             files = await apply_seed(SqlCatalogRepository(session))
             parameters = await apply_parameter_seed(SqlParameterRepository(session))
+            outputs = await apply_output_seed(SqlOutputRepository(session))
             await session.commit()
-        log.info("catalog loaded: files=%s parameters=%s", files, parameters)
+        log.info(
+            "catalog loaded: files=%s parameters=%s outputs=%s", files, parameters, outputs
+        )
     except Exception as exc:
         log.warning("catalog not loaded (%s) - see /api/v1/health/dependencies", exc)
     yield

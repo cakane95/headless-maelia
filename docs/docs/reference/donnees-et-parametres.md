@@ -143,7 +143,7 @@ territoire est donné par le paramètre `nomDecoupageZonePourLectureFichiers`.
 | `zonesAdministratives/seuilsDeRestriction.csv` | `modeleNormatif/zoneAdministrativeSimple.gaml` | — | — |
 | `zonesAdministratives/zonesAdministratives.shp` | `modeleNormatif/zoneAdministrative.gaml` | — | — |
 
-## 3. Fichiers de sortie (121 fichiers, pilotés par 102 drapeaux)
+## 3. Fichiers de sortie (121 sorties, 143 fichiers)
 
 Le modèle n'écrit pas tout : chaque famille de sortie est **conditionnée par un
 drapeau booléen**. `output/selectionOutput.gaml` déclare les 115 drapeaux et leurs
@@ -152,6 +152,12 @@ valeurs par défaut ; `output/ecritureResultats.gaml` fait l'aiguillage :
 ```gaml
 if (Assolement_SDC) { do initialisationEcritureFichiersAssolement_SDC(); }
 ```
+
+!!! tip "Ce lien est désormais dans le catalogue"
+    `scripts/generate_output_seed.py` suit cet aiguillage jusqu'aux noms de
+    fichiers littéraux et produit `seed/outputs.json`. Le drapeau seul ne suffit
+    pas : il est **imbriqué dans les gardes des modules** dont la sortie dépend,
+    et c'est la pile complète qui est extraite. Voir §3.2.
 
 Chaque module de sortie compose ensuite son nom de fichier ainsi :
 
@@ -272,19 +278,89 @@ plateforme pilote le run — ce qui rend le dossier déterministe.
 
 **Actives par défaut** (3) : `lien_ilots_zoneMeteo`, `suiviOT`, `suiviOTParParcelle`.
 
-### 3.1 Sorties écrites hors aiguillage
+### 3.1 Sorties écrites hors aiguillage (10)
 
-Ces fichiers ne dépendent d'aucun drapeau : ils sont produits à chaque exécution.
+Ces fichiers sont écrits directement, au fil du code, sans passer par
+`ecritureResultats.gaml`. L'analyse locale ne voit pas les conditions de
+l'appelant : on leur attribue donc la garde **sûre** de leur arborescence — un
+fichier écrit depuis `modeleHydrographique/` n'existe que si ce module tourne.
 
-| Fichier | Écrit par |
-|---|---|
-| `simulationParameters.txt` | `main/main.gaml` — trace exhaustive des paramètres du run |
-| `simulationDuration.txt` | `main/main.gaml` — durée totale |
-| `corresponsanceIlotZoneMeteo.csv` | `modeleCommun/zoneMeteoMoyenne.gaml` |
-| `id_ilot_zoneMeteo.csv` | `output/inputs_ilot_zoneMeteo.gaml` |
-| `surfaceParcelles.csv` | `modeleAgricole/Parcelles/parcelle.gaml` |
-| `missingITK.csv` | `modeleAgricole/ITKs/itk.gaml` — seulement si des ITK manquent |
-| `nbAgentsPerDay.csv` | `main/main.gaml` — si `executerEcritureFichiers` |
+| Fichier | Écrit par | Condition retenue |
+|---|---|---|
+| `simulationParameters.txt` | `main/main.gaml` | aucune |
+| `simulationDuration.txt` | `main/main.gaml` | aucune |
+| `corresponsanceIlotZoneMeteo.csv` | `modeleCommun/zoneMeteoMoyenne.gaml` | aucune |
+| `surfaceParcelles.csv` | `modeleAgricole/Parcelles/parcelle.gaml` | `executerModeleAgricole` |
+| `missingITK.csv` | `modeleAgricole/SystemesDeCultures/systemeDeCultureDeReference.gaml` | `executerModeleAgricole && remplacerItkManquants` |
+| `debugBilanSol.csv`, `debugBilanRoutage.csv`, `debugCouchesSolParHRU.csv`, `debugParHRU.csv`, `debugParHRU_ZH192.csv` | `modeleHydrographique/zoneHydrographiqueSWAT.gaml` | `executerModeleHydrographique` — garde interne non traduisible |
+
+!!! warning "Deux corrections par rapport à la version précédente de ce tableau"
+    `id_ilot_zoneMeteo.csv` **dépend bien d'un drapeau** (`lien_ilots_zoneMeteo`,
+    vrai par défaut) : il passe par l'aiguillage et figure au §3.
+
+    `nbAgentsPerDay.csv` **n'est jamais écrit** : sa variable de chemin existe,
+    mais le `save` est commenté dans `main.gaml`. Il ne figure plus au catalogue.
+
+
+### 3.2 La condition de production, et ce qu'elle coûte
+
+Une sortie n'est pas commandée par son seul drapeau. `ecritureResultats.gaml`
+imbrique les appels dans les gardes des modules, et la condition réelle est la
+**conjonction de la pile** :
+
+```gaml
+if(executerModeleHydrographique){
+    if(isPrelevementEtRejetSimules and executerModeleAgricole){
+        if(executerModeleNormatif){
+            if (UtilisationQuota and !isEauDisponibleAgriInfinie) { ... }
+```
+
+soit, dans le langage de conditions du catalogue :
+
+```
+executerModeleHydrographique == true && isPrelevementEtRejetSimules == true
+&& executerModeleAgricole == true && executerModeleNormatif == true
+&& UtilisationQuota == true && isEauDisponibleAgriInfinie != true
+```
+
+**Le `||` a dû être ajouté au langage.** Les gardes des entrées n'en avaient
+jamais eu besoin ; celles des sorties, si :
+
+```gaml
+if sorties_eau and (nomChoixModeleCroissancePlante=AqYield or ...=AqYieldNC)
+```
+
+Le langage reste **sans parenthèses** : `&&` lie plus fort que `||`, et
+l'extraction distribue en forme normale disjonctive. La condition tient donc sur
+une ligne, lisible par un administrateur dans une cellule de tableau.
+
+**Cinq gardes sur 121 ne sont pas entièrement traduisibles** —
+`length(listeCanaux) > 0`, un booléen d'état interne. Le terme est écarté, la
+sortie est marquée `exact = false`, et la plateforme l'annonce comme *possible*
+plutôt que certaine. Le texte GAML d'origine est conservé (`guard_source`) :
+une traduction qui abandonne un terme doit rester vérifiable.
+
+### 3.3 Quarante sorties hors de portée d'un scénario
+
+Sur les 115 drapeaux, **41 ne sont pas déclarés par `launcherBase.gaml`**. Ils ne
+peuvent donc pas être surchargés dans un `load` : la sortie qu'ils commandent est
+inatteignable, quoi que fasse l'utilisateur. Les rendre accessibles demande
+d'ajouter une ligne `parameter … var: …` au launcher — c'est une modification du
+**modèle**, pas du catalogue.
+
+L'écran `/admin/catalogue/sorties` les signale « hors de portée ».
+
+### 3.4 Invariant de vérification
+
+Le critère d'arrêt de l'extraction est objectif, et tenu par un test
+(`tests/unit/test_output_catalog.py`) :
+
+> Pour les réglages par défaut du launcher, les fichiers **prédits** par le
+> catalogue sont exactement ceux qu'un run `terrainTest` a **écrits** —
+> ni manquant, ni hors catalogue.
+
+Vérifié deux fois : 9 fichiers avec les défauts, et 11 après activation de
+`Assolement_espece` et `RDT_espece` dans un scénario.
 
 
 ## 4. Paramètres de scénario (148)
@@ -669,8 +745,11 @@ Les dix obligatoires de la configuration par défaut : `Engrais.csv`,
 | Paramètres exposés par `launcherBase.gaml` | **148** |
 | Drapeaux de sortie déclarés | **115** |
 | Drapeaux effectivement aiguillés | **102** |
-| Fichiers de sortie pilotés par un drapeau | **121** |
-| Fichiers de sortie systématiques | **7** |
+| Sorties au catalogue (`seed/outputs.json`) | **121** |
+| Fichiers de sortie déclarés | **143** |
+| Sorties écrites hors aiguillage | **10** |
+| Drapeaux absents du launcher (sorties hors de portée) | **41** |
+| Gardes non entièrement traduisibles | **5** |
 | Modules de sortie (`output/*.gaml`) | **145** |
 | Drapeaux actifs par défaut | **3** |
 

@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
  *  à l'élément qui l'a déclenchée à la fermeture — sans quoi la navigation au
  *  clavier repart du haut de la page.
  */
-export default function Modal({ title, onClose, children }) {
+export default function Modal({ title, onClose, children, wide = false }) {
   const panel = useRef(null);
   const opener = useRef(null);
 
@@ -33,7 +33,7 @@ export default function Modal({ title, onClose, children }) {
   return (
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
-        className="modal"
+        className={wide ? "modal modal--wide" : "modal"}
         role="dialog"
         aria-modal="true"
         aria-label={title}

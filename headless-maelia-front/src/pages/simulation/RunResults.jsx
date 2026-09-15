@@ -9,6 +9,7 @@ import PageHeader from "../../components/PageHeader";
 import { useAsync } from "../../hooks/useAsync";
 import CompareRuns from "./components/CompareRuns";
 import OutputPane from "./components/OutputPane";
+import OutputReview from "./components/OutputReview";
 import SavedViews from "./components/SavedViews";
 import ResultsToolbar from "./components/ResultsToolbar";
 
@@ -27,6 +28,8 @@ export default function RunResults() {
   const runs = useAsync(() => projectRunApi.list(projectId), [projectId]);
   const files = useAsync(() => resultApi.outputs(runId), [runId]);
   const views = useAsync(() => resultApi.views(projectId), [projectId]);
+  // Ce que le scénario demandait, confronté à ce que le run a écrit.
+  const review = useAsync(() => resultApi.review(runId), [runId]);
   const runIds = [runId, ...compared];
 
   // Les fichiers changent avec l'exécution : on ouvre le premier qui se trace.
@@ -68,6 +71,8 @@ export default function RunResults() {
           </Card>
         ) : (
           <>
+            <OutputReview review={review.data} />
+
             <SavedViews
               views={views.data ?? []}
               active={view?.id}

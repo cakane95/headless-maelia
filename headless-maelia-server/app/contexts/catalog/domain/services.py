@@ -36,19 +36,54 @@ def _literal(raw: str) -> Any:
         return raw
 
 
+def _operandes(expression: str) -> list[str]:
+    """Comparisons of an expression, whatever the operators joining them."""
+    return [
+        part
+        for alternative in expression.split("||")
+        for part in alternative.split("&&")
+        if part.strip()
+    ]
+
+
+def compared_parameter(term: str) -> str | None:
+    """The parameter a single comparison reads, or None if it is not one."""
+    match = _COMPARISON.match(term)
+    return match["param"] if match else None
+
+
+def referenced_parameters(expression: str) -> list[str]:
+    """Parameters a condition reads, in order of appearance, without repeats.
+
+    Feeds the screens: an output that is not produced must be able to say which
+    switch turns it on, and a parameter that is greyed out which one frees it.
+    """
+    names: list[str] = []
+    for part in _operandes(expression):
+        name = compared_parameter(part)
+        if name and name not in names:
+            names.append(name)
+    return names
+
+
 def evaluate_condition(expression: str, config: dict[str, Any]) -> bool:
     """Evaluate an applicability condition against the project configuration.
 
-    Accepted form: one or more `param == value` / `param != value` comparisons
-    joined by `&&` — all must hold. This is deliberately the useful minimum: a
-    hydrographic file in SWAT mode reads
-    `executerModeleHydrographique == true && nomChoixModeleHydrographique == 'SWAT'`.
-    No `||`, no parentheses: no real case needs them, and the condition must stay
-    readable by an administrator.
+    Accepted form: `param == value` / `param != value` comparisons joined by
+    `&&` and `||`, with `&&` binding tighter — the shape of a disjunctive normal
+    form, so parentheses are never needed. A hydrographic file in SWAT mode reads
+    `executerModeleHydrographique == true && nomChoixModeleHydrographique == 'SWAT'`;
+    an output guarded by two growth models reads
+    `sorties_eau == true && plante == 'AqYield' || sorties_eau == true && plante == 'AqYieldNC'`.
+
+    Parentheses stay out on purpose: the condition is read by an administrator in
+    a table cell, and the model's own guards all flatten to this form.
 
     A parameter missing from the configuration counts as unset: an equality is
     then false, an inequality true.
     """
+    if "||" in expression:
+        return any(evaluate_condition(part, config) for part in expression.split("||"))
     if "&&" in expression:
         return all(evaluate_condition(part, config) for part in expression.split("&&"))
 
@@ -209,7 +244,7 @@ def validate_spec(spec: DataSpec, known_ids: Iterable[str] = ()) -> list[SpecIss
             issues.append(SpecIssue(
                 "required_if",
                 "condition illisible : forme attendue « param == valeur », "
-                "plusieurs conditions liées par &&",
+                "plusieurs conditions liées par && (et) ou || (ou)",
             ))
 
     known = set(known_ids)
@@ -261,11 +296,11 @@ def validate_parameter(
             issues.append(SpecIssue(
                 "enabled_if",
                 "condition illisible : forme attendue « autreParametre == true », "
-                "plusieurs conditions liees par &&",
+                "plusieurs conditions liees par && (et) ou || (ou)",
             ))
         else:
             connus = set(known_names)
-            for partie in spec.enabled_if.split("&&"):
+            for partie in _operandes(spec.enabled_if):
                 commandant = partie.strip().split("==")[0].split("!=")[0].strip()
                 if commandant == spec.name:
                     issues.append(SpecIssue(

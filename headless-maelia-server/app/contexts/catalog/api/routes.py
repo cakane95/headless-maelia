@@ -10,21 +10,30 @@ from fastapi import APIRouter, Body, Depends, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.contexts.catalog.application import use_cases
+from app.contexts.catalog.application import outputs as output_cases, use_cases
 from app.contexts.catalog.domain.models import (
     DataSpec,
     FieldSpec,
     FieldType,
     FileKind,
+    Granularity,
     Orientation,
+    OutputFileSpec,
+    OutputSpec,
     ParameterSpec,
     ParameterType,
 )
+from app.contexts.catalog.domain.outputs import Production
 from app.contexts.catalog.infrastructure.repository import (
     SqlCatalogRepository,
+    SqlOutputRepository,
     SqlParameterRepository,
 )
-from app.contexts.catalog.infrastructure.seed import load_parameter_seed, load_seed
+from app.contexts.catalog.infrastructure.seed import (
+    load_output_seed,
+    load_parameter_seed,
+    load_seed,
+)
 from app.shared.database import get_session
 from app.shared.errors import NotFoundError
 
@@ -254,4 +263,169 @@ async def restore_parameter(parameters: Parameters, session: Session, name: str)
 @router.delete("/admin/parameters/{name}", status_code=204)
 async def delete_parameter(parameters: Parameters, session: Session, name: str) -> None:
     await use_cases.delete_parameter(parameters, name)
+    await session.commit()
+
+
+# ── Sorties du modèle (administration) ──────────────────────────────────────
+
+
+def output_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> SqlOutputRepository:
+    return SqlOutputRepository(session)
+
+
+Outputs = Annotated[SqlOutputRepository, Depends(output_repository)]
+
+
+class OutputFileOut(BaseModel):
+    name: str
+    granularity: Granularity = Granularity.UNKNOWN
+
+
+class OutputIn(BaseModel):
+    label: str
+    theme: str
+    description: str | None = None
+    flag: str | None = None
+    files: list[OutputFileOut] = Field(default_factory=list)
+    # Condition de production, dans le langage du catalogue.
+    produced_if: str | None = None
+
+
+class OutputOut(OutputIn):
+    id: str
+    module: str
+    # La garde GAML telle quelle : une traduction qui abandonne un terme doit
+    # rester vérifiable.
+    guard_source: str | None = None
+    exact: bool = True
+    gaml_source: str | None = None
+    origin: str
+    # Paramètres de la condition que le launcher n'expose pas : aucun scénario
+    # ne peut agir dessus.
+    unreachable: list[str] = Field(default_factory=list)
+
+
+def _render_output(spec: OutputSpec, exposed: set[str]) -> OutputOut:
+    return OutputOut(
+        id=spec.id,
+        label=spec.label,
+        theme=spec.theme,
+        module=spec.module,
+        description=spec.description,
+        flag=spec.flag,
+        files=[OutputFileOut(name=f.name, granularity=f.granularity) for f in spec.files],
+        produced_if=spec.produced_if,
+        guard_source=spec.guard_source,
+        exact=spec.exact,
+        gaml_source=spec.gaml_source,
+        origin=spec.origin,
+        unreachable=output_cases.unreachable_terms(spec, exposed),
+    )
+
+
+async def _exposed(parameters: SqlParameterRepository) -> set[str]:
+    return {spec.name for spec in await parameters.list_all()}
+
+
+@router.get("/outputs", response_model=list[OutputOut], tags=["output catalog"])
+async def list_outputs(
+    outputs: Outputs,
+    parameters: Parameters,
+    module: str | None = Query(None),
+    theme: str | None = Query(None),
+) -> list[OutputOut]:
+    """Ce que le modèle peut écrire, et sous quelles conditions."""
+    exposed = await _exposed(parameters)
+    specs = await output_cases.list_outputs(outputs, module=module, theme=theme)
+    return [_render_output(spec, exposed) for spec in specs]
+
+
+@router.get("/outputs/{spec_id}", response_model=OutputOut, tags=["output catalog"])
+async def get_output(outputs: Outputs, parameters: Parameters, spec_id: str) -> OutputOut:
+    spec = await output_cases.get_output(outputs, spec_id)
+    return _render_output(spec, await _exposed(parameters))
+
+
+class ExpectationOut(BaseModel):
+    id: str
+    label: str
+    theme: str
+    production: Production
+    files: list[str] = Field(default_factory=list)
+    # Paramètres à activer pour obtenir le fichier, le chemin le plus court.
+    blocking: list[str] = Field(default_factory=list)
+    reason: str = ""
+
+
+@router.post("/outputs/expected", response_model=list[ExpectationOut], tags=["output catalog"])
+async def expected_outputs(
+    outputs: Outputs,
+    parameters: Parameters,
+    values: Annotated[dict[str, Any], Body(embed=True)] = {},
+) -> list[ExpectationOut]:
+    """Ce qu'un scénario portant ces écarts produirait.
+
+    Le front demande, il n'évalue pas : deux évaluateurs, c'est deux réponses le
+    jour où la condition change de forme.
+    """
+    paires = await output_cases.expectations(outputs, await parameters.list_all(), values)
+    return [
+        ExpectationOut(
+            id=spec.id,
+            label=spec.label,
+            theme=spec.theme,
+            production=attente.production,
+            files=list(spec.file_names),
+            blocking=list(attente.blocking),
+            reason=attente.reason,
+        )
+        for spec, attente in paires
+    ]
+
+
+@router.put("/admin/outputs/{spec_id}", response_model=OutputOut, tags=["output catalog"])
+async def save_output(
+    outputs: Outputs, parameters: Parameters, session: Session, spec_id: str, payload: OutputIn
+) -> OutputOut:
+    """Écrire une sortie. Toute écriture manuelle la bascule en USER."""
+    existant = await outputs.get(spec_id)
+    spec = OutputSpec(
+        id=spec_id,
+        label=payload.label,
+        theme=payload.theme,
+        description=payload.description,
+        flag=payload.flag,
+        files=tuple(
+            OutputFileSpec(name=f.name, granularity=f.granularity) for f in payload.files
+        ),
+        produced_if=payload.produced_if,
+        # La garde GAML n'est pas modifiable : c'est le texte du modèle, la
+        # trace qui permet de vérifier la traduction.
+        guard_source=existant.guard_source if existant else None,
+        exact=existant.exact if existant else True,
+        gaml_source=existant.gaml_source if existant else None,
+        origin="USER",
+    )
+    saved = await output_cases.save_output(outputs, spec)
+    await session.commit()
+    return _render_output(saved, await _exposed(parameters))
+
+
+@router.post(
+    "/admin/outputs/{spec_id}/restore", response_model=OutputOut, tags=["output catalog"]
+)
+async def restore_output(
+    outputs: Outputs, parameters: Parameters, session: Session, spec_id: str
+) -> OutputOut:
+    """Revenir à ce que le modèle écrit, et rendre la sortie au seed."""
+    spec = await output_cases.restore_output(outputs, spec_id, load_output_seed())
+    await session.commit()
+    return _render_output(spec, await _exposed(parameters))
+
+
+@router.delete("/admin/outputs/{spec_id}", status_code=204, tags=["output catalog"])
+async def delete_output(outputs: Outputs, session: Session, spec_id: str) -> None:
+    await output_cases.delete_output(outputs, spec_id)
     await session.commit()

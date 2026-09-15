@@ -102,3 +102,34 @@ class ParameterSpecRow(Base):
     # '<autre parametre> == true' : condition d'activite.
     enabled_if: Mapped[str | None] = mapped_column(String(300), nullable=True)
     origin: Mapped[str] = mapped_column(String(10), default="SEED")
+
+
+class OutputSpecRow(Base):
+    """One family of result files, and the guard that decides it is written.
+
+    Keyed by the switch that commands it (`sorties_eau`) when there is one, so
+    the id reads the same in the catalog, in a scenario and in the GAML.
+    """
+
+    __tablename__ = "output_spec"
+
+    id: Mapped[str] = mapped_column(String(160), primary_key=True)
+    label: Mapped[str] = mapped_column(String(200))
+    theme: Mapped[str] = mapped_column(String(80), index=True)
+    module: Mapped[str] = mapped_column(String(40), index=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # The scenario parameter that switches it on, when the launcher exposes one.
+    flag: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    # Files stay with their spec: one to three per output, never queried on
+    # their own, and always read together. A child table would buy nothing.
+    files: Mapped[Any] = mapped_column(JSONB, default=list)
+
+    # Guard, twice over: evaluable, and verbatim. `exact` is false when the
+    # translation had to drop a term the condition language cannot express.
+    produced_if: Mapped[str | None] = mapped_column(Text, nullable=True)
+    guard_source: Mapped[str | None] = mapped_column(Text, nullable=True)
+    exact: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    gaml_source: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    origin: Mapped[str] = mapped_column(String(10), default="SEED")

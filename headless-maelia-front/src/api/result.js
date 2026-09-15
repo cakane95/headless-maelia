@@ -6,6 +6,9 @@ const file = (name) => encodeURIComponent(name);
 /** Sorties d'exécution : fichiers produits, profil des colonnes, séries à tracer. */
 export const resultApi = {
   outputs: (runId) => request(`/api/v1/runs/${runId}/outputs`),
+  // Les fichiers du run, confrontés à ce que ses réglages demandaient : un
+  // fichier absent se distingue alors d'un fichier jamais demandé.
+  review: (runId) => request(`/api/v1/runs/${runId}/output-review`),
   profile: (runId, name) => request(`/api/v1/runs/${runId}/outputs/${file(name)}/profile`),
   preview: (runId, name, limit = 50) =>
     request(`/api/v1/runs/${runId}/outputs/${file(name)}/preview?limit=${limit}`),

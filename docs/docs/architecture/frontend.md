@@ -364,6 +364,34 @@ ScenarioEdit               page : catalogue + scénario
 
 ---
 
+## 6 quater. Ce que la simulation va produire
+
+MAELIA n'écrit rien par défaut. Trois écrans portent cette contrainte, et aucun
+ne la calcule : la condition est évaluée au backend, où elle est écrite une fois.
+
+| Écran | Ce qu'il montre | Source |
+|---|---|---|
+| `/admin/catalogue/sorties` | les 121 sorties, leur interrupteur, leur pas de temps | `GET /outputs` |
+| Éditeur de scénario | « ce scénario produira N fichiers », en direct pendant la saisie | `POST /outputs/expected` |
+| Résultats d'un run | ce qui manque, ce qui n'était pas demandé, et le levier de chacun | `GET /runs/{id}/output-review` |
+
+`useExpectedOutputs` suit le même contrat que `useActivation` : débounce de
+300 ms, et **rien d'annoncé** en cas d'échec réseau plutôt qu'une liste fausse.
+
+Sur l'écran de résultats, le panneau est **replié quand tout est conforme** — il
+n'y a alors rien à lire. Il ne se déploie que pour deux constats :
+
+- **demandé mais absent** : la cause est dans le modèle ou dans les données, pas
+  dans les réglages ;
+- **écrit sans être au catalogue** : une sortie à recenser côté administration.
+
+Le catalogue signale enfin les **41 sorties hors de portée** : leur interrupteur
+n'est pas déclaré par le launcher, donc aucun scénario ne peut les activer. Les
+rendre accessibles est une modification du modèle, et l'écran le dit plutôt que
+de laisser chercher.
+
+---
+
 ## 7. Styles
 
 CSS natif, variables déclarées sur `:root`, classes sémantiques.
@@ -410,9 +438,9 @@ statuts modifiable en un point.
 
 **Conventions.** Chemins en français, en minuscules, avec tirets
 (`/admin/banc-essai`) · l'état d'un écran adressable vit dans l'URL, pas dans un
-state (un run consultable doit avoir son lien partageable) · une rubrique prévue
-mais non implémentée reçoit un `Placeholder` décrivant ce qui viendra, jamais une
-route absente ou un lien mort.
+state (un run consultable doit avoir son lien partageable) · jamais de route
+absente ni de lien mort : une rubrique annoncée dans la navigation est une
+rubrique qui existe.
 
 ---
 
@@ -446,12 +474,12 @@ route absente ou un lien mort.
 
 ## 11. État actuel
 
-**Fait.** `AppShell` avec bascule d'espace · `AdminLayout` et son espace
-opérationnel (tableau de bord des dépendances, modèles, banc d'essai avec
-lancement, historique, et détail temps réel : console GAMA en direct, date
-simulée, artefacts) · layout Simulation et navigation en place.
+**Fait.** `AppShell` avec bascule d'espace · espace Administration complet
+(tableau de bord, modèles, banc d'essai temps réel, et les **trois catalogues** :
+entrées, paramètres, sorties) · espace Simulation complet (projets, import,
+données d'entrée, scénarios, exécutions, résultats avec module de graphiques et
+lectures enregistrées).
 
-**À faire.** Les trois écrans de catalogue de l'espace Administration (entrées,
-paramètres, sorties) · l'ensemble de l'espace Simulation · l'extraction de
-`useRunStream` dans `hooks/` dès qu'un deuxième écran suivra un run · les
-graphiques de résultats (`recharts` est déjà installé).
+**À faire.** L'extraction de `useRunStream` dans `hooks/` dès qu'un troisième
+écran suivra un run · la jointure sortie ↔ entrée pour les figures qui croisent
+un résultat avec une donnée d'entrée (type de sol, cf. l'article Diohine).

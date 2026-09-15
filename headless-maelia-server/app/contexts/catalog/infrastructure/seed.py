@@ -17,7 +17,10 @@ from app.contexts.catalog.domain.models import (
     FieldSpec,
     FieldType,
     FileKind,
+    Granularity,
     Orientation,
+    OutputFileSpec,
+    OutputSpec,
     ParameterSpec,
     ParameterType,
 )
@@ -148,3 +151,77 @@ async def apply_parameter_seed(repository) -> dict[str, int]:
 
     log.info("parameters: %d written, %d preserved", written, preserved)
     return {"read": len(specs), "written": written, "preserved": preserved}
+
+
+OUTPUT_SEED_FILE = pathlib.Path(__file__).with_name("seed") / "outputs.json"
+
+
+def load_output_seed(path: pathlib.Path | None = None) -> list[OutputSpec]:
+    """Read the output reference, produced from the model's own routing code.
+
+    `scripts/generate_output_seed.py` follows `ecritureResultats.gaml` down to
+    the literal file names, which is the only place the flag → file link exists.
+    """
+    source = path or OUTPUT_SEED_FILE
+    if not source.is_file():
+        log.warning("output seed not found: %s", source)
+        return []
+
+    return [
+        OutputSpec(
+            id=entry["id"],
+            label=entry["label"],
+            theme=entry["theme"],
+            files=tuple(
+                OutputFileSpec(
+                    name=item["name"],
+                    granularity=Granularity(item.get("granularity") or "UNKNOWN"),
+                )
+                for item in entry.get("files") or []
+            ),
+            description=entry.get("description"),
+            flag=entry.get("flag"),
+            produced_if=entry.get("produced_if"),
+            guard_source=entry.get("guard_source"),
+            exact=entry.get("exact", True),
+            gaml_source=entry.get("gaml_source"),
+            origin="SEED",
+        )
+        for entry in json.loads(source.read_text(encoding="utf-8"))
+    ]
+
+
+async def apply_output_seed(repository) -> dict[str, int]:
+    """Write the output catalog, preserving local customisations.
+
+    Same contract as the input catalog: a SEED entry the model no longer routes
+    is removed, because keeping it would announce a file no run can produce.
+    """
+    specs = load_output_seed()
+    if not specs:
+        return {"read": 0, "written": 0, "preserved": 0, "removed": 0}
+
+    existing = {s.id: s for s in await repository.list_all()}
+    written = preserved = 0
+
+    for spec in specs:
+        current = existing.get(spec.id)
+        if current is not None and current.origin == "USER":
+            preserved += 1
+            continue
+        await repository.upsert(spec)
+        written += 1
+
+    expected = {s.id for s in specs}
+    obsolete = [s.id for s in existing.values() if s.origin == "SEED" and s.id not in expected]
+    for spec_id in obsolete:
+        await repository.delete(spec_id)
+
+    log.info(
+        "outputs: %d written, %d preserved, %d obsolete removed",
+        written, preserved, len(obsolete),
+    )
+    return {
+        "read": len(specs), "written": written,
+        "preserved": preserved, "removed": len(obsolete),
+    }
