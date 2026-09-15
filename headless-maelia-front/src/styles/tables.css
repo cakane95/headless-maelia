@@ -175,3 +175,11 @@ tr.selected td {
   font-size: 0.78rem;
   color: var(--text-muted);
 }
+
+/* Valeur par défaut : résumée, jamais étalée. Une liste de 165 identifiants
+   poussait les colonnes suivantes hors de l'écran. */
+.cell--default {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

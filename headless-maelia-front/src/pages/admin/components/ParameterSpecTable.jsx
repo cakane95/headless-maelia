@@ -1,5 +1,5 @@
 import EmptyState from "../../../components/EmptyState";
-import { toLabel } from "../../../utils/parameters";
+import { summariseDefault, toLabel } from "../../../utils/parameters";
 
 /** Paramètres de scénario. Purement présentationnel. */
 export default function ParameterSpecTable({ specs, onSelect }) {
@@ -24,7 +24,9 @@ export default function ParameterSpecTable({ specs, onSelect }) {
               {spec.label !== spec.name && <em className="row__note">{spec.label}</em>}
             </td>
             <td className="muted">{spec.type}</td>
-            <td className="muted">{toLabel(spec.default)}</td>
+            <td className="muted cell--default" title={toLabel(spec.default)}>
+              {summariseDefault(spec.default)}
+            </td>
             <td className="muted">
               {/* Un paramètre commandé par un autre reste grisé tant que
                   celui-ci est éteint. */}

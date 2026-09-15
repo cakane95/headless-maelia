@@ -35,6 +35,20 @@ export function toLabel(value) {
   return value === "" ? "vide" : String(value);
 }
 
+/** Valeur par défaut résumée pour une cellule de tableau.
+ *
+ *  `listAgriASuivre` en compte 165 : les afficher obligeait à faire défiler la
+ *  table de côté pour atteindre les colonnes suivantes. Le compte suffit à
+ *  situer le paramètre ; le détail s'obtient en l'ouvrant.
+ */
+export function summariseDefault(value, limit = 40) {
+  if (Array.isArray(value)) {
+    return value.length === 0 ? "liste vide" : `${value.length} valeur${value.length > 1 ? "s" : ""}`;
+  }
+  const texte = toLabel(value);
+  return texte.length > limit ? `${texte.slice(0, limit)}…` : texte;
+}
+
 const plain = (text) =>
   (text ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
