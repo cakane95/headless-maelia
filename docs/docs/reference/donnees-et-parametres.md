@@ -613,6 +613,54 @@ Deux familles restent à rattacher, faute de source vérifiable dans le code :
 `typeDeSolForceParcelle`. Les laisser libres vaut mieux qu'un rattachement
 approximatif qui proposerait les mauvaises valeurs.
 
+### 6.6 Obligatoire ou facultatif : le modèle le dit lui-même
+
+Tous les fichiers attendus ne bloquent pas un lancement. Le code distingue quatre
+situations, et c'est lui qui fait foi :
+
+| Dans le GAML | Conséquence |
+|---|---|
+| lecture directe, sans garde | **obligatoire** |
+| `if !file_exists(X) { raiseError }` | **obligatoire** — le modèle s'arrête |
+| `if !file_exists(X) { raiseWarning }` | facultatif — il prévient et continue |
+| `if (file_exists(X)) { … }` | facultatif |
+
+Quatre relais rendent l'analyse moins directe qu'il n'y paraît, et chacun a coûté
+un faux positif :
+
+- la lecture passe par une **action partagée** qui garde son argument
+  (`lectureDonneEcoParNatureDeRessource`) — toute la famille économique ;
+- la lecture est dans un bloc gardé par **un autre fichier**
+  (`if(file_exists(communesShape))`) ;
+- l'action qui lit n'est **appelée** que depuis un bloc gardé
+  (`initialisationCommunes`) ;
+- le modèle essaie **plusieurs emplacements** et ne lève l'erreur qu'au dernier
+  (`polygonesMeteoFrance.shp`).
+
+Une variable déclarée et jamais reprise ne lit rien : `contratsLivraison.csv` est
+du code mort. Un fichier lu seulement sous `output/` sert une sortie, pas le
+démarrage.
+
+**Le caractère obligatoire dépend des modules.** `required` dit « ce fichier
+étant attendu, peut-on démarrer sans lui » ; `required_if` dit s'il est attendu.
+L'applicabilité est calculée d'abord :
+
+| Configuration | Attendus | Obligatoires | Facultatifs |
+|---|---:|---:|---:|
+| Agricole seul (défaut) | 41 | 10 | 31 |
+| + hydrographique | 65 | 22 | 43 |
+| + normatif | 74 | 26 | 48 |
+
+!!! success "Contrôle"
+    Un run sur `terrainTest` va au bout. Donc **aucun fichier obligatoire de la
+    configuration agricole ne doit manquer de ce jeu** — c'est vérifié, et c'est
+    ce qui a permis d'éliminer les faux positifs un à un.
+
+Les dix obligatoires de la configuration par défaut : `Engrais.csv`,
+`especesCultivees.csv`, `ilots.shp`, `parcelles.shp`, `reglesDeDecisions.csv`,
+`reglesDeDecisions_fertilisation.csv`, `joursParMois.csv`,
+`polygonesMeteoFrance.shp`, `typeDeSolParZH.shp`, et la série climatique observée.
+
 ## 7. Chiffres
 
 | | Quantité |

@@ -12,9 +12,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.contexts.catalog.infrastructure.repository import SqlParameterRepository
+from app.contexts.catalog.infrastructure.repository import (
+    SqlCatalogRepository,
+    SqlParameterRepository,
+)
 from app.contexts.dataset.application.use_cases import resolve_versions
-from app.contexts.dataset.infrastructure.repository import SqlDatasetRepository
+from app.contexts.dataset.infrastructure.repository import (
+    SqlDatasetInventory,
+    SqlDatasetRepository,
+)
 from app.contexts.project.application import use_cases as project_use_cases
 from app.contexts.project.infrastructure.repository import SqlProjectRepository
 from app.contexts.run.infrastructure import redis_store as runs
@@ -24,6 +30,7 @@ from app.contexts.scenario.domain.services import effective_parameters
 from app.contexts.scenario.infrastructure.repository import SqlScenarioRepository
 from app.shared.config import settings
 from app.shared.database import get_session
+from app.shared.errors import ConflictError
 
 router = APIRouter(prefix="/api/v1/admin", tags=["test bench"])
 
@@ -155,6 +162,18 @@ async def launch_project_run(
 
     projects = SqlProjectRepository(session)
     project = await project_use_cases.get_project(projects, project_id)
+
+    # Un projet tourne sur SES données : ce qui manque manquera vraiment. Mieux
+    # vaut le dire ici qu'au bout de vingt minutes de simulation.
+    _, completion = await project_use_cases.project_completion(
+        projects, SqlCatalogRepository(session), SqlDatasetInventory(session), project_id
+    )
+    if completion.missing:
+        raise ConflictError(
+            f"{len(completion.missing)} entrée(s) obligatoire(s) manquante(s) : "
+            + ", ".join(e.label for e in completion.missing[:5])
+            + (" …" if len(completion.missing) > 5 else "")
+        )
 
     scenario = None
     parameters: list[dict[str, Any]] = []

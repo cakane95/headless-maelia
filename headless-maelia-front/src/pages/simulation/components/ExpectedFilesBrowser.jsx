@@ -16,6 +16,7 @@ export default function ExpectedFilesBrowser({ completion, datasetsBySpec, proje
   const [active, setActive] = useState("all");
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("");
+  const [obligatoires, setObligatoires] = useState(false);
 
   const entries = completion.entries;
   const tabs = useMemo(() => buildTabs(completion), [completion]);
@@ -24,6 +25,7 @@ export default function ExpectedFilesBrowser({ completion, datasetsBySpec, proje
     (entry) =>
       (active === "all" || entry.module === active) &&
       (!status || entry.status === status) &&
+      (!obligatoires || entry.required) &&
       entry.label.toLowerCase().includes(query.trim().toLowerCase()),
   );
 
@@ -50,6 +52,14 @@ export default function ExpectedFilesBrowser({ completion, datasetsBySpec, proje
             <option key={value} value={value}>{fileStatusLabel(value)}</option>
           ))}
         </select>
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={obligatoires}
+            onChange={(event) => setObligatoires(event.target.checked)}
+          />
+          <span>Obligatoires seulement</span>
+        </label>
         <span className="filters__count">
           {shown.length} fichier{shown.length > 1 ? "s" : ""}
         </span>

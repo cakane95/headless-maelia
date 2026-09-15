@@ -35,10 +35,11 @@ export default function ProjectData() {
         {completion.data && (
           <>
             <Card title="Avancement">
-              <ProgressBar ratio={completion.data.ratio} label="Complétude globale" />
+              <ProgressBar ratio={completion.data.ratio} label="Entrées obligatoires" />
               <p className="muted">
-                {completion.data.supplied} fichier(s) valide(s) sur{" "}
-                {completion.data.expected} attendu(s).
+                {completion.data.supplied} fichier(s) obligatoire(s) valide(s) sur{" "}
+                {completion.data.expected}. Un fichier facultatif manquant ne bloque
+                pas le lancement : le modèle continue sans lui.
               </p>
               <CompletionByModule byModule={completion.data.by_module} />
             </Card>

@@ -38,36 +38,50 @@ PREFIXE_MODULE = {
 
 # Familles a nom dynamique : le code compose le nom a l'execution.
 # id -> (relative_dir, motif de reconnaissance, libelle)
+# Familles a nom dynamique. Le quatrieme element dit si le modele s'arrete quand
+# la famille est absente : il ne se deduit pas d'un nom de fichier litteral,
+# puisqu'il n'y en a pas.
 MULTI_INSTANCE = {
     "commun.meteo.observee": (
         "modeleCommun/meteo/observee",
         r"\d{4}\.csv",
         "Serie climatique observee (un fichier par annee)",
+        # « aucun fichier meteo pour l'annee X » -> ERREUR LORS DE L'INITIALISATION
+        True,
     ),
     "commun.meteo.simulee": (
         "modeleCommun/meteo/simulee",
         r"\d{4}\.csv",
         "Serie climatique simulee (scenario / annee)",
+        # Lue seulement si nomScenarioClimatique est renseigne.
+        False,
     ),
     "agri.marcheAgricole.prixVentes": (
         "modeleAgricole/marcheAgricole",
         r"prixVentes.+\.csv",
         "Prix de vente par scenario",
+        # Un fichier par scenario de prix declare : sans scenario, rien a lire.
+        False,
     ),
     "agri.blocs": (
         "modeleAgricole",
         r"blocs(?!.*_cor).+\.csv",
         "Blocs d'assolement (selon nomChoixAssolement)",
+        # bloc.gaml:46 — absent, le modele construit les blocs lui-meme.
+        False,
     ),
     "agri.blocsCorriges": (
         "modeleAgricole",
         r"blocs.+_cor\.csv",
         "Blocs d'assolement corriges",
+        False,
     ),
     "hydro.canaux.donneesDetaillees": (
         "modeleHydrographique/canaux",
         r"(?!canaux\.csv).+\.csv",
         "Donnees detaillees par canal",
+        # main.gaml:344 — lus seulement si le shapefile des canaux existe.
+        False,
     ),
 }
 
@@ -272,6 +286,208 @@ def territories(root):
     return sorted(found, key=lambda d: (d.name != REFERENCE_TERRITORY, d.name))
 
 
+# ── Obligatoire ou facultatif ───────────────────────────────────────────────
+# Le modèle le dit lui-même, de quatre façons :
+#   lecture directe, aucune garde                      -> obligatoire
+#   `if !file_exists(X) { raiseError }`   il s'arrête  -> obligatoire
+#   `if !file_exists(X) { raiseWarning }` il prévient  -> facultatif
+#   `if (file_exists(X)) { ... }`         il continue  -> facultatif
+#
+# Deux pièges : le dossier est parfois une variable
+# (`cheminMarcheAgricole + 'primes.csv'`), et chercher le seul nom de fichier en
+# sous-chaine confond `ZH.shp` avec `altitudeAgregeesParZH.shp`. On cherche donc
+# un littéral qui se **termine** par le nom du fichier.
+AFFECTATION = re.compile(r"(?:^|\s)(?:\w+\s+)?(?P<var>[A-Za-z_]\w*)\s*<-")
+
+
+def lignes_gaml() -> list[tuple[str, int, str]]:
+    lignes = []
+    for chemin in sorted(MODELS.rglob("*.gaml")):
+        for numero, ligne in enumerate(
+            chemin.read_text(encoding="utf-8", errors="replace").splitlines(), 1
+        ):
+            if not ligne.strip().startswith("//"):
+                lignes.append((str(chemin.relative_to(MODELS)).replace("\\", "/"), numero, ligne))
+    return lignes
+
+
+def actions_prudentes(lignes: list[tuple[str, int, str]]) -> set[str]:
+    """Actions qui verifient l'existence du fichier qu'on leur passe.
+
+    `lectureDonneEcoParNatureDeRessource(string Chemin, ...)` ouvre son corps par
+    `if (file_exists(Chemin))` : tout fichier passe a cette action est lu
+    prudemment, meme si aucune garde n'entoure sa variable. Sans ce relais, une
+    dizaine de fichiers economiques passeraient pour obligatoires alors que le
+    modele tourne sans eux.
+    """
+    entete = re.compile(r"\baction\s+(?P<nom>\w+)\s*\((?P<params>[^)]*)")
+    prudentes: set[str] = set()
+
+    for index, (_, _, ligne) in enumerate(lignes):
+        trouve = entete.search(ligne)
+        if trouve is None:
+            continue
+        params = re.findall(r"string\s+(\w+)", trouve.group("params"))
+        if not params:
+            continue
+        corps = []
+        for _, _, suite in lignes[index + 1 : index + 60]:
+            if entete.search(suite):
+                break
+            corps.append(suite)
+        texte = " ".join(corps)
+        if any(re.search(r"file_exists\s*\(\s*" + re.escape(p) + r"\s*\)", texte) for p in params):
+            prudentes.add(trouve.group("nom"))
+
+    return prudentes
+
+
+# Une lecture peut etre enfermee dans un bloc garde par l'existence d'un AUTRE
+# fichier : `if(file_exists(communesShape)){ ... csv_file(cheminSalaireCommunes) }`.
+# Sans communes, ces fichiers ne sont jamais ouverts.
+PORTEE_BLOC = 20
+
+
+def _sous_garde(lignes: list[tuple[str, int, str]], index: int) -> bool:
+    """La ligne est-elle dans un bloc ouvert par un `if (file_exists(...))` ?"""
+    fichier = lignes[index][0]
+    for _, _, precedente in reversed(lignes[max(0, index - PORTEE_BLOC) : index]):
+        if ENTETE_ACTION.search(precedente):
+            return False
+        if re.search(r"if\s*\(?\s*file_exists\s*\(", precedente) and "!" not in precedente:
+            return True
+    return False
+
+
+# Une action se declare avec ou sans parentheses : `action f(string x){` comme
+# `action initialisationCommunes{`. Exiger la parenthese faisait manquer la
+# moitie des actions du modele.
+ENTETE_ACTION = re.compile(r"\baction\s+(?P<nom>\w+)\s*[({]")
+
+
+def _action_englobante(lignes, index: int) -> str | None:
+    """Nom de l'action qui contient cette ligne."""
+    fichier = lignes[index][0]
+    for f, _, precedente in reversed(lignes[:index]):
+        if f != fichier:
+            return None
+        trouve = ENTETE_ACTION.search(precedente)
+        if trouve:
+            return trouve.group("nom")
+    return None
+
+
+def _appels_tous_gardes(lignes, action: str) -> bool:
+    """Cette action n'est-elle appelee que depuis un bloc garde ?
+
+    `initialisationCommunes` lit son fichier sans precaution, mais elle n'est
+    appelee que sous `if(file_exists(communesShape))` : sans communes, le
+    fichier n'est jamais ouvert.
+    """
+    appel = re.compile(r"\bdo\s+" + re.escape(action) + r"\s*[(;]")
+    sites = [i for i, (_, _, ligne) in enumerate(lignes) if appel.search(ligne)]
+    return bool(sites) and all(_sous_garde(lignes, i) for i in sites)
+
+
+def est_obligatoire(
+    nom: str, lignes: list[tuple[str, int, str]], prudentes: set[str] = frozenset()
+) -> bool:
+    """Le modele s'arrete-t-il si ce fichier manque ?
+
+    Les tests suivent ce que le code dit, du plus direct au plus indirect :
+
+      1. variable jamais reprise ailleurs -> le fichier n'est pas lu : facultatif
+      2. lue seulement dans output/       -> depend d'une sortie : facultatif
+      3. passee a une action qui verifie son existence -> facultatif
+      4. toutes ses lectures sont dans un bloc `if (file_exists(...))` -> facultatif
+      5. `if !file_exists(X) { raiseError }`   -> obligatoire
+         `raiseWarning`, ou `if (file_exists(X))` -> facultatif
+      6. lue sans aucune garde            -> obligatoire
+
+    Ce verdict dit « ce fichier etant attendu, peut-on demarrer sans lui ». Il ne
+    dit pas s'il est attendu : c'est `required_if` qui porte la condition de
+    module, et l'applicabilite est calculee avant d'arriver ici.
+    """
+    porteur = re.compile(r"""['"](?:[^'"]*/)?""" + re.escape(nom) + r"""['"]""")
+    variables: set[str] = set()
+    litterales: list[int] = []
+
+    for index, (_, _, ligne) in enumerate(lignes):
+        if not porteur.search(ligne):
+            continue
+        trouve = AFFECTATION.search(ligne)
+        if trouve is None and index > 0:
+            # Chemin ecrit sur deux lignes : l'affectation est au-dessus.
+            precedente = lignes[index - 1][2]
+            if precedente.rstrip().endswith(("+", "<-")):
+                trouve = AFFECTATION.search(precedente)
+        if trouve and "file_exists" not in ligne:
+            variables.add(trouve.group("var"))
+        else:
+            litterales.append(index)
+
+    if litterales and not variables:
+        # Lecture en toutes lettres : la garde ne peut venir que du bloc, ou de
+        # l'action qui la contient.
+        if all(_sous_garde(lignes, i) for i in litterales):
+            return False
+        actions = {_action_englobante(lignes, i) for i in litterales}
+        actions.discard(None)
+        return not (actions and all(_appels_tous_gardes(lignes, a) for a in actions))
+    if not variables:
+        return False
+
+    emplois: dict[str, list[tuple[str, str, int]]] = {}
+    for var in variables:
+        mot = re.compile(r"\b" + re.escape(var) + r"\b")
+        affectation = re.compile(r"\b" + re.escape(var) + r"\s*<-")
+        emplois[var] = [
+            (fichier, ligne, index)
+            for index, (fichier, _, ligne) in enumerate(lignes)
+            if mot.search(ligne) and not affectation.search(ligne)
+        ]
+
+    utilisees = {var for var, ou in emplois.items() if ou}
+    if not utilisees:
+        return False  # declaree, jamais lue : le fichier n'est pas ouvert
+
+    toutes = [entree for var in utilisees for entree in emplois[var]]
+    if all(fichier.startswith("output/") for fichier, _, _ in toutes):
+        return False  # lue pour produire une sortie, pas pour demarrer
+
+    appel = re.compile(r"\bdo\s+(\w+)\s*\(")
+    if prudentes and all(
+        any(action in prudentes for action in appel.findall(ligne)) for _, ligne, _ in toutes
+    ):
+        return False
+
+    if all(_sous_garde(lignes, index) for _, _, index in toutes):
+        return False
+
+    englobantes = {_action_englobante(lignes, index) for _, _, index in toutes}
+    englobantes.discard(None)
+    if englobantes and all(_appels_tous_gardes(lignes, a) for a in englobantes):
+        return False
+
+    # La garde la plus contraignante l'emporte : le modele essaie parfois
+    # plusieurs emplacements et ne leve l'erreur qu'au dernier.
+    gardee = False
+    for var in sorted(utilisees):
+        garde = re.compile(r"file_exists\s*\(\s*" + re.escape(var) + r"\s*\)")
+        for index, (_, _, ligne) in enumerate(lignes):
+            if not garde.search(ligne):
+                continue
+            gardee = True
+            voisinage = " ".join(l for _, _, l in lignes[index : index + 3])
+            if re.search(r"!\s*file_exists", ligne) and "raiseError" in voisinage:
+                return True
+
+    if gardee:
+        return False
+
+    return True
+
+
 def main() -> int:
     if not MODELS.is_dir():
         print(f"modele introuvable : {MODELS}", file=sys.stderr)
@@ -280,6 +496,8 @@ def main() -> int:
     # Les en-tetes viennent du jeu de reference ; un autre jeu ne depanne que
     # pour un fichier qu'il ne porterait pas.
     territoires = territories(INCLUDES)
+    gaml = lignes_gaml()
+    prudentes = actions_prudentes(gaml)
     specs: list[dict] = []
 
     # Deux fichiers de meme nom mais d'extension differente (canaux.csv et
@@ -307,7 +525,7 @@ def main() -> int:
             "delimiter": ";",
             "has_header": True,
             "matrix_value_start_index": None,
-            "required": True,
+            "required": est_obligatoire(nom_fichier, gaml, prudentes),
             "required_if": condition(spec_id, module),
             "depends_on": DEPENDS_ON.get(spec_id, []),
             "gaml_source": source,
@@ -330,7 +548,7 @@ def main() -> int:
                     break
         specs.append(spec)
 
-    for spec_id, (dossier, motif, libelle) in MULTI_INSTANCE.items():
+    for spec_id, (dossier, motif, libelle, obligatoire) in MULTI_INSTANCE.items():
         specs = [s for s in specs if s["id"] != spec_id]
         module = dossier.split("/")[0]
         specs.append({
@@ -345,7 +563,7 @@ def main() -> int:
             "delimiter": ";",
             "has_header": True,
             "matrix_value_start_index": None,
-            "required": True,
+            "required": obligatoire,
             "required_if": condition(spec_id, module),
             "depends_on": DEPENDS_ON.get(spec_id, []),
             "gaml_source": None,

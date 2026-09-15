@@ -53,24 +53,35 @@ def materialize(
     run_id: str,
     territory: str,
     overlays: Iterable[OverlayFile] = (),
+    baseline: bool = True,
 ) -> str:
-    """Copy `includes/<territory>` into a run-specific directory, then overlay the
-    project's files onto it.
+    """Build the input set of a run, in a directory of its own.
 
-    Returns the value to hand to `cheminModeleVersDonnees`: the PARENT of the copy,
-    because the model appends `nomDecoupageZonePourLectureFichiers` itself.
+    `baseline=True` starts from a copy of `includes/<territory>`: that is the
+    **test bench**, which exercises GAMA on the data shipped with the model.
+
+    `baseline=False` starts from nothing: a **project** runs on its own files
+    and on nothing else. Copying a shipped territory underneath would silently
+    fill the gaps with test data — and the results would describe neither the
+    project nor the fixture.
+
+    Returns the value to hand to `cheminModeleVersDonnees`: the PARENT of the
+    directory, because the model appends `nomDecoupageZonePourLectureFichiers`.
     """
-    source = includes_root() / territory
-    if not source.is_dir():
-        raise FileNotFoundError(f"unknown territory: {source}")
-
     target_parent = run_includes_dir(run_id)
     target = target_parent / territory
 
     if target_parent.exists():
         shutil.rmtree(target_parent)
     target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(source, target)
+
+    if baseline:
+        source = includes_root() / territory
+        if not source.is_dir():
+            raise FileNotFoundError(f"unknown territory: {source}")
+        shutil.copytree(source, target)
+    else:
+        target.mkdir(parents=True)
 
     overlaid = 0
     for overlay in overlays:
@@ -80,8 +91,8 @@ def materialize(
         overlaid += 1
 
     log.info(
-        "includes materialised for %s: %s (%d project file(s) overlaid)",
-        run_id, target, overlaid,
+        "includes materialised for %s: %s (%d project file(s), baseline=%s)",
+        run_id, target, overlaid, baseline,
     )
     # The trailing slash matters: the model concatenates the territory name to it.
     return f"{target_parent.as_posix()}/"

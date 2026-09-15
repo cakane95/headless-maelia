@@ -103,13 +103,17 @@ async def run_simulation(ctx: dict[str, Any], run_id: str) -> dict[str, Any]:
         # Working copy BEFORE the load: a run must never read — nor rewrite —
         # the shared baseline, otherwise two concurrent runs corrupt each other.
         overlays = await _project_overlays(run)
+        # Un run de projet part de SES fichiers, et de rien d'autre. Le banc
+        # d'essai, lui, copie le jeu livré : c'est sa raison d'être.
+        from_project = bool(run.get("project_id"))
         await runs.append_log(
             run_id,
             f"[platform] materialising includes ({territory}, "
-            f"{len(overlays)} project file(s))...",
+            f"{len(overlays)} file(s)"
+            f"{', projet seul' if from_project else ', jeu livré'})...",
         )
         includes_path = await asyncio.to_thread(
-            includes.materialize, run_id, territory, overlays
+            includes.materialize, run_id, territory, overlays, not from_project
         )
 
         async with GamaSession(on_event=on_event) as session:

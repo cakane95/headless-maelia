@@ -20,9 +20,9 @@ export default function DataSummary({ projectId }) {
     <AsyncBoundary error={error} loading={loading}>
       {data && (
         <>
-          <ProgressBar ratio={data.ratio} label="Complétude" />
+          <ProgressBar ratio={data.ratio} label="Entrées obligatoires" />
           <p className="muted">
-            {data.supplied} fichier(s) valide(s) sur {data.expected} attendu(s).{" "}
+            {data.supplied} fichier(s) obligatoire(s) valide(s) sur {data.expected}.{" "}
             <Link to={`/simulation/projets/${projectId}/donnees`}>Voir le détail</Link>
           </p>
         </>

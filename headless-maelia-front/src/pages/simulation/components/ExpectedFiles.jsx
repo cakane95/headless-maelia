@@ -16,6 +16,7 @@ export default function ExpectedFiles({ entries, datasetsBySpec, projectId }) {
       <thead>
         <tr>
           <th>Fichier</th>
+          <th>Attendu</th>
           <th>Module</th>
           <th>État</th>
           <th>Versions</th>
@@ -36,6 +37,13 @@ export default function ExpectedFiles({ entries, datasetsBySpec, projectId }) {
               }
             >
               <td>{entry.label}</td>
+              <td>
+                {/* Obligatoire : le modèle s'arrête sans lui. Facultatif : il
+                    continue, avec moins de détail. */}
+                <span className={entry.required ? "badge INVALID" : "badge"}>
+                  {entry.required ? "Obligatoire" : "Facultatif"}
+                </span>
+              </td>
               <td className="muted">{moduleLabel(entry.module)}</td>
               <td><FileStatusBadge status={entry.status} /></td>
               <td className="muted">{dataset?.versions?.length ?? 0}</td>

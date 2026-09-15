@@ -94,6 +94,18 @@ class Completion:
         return sum(1 for e in self.entries if e.required and e.status is FileStatus.VALID)
 
     @property
+    def missing(self) -> tuple[CompletionEntry, ...]:
+        """Les entrées obligatoires qu'un run ne trouverait pas.
+
+        Un brouillon n'est pas un fichier fourni : il n'est pas publié, donc le
+        run ne le lirait pas. Un fichier invalide non plus — le charger
+        produirait un résultat qu'on ne pourrait pas défendre.
+        """
+        return tuple(
+            e for e in self.entries if e.required and e.status is not FileStatus.VALID
+        )
+
+    @property
     def ratio(self) -> float:
         return round(self.supplied / self.expected, 4) if self.expected else 1.0
 
